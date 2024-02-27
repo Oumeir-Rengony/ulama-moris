@@ -1,0 +1,16 @@
+{
+  "name": "contentful",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "bayaan": "node ./bayaan/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mohammad Oumeir Rengony",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "contentful-management": "^10.3.1"
+  }
+}
