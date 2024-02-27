@@ -1,0 +1,10 @@
+fragment AssetsFields on Asset {
+  title
+  description
+  contentType
+  fileName
+  size
+  url
+  width
+  height
+}

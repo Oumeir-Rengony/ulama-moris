@@ -1,0 +1,14 @@
+{
+    "contentful":{
+        "host": "https://graphql.contentful.com/content/v1/spaces/",
+        "locale": "en-US"
+    },
+    "bayaan": {
+        "pageSize": 8,
+        "dateFilterFormat": "YYYY-MM-DD",
+        "displayFormat": "DD MMMM YYYY"
+    },
+    "filter": {
+        "calendarFormat": "YYYY-MM-DD"
+    }
+}
