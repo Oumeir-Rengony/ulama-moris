@@ -110,8 +110,15 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
     useEffect(() => {
         if(typeof window !== 'undefined'){
-            console.log(window.location.href)
-            setWhatsApp(`whatsapp://send?text=${window.location.href}`);
+            const queryParams = new URLSearchParams(window.location.search); 
+
+            if(queryParams.has("id")){
+                queryParams.delete("id");
+            }
+
+            queryParams.append("id", index);
+            const url = `${window.location.origin}/?${queryParams.toString()}`;
+            setWhatsApp(`whatsapp://send?text=${encodeURIComponent(url)}`);
         }
     },[])
 
