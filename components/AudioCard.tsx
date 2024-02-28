@@ -160,9 +160,10 @@ const AudioCard: React.FC<AudioCardProps> = ({
                     onPause={onPause}
                     className="audio"
                     controls
-                    controlsList="nodownload noplaybackrate"
-                    src={audio?.url} 
-                />             
+                    controlsList="nodownload noplaybackrate noremoteplayback nodownload"
+                >
+                    <source src={audio?.url} type={audio.contentType} />
+                </audio>           
             </figure>
 
 
