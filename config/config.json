@@ -3,6 +3,7 @@
         "host": "https://graphql.contentful.com/content/v1/spaces/",
         "locale": "en-US"
     },
+    "title": "Ulama de Moris",
     "bayaan": {
         "pageSize": 8,
         "dateFilterFormat": "YYYY-MM-DD",
