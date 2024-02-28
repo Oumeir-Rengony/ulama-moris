@@ -3,7 +3,10 @@
         "host": "https://graphql.contentful.com/content/v1/spaces/",
         "locale": "en-US"
     },
-    "title": "Ulama de Moris",
+    "meta":{
+        "title": "Ulama de Moris",
+        "description": "Explication deen par les ulama de moris"
+    },
     "bayaan": {
         "pageSize": 8,
         "dateFilterFormat": "YYYY-MM-DD",
