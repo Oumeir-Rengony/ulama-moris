@@ -59,6 +59,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
     audio,
 }) => {
 
+    const [whatsApp, setWhatsApp] = useState<string>('');
     const [showPulsar, setShowPulsar] = useState<boolean>(false);
 
     const audioRef = useRef<HTMLAudioElement>();
@@ -107,6 +108,13 @@ const AudioCard: React.FC<AudioCardProps> = ({
     },[audioRef, router.query.id, index])
 
 
+    useEffect(() => {
+        if(typeof window !== 'undefined'){
+            console.log(window.location.href)
+            setWhatsApp(`whatsapp://send?text=${window.location.href}`);
+        }
+    },[])
+
 
     const onPlay = (e) => {
 
@@ -125,6 +133,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
             onAudioPause(e);
         }
     }
+
 
 
 
@@ -157,7 +166,9 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
             <div className="bottom">
                 <div className="share-links">
-                    <ShareIcon/>
+                    <a href={whatsApp} data-action="share/whatsapp/share">
+                        <ShareIcon/>
+                    </a>
                     <a href="" download={audio.url}><DownloadIcon download={audio.url}/></a>
                 </div>
             </div>
