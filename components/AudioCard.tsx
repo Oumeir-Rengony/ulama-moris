@@ -166,10 +166,8 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
             <div className="bottom">
                 <div className="share-links">
-                    <a href={whatsApp} data-action="share/whatsapp/share">
-                        <ShareIcon/>
-                    </a>
-                    <a href="" download={audio.url}><DownloadIcon download={audio.url}/></a>
+                    <a href={whatsApp} data-action="share/whatsapp/share"><ShareIcon/></a>
+                    {/* <a href={audio.url} download={audio.url}><DownloadIcon download={audio.url}/></a> */}
                 </div>
             </div>
             
@@ -229,7 +227,7 @@ const StyledWrapper = styled.div`
 
         .audio::-webkit-media-controls-timeline {
             width: 100%;
-            padding: 0 0 0 12px;
+            padding: 0 0 0 4px;
         }
 
     }
@@ -257,12 +255,18 @@ const StyledWrapper = styled.div`
         gap: 12px;
         cursor: pointer;
 
-        .download-icon {
+        @media(min-width: 992px){
+                display: none;
+            }
+
+
+        /* .download-icon {
+
             &:hover {
                 fill: #4e4e50 ;
                 border-radius: 2px;
             }
-        }
+        } */
 
         .share-icon {
             padding: 1px;
