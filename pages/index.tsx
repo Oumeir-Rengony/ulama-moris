@@ -170,8 +170,18 @@ function Home({
         />
 
         <footer className="footer">
-          <p className="footer-item">if you want to remove your bayaan from our site please contact ulama.moris@gmail.com</p>
+
+          <div className="container">
+            <div className="row">
+              <div className="col">
+                  <img className="footer-item img" src="./logo.png"/>
+                  <p className="footer-item">contact: ulama.moris@gmail.com</p>
+              </div>
+              </div>
+          </div>
+
         </footer>
+
       </div>
 
       </StyledWrapper>
@@ -240,17 +250,26 @@ const StyledWrapper = styled.main`
 
 
     .footer {
-      width: 100%;
-      height: 80px;    
       background: rgba(112, 128, 144, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+
+
+      .col {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 80px;
+      }
+      
 
       .footer-item {
         font-size: 14px;
         color: white;
-        padding: 0 30px;
+        padding: 0 12px;
+      }
+
+
+      .footer-item.img {
+        width: 80px;
       }
     }
 
