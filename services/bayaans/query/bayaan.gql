@@ -15,7 +15,7 @@ query GetBayaan (
     },
     limit: $limit, 
     skip: $skip,
-    order: sys_publishedAt_DESC
+    order: date_DESC
   ) {
     total
     items {
