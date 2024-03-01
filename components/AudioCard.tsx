@@ -53,6 +53,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
     currentAudioId,
     onAudioPlay,
     onAudioPause,
+    onShare,
     className='',
     description,
     date,
@@ -143,6 +144,13 @@ const AudioCard: React.FC<AudioCardProps> = ({
     }
 
 
+    const onWhatsAppShare = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if(onShare){
+            onShare(e);
+        }
+    }
+
+
 
     return (
         <StyledWrapper className={`audio__card ${className}`}>
@@ -174,7 +182,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
             <div className="bottom">
                 <div className="share-links">
-                    <a href={whatsApp} data-action="share/whatsapp/share"><ShareIcon/></a>
+                    <a href={whatsApp} onClick={onWhatsAppShare} data-action="share/whatsapp/share"><ShareIcon/></a>
                     {/* <a href={audio.url} download={audio.url}><DownloadIcon download={audio.url}/></a> */}
                 </div>
             </div>

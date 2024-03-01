@@ -24,7 +24,7 @@ function Home({
   audioList
 }) {
 
-  const [metaDescription, setMetaDescription] = useState(config.meta.description);
+  const [metaTitle, setMetaTitle] = useState(config.meta.title);
   const [updatedAudioList, setUpdatedAudioList] = useState(audioList);
   const [currentAudioId, setCurrentAudioId] = useState(null);
 
@@ -93,7 +93,7 @@ function Home({
 
   const onAudioPlay = (audio) => {
     setCurrentAudioId(audio.sys.id);
-    setMetaDescription(`${audio.title} par ${audio.author}`);
+    setMetaTitle(`${audio.title} par ${audio.author}`);
 
     const queryParams = {
       ...page ? { page } : {},
@@ -116,8 +116,8 @@ function Home({
   return (
     <>
       <Head>
-        <title>{config.meta.title}</title>
-        <meta name="description" content={metaDescription} />
+        <title>{metaTitle}</title>
+        <meta name="description" content={config.meta.description} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -144,6 +144,7 @@ function Home({
                         index={audio?.sys?.id}
                         currentAudioId={currentAudioId}
                         onAudioPlay={() => onAudioPlay(audio)}
+                        onShare={() => setMetaTitle(`${audio.title} par ${audio.author}`)}
                         {...audio}
                       />
                     )
