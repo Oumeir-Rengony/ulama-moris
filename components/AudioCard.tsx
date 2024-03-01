@@ -38,6 +38,7 @@ export interface AudioCardProps {
     currentAudioId?: string;
     onAudioPlay?: React.ReactEventHandler<HTMLAudioElement>;
     onAudioPause?: React.ReactEventHandler<HTMLAudioElement>;
+    onShare? : React.MouseEventHandler<HTMLAnchorElement>;
     className?: string;
     description: HTMLElement | string;
     date: string;
@@ -123,7 +124,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
     },[])
 
 
-    const onPlay = (e) => {
+    const onPlay = (e: React.SyntheticEvent<HTMLAudioElement>) => {
 
         setShowPulsar(true);
 
@@ -133,7 +134,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
     }
 
 
-    const onPause = (e) => {
+    const onPause = (e: React.SyntheticEvent<HTMLAudioElement>) => {
         setShowPulsar(false);
 
         if(onAudioPause){
