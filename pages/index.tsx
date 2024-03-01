@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
-import { Inter } from "next/font/google";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
 
@@ -16,8 +15,6 @@ import styled from "styled-components";
 import dayjs from "dayjs";
 import config from "@config/config.json";
 
-
-const inter = Inter({ subsets: ["latin"] });
 
 
 function Home({
@@ -122,7 +119,7 @@ function Home({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <StyledWrapper className={`${inter.className}`}>
+      <StyledWrapper>
 
 
         <div className="container">
@@ -192,7 +189,7 @@ function Home({
 }
 
 
-const StyledWrapper = styled.main`
+const StyledWrapper = styled.div`
 
   min-height: 100vh;
   display: flex;
@@ -203,6 +200,7 @@ const StyledWrapper = styled.main`
     margin: 2rem;
     color: #6d6b6b;
     font-size: 28px;
+    font-weight: 600;
   }
 
 

@@ -214,6 +214,7 @@ const StyledWrapper = styled.div`
         margin-top: 0;
         margin-bottom: 12px;
         font-size: 22px;
+        font-weight: 600;
     }
 
     .figure {
