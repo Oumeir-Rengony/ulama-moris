@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
 
 
 import AudioCard from "@components/AudioCard";
-import { Pagination } from "@nextui-org/pagination";
+import Pagination from "@components/Pagination";
 import Filter from "@components/Filter";
 
 
@@ -24,6 +24,7 @@ function Home({
   const [metaTitle, setMetaTitle] = useState(config.meta.title);
   const [updatedAudioList, setUpdatedAudioList] = useState(audioList);
   const [currentAudioId, setCurrentAudioId] = useState(null);
+  const ref = useRef<HTMLDivElement>();
 
   const router = useRouter();
 
@@ -79,12 +80,9 @@ function Home({
     router.push({
       pathname: router.pathname,
       query: queryParams
-    }, undefined, { shallow: true});
+    }, undefined, { shallow: true, scroll: true});
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
+
   }
 
 
@@ -104,10 +102,9 @@ function Home({
     router.push({
       pathname: router.pathname,
       query: queryParams
-    }, undefined, { shallow: true});
+    }, undefined, { shallow: true });
 
   }
-
 
 
   return (
@@ -132,7 +129,7 @@ function Home({
 
               <Filter onSubmit={() => setCurrentAudioId(null)}/>
 
-              <div className="audio__list">
+              <div className="audio__list" ref={ref}>
                 {
                   updatedAudioList?.items.map(audio => {
                     return (
@@ -172,7 +169,7 @@ function Home({
           <div className="container">
             <div className="row">
               <div className="col">
-                  <img className="footer-item img" src="./logo.png"/>
+                  <img className="footer-item img" src="./logo.png" alt="logo"/>
                   <p className="footer-item">contact: ulama.moris@gmail.com</p>
               </div>
               </div>
@@ -249,7 +246,7 @@ const StyledWrapper = styled.div`
 
 
     .footer {
-      background: rgba(112, 128, 144, 0.7);
+      background: #767677;
 
 
       .col {
