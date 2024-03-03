@@ -18,10 +18,9 @@ import config from "@config/config.json";
 
 
 function Home({
-  audioList
+  audioList,
+  openGraphMeta
 }) {
-
-  const [metaTitle, setMetaTitle] = useState(config.meta.title);
   const [updatedAudioList, setUpdatedAudioList] = useState(audioList);
   const [currentAudioId, setCurrentAudioId] = useState(null);
   const ref = useRef<HTMLDivElement>();
@@ -34,6 +33,7 @@ function Home({
   const startDate = router.query.startDate ? router.query.startDate as string : null;
   const endDate = router.query.endDate ? router.query.endDate as string : null;
   const search = router.query.search ? router.query.search as string : null;
+  const id = router.query.id ? router.query.id as string : null;
 
   // let categories = router.query.categories ? router.query.categories: null
 
@@ -65,6 +65,9 @@ function Home({
   }, [page, startDate, endDate, search]);
 
 
+  const getMetaDesription = () => {
+
+  }
 
   const handlePageChanges = (newPage: number) => {
 
@@ -85,10 +88,8 @@ function Home({
 
   }
 
-
   const onAudioPlay = (audio) => {
     setCurrentAudioId(audio.sys.id);
-    setMetaTitle(`${audio.title} par ${audio.author}`);
 
     const queryParams = {
       ...page ? { page } : {},
@@ -110,9 +111,13 @@ function Home({
   return (
     <>
       <Head>
-        <title>{metaTitle}</title>
+        <title>{config.meta.title}</title>
         <meta name="description" content={config.meta.description} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {openGraphMeta?.title && <meta property="og:title" content={openGraphMeta?.title}/>}
+        {openGraphMeta?.description && <meta property="og:description" content={openGraphMeta?.description} />}
+        {openGraphMeta?.image && <meta property="og:image" content={openGraphMeta?.image} />}
+        {/* {<meta property="og:site_name" content={`${Config.Contentful.main.SpaceName}`} />} */}
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -138,7 +143,7 @@ function Home({
                         index={audio?.sys?.id}
                         currentAudioId={currentAudioId}
                         onAudioPlay={() => onAudioPlay(audio)}
-                        onShare={() => setMetaTitle(`${audio.title} par ${audio.author}`)}
+                        // onShare={() => setMetaDescription(`${audio.title} par ${audio.author}`)}
                         {...audio}
                       />
                     )
@@ -169,7 +174,7 @@ function Home({
           <div className="container">
             <div className="row">
               <div className="col">
-                  <img className="footer-item img" src="./logo.png" alt="logo"/>
+                  <img className="footer-item img" src="/logo.webp" alt="logo"/>
                   <p className="footer-item">contact: ulama.moris@gmail.com</p>
               </div>
               </div>
@@ -281,6 +286,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const startDate = ctx.query?.startDate as string;
   const endDate = ctx.query?.endDate as string;
   const search = ctx.query?.search as string;
+  const id = ctx.query?.id as string;
+
 
   const audioList = await GetBayaans({ 
     page: +page,
@@ -288,10 +295,28 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     endDate,
     search,
   });
+
+  const GetMetaData = () => {
+    if(id === null){
+      return;
+    }
+
+    const audio =  audioList.items.find(audio => {
+      return audio?.sys?.id === id
+    });
+
+    return ({
+      title: audio?.title,
+      description: audio?.author,
+      image: '/logo.webp'
+    })
+  }
+
  
   return {
     props: {
       audioList,
+      openGraphMeta: GetMetaData()
     }
   }
 }
