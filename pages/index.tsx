@@ -65,9 +65,6 @@ function Home({
   }, [page, startDate, endDate, search]);
 
 
-  const getMetaDesription = () => {
-
-  }
 
   const handlePageChanges = (newPage: number) => {
 
@@ -114,10 +111,15 @@ function Home({
         <title>{config.meta.title}</title>
         <meta name="description" content={config.meta.description} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="canonical" href="https://ulama-moris.org" />
         {openGraphMeta?.title && <meta property="og:title" content={openGraphMeta?.title}/>}
         {openGraphMeta?.description && <meta property="og:description" content={openGraphMeta?.description} />}
         {openGraphMeta?.image && <meta property="og:image" content={openGraphMeta?.image} />}
-        {/* {<meta property="og:site_name" content={`${Config.Contentful.main.SpaceName}`} />} */}
+        {openGraphMeta?.image  && <meta property="og:image:width" content="900" />}
+        {openGraphMeta?.image && <meta property="og:image:height" content="600" />}
+        {openGraphMeta?.url && <meta property="og:url" content={openGraphMeta?.url}  />}
+        {<meta property="og:site_name" content="Ulama De Moris" />}
+        {<meta property="og:type" content="website"  />}
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -298,7 +300,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const GetMetaData = () => {
     if(id === null){
-      return;
+      return null;
     }
 
     const audio =  audioList.items.find(audio => {
@@ -306,9 +308,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     });
 
     return ({
-      title: audio?.title,
-      description: audio?.author,
-      image: '/logo.webp'
+      title: audio?.title || null,
+      description: audio?.author || null,
+      image: 'https://www.ulama-moris.org/og1.png',
+      url: ctx?.req?.headers?.host + ctx?.resolvedUrl
     })
   }
 
