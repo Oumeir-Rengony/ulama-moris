@@ -118,7 +118,8 @@ const AudioCard: React.FC<AudioCardProps> = ({
             }
 
             queryParams.append("id", index);
-            const url = `${window.location.origin}/?${queryParams.toString()}`;
+            //reset=1 is done so tht social media consider it as a new url to refresh their cache
+            const url = `${window.location.origin}/?${queryParams.toString()}&reset=1`;
             setWhatsApp(`whatsapp://send?text=${encodeURIComponent(url)}`);
         }
     },[])
