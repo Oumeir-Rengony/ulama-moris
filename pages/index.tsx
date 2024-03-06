@@ -21,6 +21,8 @@ function Home({
   audioList,
   openGraphMeta
 }) {
+
+  const [metaTitle, setMetaTitle] = useState(config.meta.title);
   const [updatedAudioList, setUpdatedAudioList] = useState(audioList);
   const [currentAudioId, setCurrentAudioId] = useState(null);
   const ref = useRef<HTMLDivElement>();
@@ -87,6 +89,7 @@ function Home({
 
   const onAudioPlay = (audio) => {
     setCurrentAudioId(audio.sys.id);
+    setMetaTitle(audio.title);
 
     const queryParams = {
       ...page ? { page } : {},
@@ -108,7 +111,7 @@ function Home({
   return (
     <>
       <Head>
-        <title>{config.meta.title}</title>
+        <title>{metaTitle}</title>
         <meta name="description" content={config.meta.description} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="canonical" href="https://ulama-moris.org" />
@@ -308,10 +311,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     });
 
     return ({
-      title: audio?.title || null,
-      description: audio?.author || null,
+      title: audio?.title || config.meta.title,
+      description: audio?.author || config.meta.description,
       image: 'https://www.ulama-moris.org/og1.png',
-      url: ctx?.req?.headers?.host + ctx?.resolvedUrl
+      url: 'https://' + ctx?.req?.headers?.host + ctx?.resolvedUrl
     })
   }
 
