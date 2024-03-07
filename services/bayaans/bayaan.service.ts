@@ -13,7 +13,7 @@ export const GetBayaans = async ({
     startDate = null, 
     endDate = null,  
     search = null, 
-    device = null,
+    isMobile = true,
     // categories = null,
     isPreview = false 
 }: { 
@@ -21,13 +21,13 @@ export const GetBayaans = async ({
     startDate?: string; 
     endDate?: string; 
     search?: string;
-    device?: string 
+    isMobile?: boolean 
     // categories: string[] | string,
     isPreview?: boolean; 
 }): Promise<any> => {
 
   //determine set of pages to fetch
-  const limit = Config.bayaan.pageSize;
+  const limit = isMobile ? Config.bayaan.pageSize.mobile : Config.bayaan.pageSize.desktop;
 
   const skipMultiplier = (page === 1) ? 0 : page - 1;
   const skip = skipMultiplier > 0 ? limit * skipMultiplier : 0;

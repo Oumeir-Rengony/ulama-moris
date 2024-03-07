@@ -13,6 +13,7 @@ import styled from "styled-components";
 import dayjs from "dayjs";
 import config from "@config/config.json";
 import dynamic from "next/dynamic";
+import { getSelectorsByUserAgent } from "react-device-detect";
 
 
 
@@ -21,6 +22,7 @@ const AudioCard = dynamic(() => import('@components/AudioCard'));
 
 function Home({
   audioList,
+  isMobile,
   openGraphMeta
 }) {
 
@@ -28,6 +30,9 @@ function Home({
   const [updatedAudioList, setUpdatedAudioList] = useState(audioList);
   const [currentAudioId, setCurrentAudioId] = useState(null);
   const ref = useRef<HTMLDivElement>();
+
+
+  const pageSize = isMobile ? config.bayaan.pageSize.mobile : config.bayaan.pageSize.desktop;
 
   const router = useRouter();
 
@@ -57,7 +62,8 @@ function Home({
         page,
         startDate: validStartDate,
         endDate: validEndDate,
-        search
+        search,
+        isMobile
         // categories
       });
 
@@ -172,7 +178,7 @@ function Home({
           showControls={true} 
           initialPage={page ? page : 1}
           page={page}
-          total={Math.ceil(updatedAudioList.total/config.bayaan.pageSize)}
+          total={Math.ceil(updatedAudioList.total/pageSize)}
           onChange={handlePageChanges}
         />
 
@@ -297,11 +303,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = ctx.query?.id as string;
 
 
+  const { isMobile } = getSelectorsByUserAgent(ctx.req.headers["user-agent"]);
+  
+
   const audioList = await GetBayaans({ 
     page: +page,
     startDate,
     endDate,
     search,
+    isMobile
   });
 
   const GetMetaData = () => {
@@ -325,6 +335,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       audioList,
+      isMobile,
       openGraphMeta: GetMetaData()
     }
   }

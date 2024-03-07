@@ -8,7 +8,10 @@
         "description": "Explication deen par les ulama de moris"
     },
     "bayaan": {
-        "pageSize": 8,
+        "pageSize": {
+            "mobile": 6,
+            "desktop": 8
+        },
         "dateFilterFormat": "YYYY-MM-DD",
         "displayFormat": "DD MMMM YYYY"
     },
