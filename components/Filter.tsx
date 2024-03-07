@@ -34,8 +34,8 @@ const Filter: React.FC<FilterProps> = ({
 
 
     const [dateRange, setDateRange] = useState<DateRangeType>({
-        startDate: null,
-        endDate: null 
+        startDate: "",
+        endDate: "" 
     });
     const [title, setTitle] = useState<string>("");
 

@@ -107,7 +107,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
             const url = `${window.location.origin}/?${queryParams.toString()}&reset=1`;
             setWhatsApp(`whatsapp://send?text=${encodeURIComponent(url)}`);
         }
-    },[])
+    },[index])
 
 
     const onPlay = (e: React.SyntheticEvent<HTMLAudioElement>) => {

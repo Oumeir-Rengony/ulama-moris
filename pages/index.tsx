@@ -3,8 +3,6 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
 
-
-import AudioCard from "@components/AudioCard";
 import Pagination from "@components/Pagination";
 import Filter from "@components/Filter";
 
@@ -14,7 +12,11 @@ import { GetBayaans } from "@services/bayaans/bayaan.service";
 import styled from "styled-components";
 import dayjs from "dayjs";
 import config from "@config/config.json";
+import dynamic from "next/dynamic";
 
+
+
+const AudioCard = dynamic(() => import('@components/AudioCard'));
 
 
 function Home({
@@ -276,6 +278,7 @@ const StyledWrapper = styled.div`
 
       .footer-item.img {
         width: 80px;
+        height: 56px;
       }
     }
 
