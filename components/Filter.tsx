@@ -1,13 +1,19 @@
+import React from "react";
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 
 import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 
-import Datepicker, { DateRangeType } from "react-tailwindcss-datepicker"; 
+import type { DateRangeType } from "react-tailwindcss-datepicker"; 
 import { styled } from "styled-components";
 import dayjs from "dayjs";
 import config from "@config/config.json";
+
+
+const Datepicker = dynamic(() => import("react-tailwindcss-datepicker").then(mod => mod.default));
+
 
 const SearchIcon = () => (
     <svg className="search-icon" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="0 0 128 128">
@@ -34,9 +40,10 @@ const Filter: React.FC<FilterProps> = ({
 
 
     const [dateRange, setDateRange] = useState<DateRangeType>({
-        startDate: "",
-        endDate: "" 
+        startDate: null,
+        endDate: null
     });
+
     const [title, setTitle] = useState<string>("");
 
     const router = useRouter();
@@ -97,6 +104,7 @@ const Filter: React.FC<FilterProps> = ({
                 onChange={setDateRange}
                 toggleIcon={() => <DateIcon/>}
             />
+
 
             <Input 
                 color="primary" 
