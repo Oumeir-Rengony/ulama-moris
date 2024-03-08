@@ -1,6 +1,11 @@
+
+/*! purgecss start ignore */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/*! purgecss end ignore */
+
+
 
 body {
     margin: 0;
