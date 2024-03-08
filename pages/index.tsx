@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
+import Image from "next/image";
 
 import Pagination from "@components/Pagination";
 import Filter from "@components/Filter";
@@ -187,7 +188,7 @@ function Home({
           <div className="container">
             <div className="row">
               <div className="col">
-                  <img className="footer-item img" src="/logo.webp" alt="logo"/>
+                  <Image  width={80} height={56} className="footer-item img" src="/logo.webp" alt="logo"/>
                   <p className="footer-item">contact: ulama.moris@gmail.com</p>
               </div>
               </div>
@@ -281,11 +282,11 @@ const StyledWrapper = styled.div`
         padding: 0 12px;
       }
 
-
-      .footer-item.img {
-        width: 80px;
-        height: 56px;
+      .footer-item img {
+        width: auto;
+        height: auto;
       }
+
     }
 
   }

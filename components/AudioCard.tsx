@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import dayjs from "dayjs";
+import Image from "next/image";
+import { useRouter } from "next/router";
 import config from "@config/config.json";
 import { styled } from "styled-components";
 import Pulsar from "./Pulsar";
-import { useRouter } from "next/router";
+import dayjs from "dayjs";
 
 
 
@@ -168,7 +169,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
             <div className="bottom">
                 <div className="share-links">
                     <a href={whatsApp} onClick={onWhatsAppShare} data-action="share/whatsapp/share">
-                        <img className="wa-image" src="wa.png" alt="whats app"/>
+                        <Image  width={26} height={26} className="wa-image" src="/wa.png" alt="whats app"/>
                     </a>
                 </div>
             </div>
@@ -260,11 +261,6 @@ const StyledWrapper = styled.div`
 
         @media(min-width: 992px){
             display: none;
-        }
-
-        .wa-image{
-            width: 26px;
-            height: 26px;
         }
     }
     
