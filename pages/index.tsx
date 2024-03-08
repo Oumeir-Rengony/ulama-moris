@@ -72,7 +72,7 @@ function Home({
     
     fetchAudio().catch(err => console.error(err))
 
-  }, [page, startDate, endDate, search]);
+  }, [page, startDate, endDate, search, isMobile]);
 
 
 
