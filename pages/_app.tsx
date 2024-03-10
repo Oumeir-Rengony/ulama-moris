@@ -43,7 +43,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return  (
     <NextUIProvider navigate={router.push}>
-      <main className={Objektiv.className}>
+      <main className={`${Objektiv.className} light`}>
         <Component {...pageProps} />
       </main>
     </NextUIProvider>

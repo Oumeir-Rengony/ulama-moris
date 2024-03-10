@@ -3,6 +3,9 @@ const {nextui} = require("@nextui-org/theme");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  experimental: {
+    optimizeUniversalDefaults: true
+  },
   content: [
     "./node_modules/@nextui-org/theme/dist/components/pagination.js", 
     "./node_modules/@nextui-org/theme/dist/components/input.js", 
