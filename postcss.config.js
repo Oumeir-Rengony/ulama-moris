@@ -25,6 +25,7 @@ module.exports = {
         safelist: {
           standard: ["html", "body", /^data-.*/],
         },
+        variables: true
       }
     },
 }
