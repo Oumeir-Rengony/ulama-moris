@@ -143,7 +143,7 @@ function Home({
             <div className="col">
 
 
-              <h1 className="heading">Bayaan par les Ulama de Moris</h1>
+              {/* <h1 className="heading">Bayaan par les Ulama de Moris</h1> */}
 
 
               <Filter onSubmit={() => setCurrentAudioId(null)}/>
