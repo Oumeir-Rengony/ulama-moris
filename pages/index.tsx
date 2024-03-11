@@ -188,7 +188,7 @@ function Home({
           <div className="container">
             <div className="row">
               <div className="col">
-                  <Image  width={80} height={56} className="footer-item img" src="/logo.webp" alt="logo"/>
+                  <Image loading="lazy" width={80} height={56} className="footer-item img" src="/logo.webp" alt="logo"/>
                   <p className="footer-item">contact: ulama.moris@gmail.com</p>
               </div>
               </div>
