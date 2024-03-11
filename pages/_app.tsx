@@ -34,6 +34,8 @@ const Objektiv = localFont({
       style: 'normal',
     }
   ],
+  preload: true,
+  display: 'swap'
 });
 
 
