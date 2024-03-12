@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import config from "@config/config.json";
-import { styled } from "styled-components";
 import Pulsar from "./Pulsar";
 import dayjs from "dayjs";
+
+import { styled } from "../styled-system/jsx";
 
 
 
@@ -180,8 +181,6 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
 
 const StyledWrapper = styled.div`
-
-&.audio__card {
     position: relative;
     max-width: 100%;
     box-shadow: 0px 0px 4px 0px #00000033;
@@ -191,52 +190,51 @@ const StyledWrapper = styled.div`
     padding: 12px 18px;
     margin: 24px 0;
 
-
-    .figure__description {
+    & .figure__description {
         font-size: 14px;
     }
-
-
-    .title {
+    
+    & .title {
         margin-top: 0;
         margin-bottom: 12px;
         font-size: 22px;
         font-weight: 600;
     }
 
-    .figure {
+    & .figure {
         margin: 0;
         overflow: hidden;
 
 
-        .audio {
+        & .audio {
             width: 100%;
             height: 34px;
             margin: 12px 0;
-            background: none;;
+            background: none;
         }
 
 
-        .audio::-webkit-media-controls-play-button,
-        .audio::-webkit-media-controls-current-time-display,
-        .audio::-webkit-media-controls-time-remaining-display{
+        & .audio::-webkit-media-controls-play-button,
+        & .audio::-webkit-media-controls-current-time-display,
+        & .audio::-webkit-media-controls-time-remaining-display{
             position: relative; 
             left: -9px;
         }
     
-        .audio::-webkit-media-controls-mute-button,
-        .audio::-webkit-media-controls-volume-slider { 
+        & .audio::-webkit-media-controls-mute-button,
+        & .audio::-webkit-media-controls-volume-slider { 
             display: none !important;
         }
 
-        .audio::-webkit-media-controls-timeline {
+        & .audio::-webkit-media-controls-timeline {
             width: 100%;
             padding: 0 0 0 4px;
         }
 
     }
-  
-    .info__author, .info__date {
+
+
+    & .info__author {
         color: rgb(113, 113, 122);
         font-weight: 500;
         margin: 0 0 14px;
@@ -244,13 +242,15 @@ const StyledWrapper = styled.div`
 
 
 
-    .info__date {
+    & .info__date {
+        color: rgb(113, 113, 122);
         font-size: 12px;
+        font-weight: 500;
         margin: 0;
     }
 
 
-    .share-links {
+    & .share-links {
         position: absolute;
         bottom: 8px;
         right: 8px;
@@ -264,9 +264,6 @@ const StyledWrapper = styled.div`
         }
     }
     
-
-    
-}
 `
 
 export default AudioCard;

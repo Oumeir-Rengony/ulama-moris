@@ -1,10 +1,20 @@
-
 /*! purgecss start ignore */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-/*! purgecss end ignore */
 
+@layer tailwind.base {
+	@tailwind base;
+}
+
+@layer tailwind.components {
+	@tailwind components;
+}
+
+@layer tailwind.utilities {
+	@tailwind utilities;
+}
+
+@layer reset, base, tokens, recipes, utilities;
+
+/*! purgecss end ignore */
 
 
 body {

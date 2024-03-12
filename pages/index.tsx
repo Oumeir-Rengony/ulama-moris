@@ -10,7 +10,8 @@ import Filter from "@components/Filter";
 
 import { GetBayaans } from "@services/bayaans/bayaan.service";
 
-import styled from "styled-components";
+import { styled } from "../styled-system/jsx";
+
 import dayjs from "dayjs";
 import config from "@config/config.json";
 import dynamic from "next/dynamic";
@@ -206,12 +207,11 @@ function Home({
 
 
 const StyledWrapper = styled.div`
-
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 
-  .heading {
+  & .heading {
     text-align: center;
     margin: 2rem;
     color: #6d6b6b;
@@ -220,7 +220,7 @@ const StyledWrapper = styled.div`
   }
 
 
-  .audio__list {
+  & .audio__list {
     max-width: 100%;
     margin: 1rem;
 
@@ -240,7 +240,7 @@ const StyledWrapper = styled.div`
       grid-gap: 2rem;
     }
 
-    .audio__card {
+    & .audio__card {
       @media(min-width: 768px){
         margin: 0;
       }
@@ -250,25 +250,23 @@ const StyledWrapper = styled.div`
   }
 
   
-  .fixed-bottom {
+  & .fixed-bottom {
     margin-top: auto;
 
 
-    .pagination {
-      /* padding: 24px; */
+    & .pagination {
       margin: 20px auto;
 
-      .pagination-ul {
+      & .pagination-ul {
         margin: auto;
       }
     }
 
 
-    .footer {
+    & .footer {
       background: #767677;
 
-
-      .col {
+      & .col {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -276,13 +274,13 @@ const StyledWrapper = styled.div`
       }
       
 
-      .footer-item {
+      & .footer-item {
         font-size: 14px;
         color: white;
         padding: 0 12px;
       }
 
-      .footer-item img {
+      & .footer-item img {
         width: auto;
         height: auto;
       }
@@ -294,9 +292,8 @@ const StyledWrapper = styled.div`
 `;
 
 
-
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-
+  console.log("high");
   const page = ctx.query?.page;
   const startDate = ctx.query?.startDate as string;
   const endDate = ctx.query?.endDate as string;

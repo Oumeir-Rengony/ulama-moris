@@ -7,7 +7,9 @@ import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 
 import type { DateRangeType } from "react-tailwindcss-datepicker"; 
-import { styled } from "styled-components";
+
+import { styled } from "../styled-system/jsx"
+
 import dayjs from "dayjs";
 import config from "@config/config.json";
 
@@ -132,8 +134,6 @@ const Filter: React.FC<FilterProps> = ({
 
 
 const StyledWraper = styled.form`
-
-&.filter {
     margin: 24px 16px 40px;
     display: flex;
     flex-direction: column;
@@ -143,7 +143,7 @@ const StyledWraper = styled.form`
         flex-direction: row;
     }
 
-    .calendar {
+    & .calendar {
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
         border-radius: 8px;
 
@@ -152,18 +152,18 @@ const StyledWraper = styled.form`
         }
     }
 
-    .input {
+    & .input {
 
         @media(min-width: 1024px){
             flex: 1;
         }
 
-        .input-wrapper {
+        & .input-wrapper {
             height: 40px;
         }
     }
 
-    .search-btn {
+    & .search-btn {
         width: 100%;
 
         @media(min-width: 1024px){
@@ -171,16 +171,13 @@ const StyledWraper = styled.form`
             margin-left: auto;
         }
 
-        .search-icon {
+        & .search-icon {
             width: 24px;
             height: 24px;
         }
-    }
+    } 
 
-    
 
-}
-
-`
+`;
 
 export default Filter;
