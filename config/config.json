@@ -10,7 +10,7 @@
     "bayaan": {
         "pageSize": {
             "mobile": 6,
-            "desktop": 9
+            "desktop": 8
         },
         "dateFilterFormat": "YYYY-MM-DD",
         "displayFormat": "DD MMMM YYYY"
