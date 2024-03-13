@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@apollo/client": "^3.9.5",
-    "@nextui-org/button": "^2.0.26",
     "@nextui-org/input": "^2.1.16",
     "@nextui-org/pagination": "^2.0.26",
     "@nextui-org/system": "^2.0.15",
