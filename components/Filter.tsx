@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 
 import { Input } from "@nextui-org/input";
-import { Button } from "@nextui-org/button";
 
 import type { DateRangeType } from "react-tailwindcss-datepicker"; 
 import { styled } from "styled-components";
@@ -116,16 +115,16 @@ const Filter: React.FC<FilterProps> = ({
                 onChange={(e) => setTitle(e.target.value)}
             />
 
-            <Button
+            <button
                 className="search-btn"
-                isDisabled={disabledSearch}
+                disabled={disabledSearch}
+                style={{opacity: disabledSearch ? 0.5 : 1}}
                 type="submit"
-                color="primary" 
-                endContent={<SearchIcon/>}
                 onClick={handleSearch}
-            > 
-                Search 
-            </Button>
+            >
+               Search <SearchIcon/>
+            </button>
+
         </StyledWraper>
     )
 };
@@ -165,6 +164,15 @@ const StyledWraper = styled.form`
 
     .search-btn {
         width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #fff;
+        background: rgb(0, 112, 240);
+        height: 40px;
+        border-radius: 8px;
+        gap: 12px;
 
         @media(min-width: 1024px){
             flex: 0.5;

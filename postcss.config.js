@@ -14,12 +14,10 @@ module.exports = {
       },
       '@fullhuman/postcss-purgecss': {
         content: [
-          './pages/**/*.{js,jsx,ts,tsx}',
-          './components/**/*.{js,jsx,ts,tsx}',
-          "./node_modules/@nextui-org/theme/**/*.{js,jsx,ts,tsx}",
-          // "./node_modules/@nextui-org/theme/dist/components/pagination.js", 
-          // "./node_modules/@nextui-org/theme/dist/components/input.js", 
-          // "./node_modules/@nextui-org/theme/dist/components/button.js", 
+          "./pages/**/*.{js,jsx,ts,tsx}",
+          "./components/**/*.{js,jsx,ts,tsx}",
+          "./node_modules/@nextui-org/theme/dist/components/pagination.js", 
+          "./node_modules/@nextui-org/theme/dist/components/input.js", 
           // "./node_modules/react-tailwindcss-datepicker/dist/index.esm.js",
         ],
         defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || [],
