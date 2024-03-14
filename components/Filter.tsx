@@ -106,14 +106,11 @@ const Filter: React.FC<FilterProps> = ({
                 toggleIcon={() => <DateIcon/>}
             />
 
-
-            <Input 
-                color="primary" 
-                classNames={{base: 'input', inputWrapper: 'input-wrapper'}} 
+            <input 
+                className="input"
                 type="text" 
-                variant="bordered" 
-                placeholder="Title" 
-                // isClearable={true}
+                placeholder="Title"
+                aria-label="Title"
                 onChange={(e) => setTitle(e.target.value)}
             />
 
@@ -152,14 +149,16 @@ const StyledWraper = styled.form`
     }
 
     & .input {
+        height: 40px;
+        border: solid rgb(228, 228, 231) 1px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.16);
 
         @media(min-width: 1024px){
             flex: 1;
         }
 
-        & .input-wrapper {
-            height: 40px;
-        }
     }
 
     & .search-btn {
