@@ -7,7 +7,7 @@
     "panda-init": "panda init -p --syntax template-literal --jsx-framework react && panda codegen",
     "dev": "next dev",
     "dev:clean": "rm -rf .next && next dev",
-    "build": "next build",
+    "build": "npm run panda-style && next build",
     "start": "next start",
     "lint": "next lint"
   },
