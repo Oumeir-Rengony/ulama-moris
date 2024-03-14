@@ -249,7 +249,7 @@ const StyledWrapper = styled.div`
         padding: 0 12px;
       }
 
-      & .footer-item img {
+      & .img {
         width: auto;
         height: auto;
       }
