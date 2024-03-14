@@ -44,7 +44,7 @@ const StyledWrapper = styled.div`
     border-radius: 50%;
 
     & .blob {
-        background-color: #4f77eb;
+        background-color: #0070f0;
         opacity: 0.7;
         border-radius: 50%;
     }

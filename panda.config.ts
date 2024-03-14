@@ -12,6 +12,14 @@ export const pulseKeyFrames = defineKeyframes({
     '100%': {
         transform: 'scale(1)'
     } 
+  },
+  loading: {
+    '0%,100%': {
+      transform:' scale(0)'
+    },
+    '50%': {
+      transform: 'scale(1)'
+    }
   }
 });
 

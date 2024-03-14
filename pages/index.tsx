@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
@@ -6,7 +6,7 @@ import Image from "next/image";
 
 import Pagination from "@components/Pagination";
 import Filter from "@components/Filter";
-
+import Loading from "@components/Loading";
 
 import { GetBayaans } from "@services/bayaans/bayaan.service";
 
@@ -25,11 +25,11 @@ const AudioCard = dynamic(() => import('@components/AudioCard'));
 function Home({
   audioList,
   isMobile,
-  openGraphMeta
+  openGraphMeta,
 }) {
 
-  const [metaTitle, setMetaTitle] = useState(config.meta.title);
-  const [updatedAudioList, setUpdatedAudioList] = useState(audioList);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [metaTitle, setMetaTitle] = useState<string>(config.meta.title);
   const [currentAudioId, setCurrentAudioId] = useState(null);
   const ref = useRef<HTMLDivElement>();
 
@@ -39,46 +39,22 @@ function Home({
   const router = useRouter();
 
 
+  useEffect(() => {
+    setLoading(false)
+  },[audioList])
+
+
   //query params { page, startDate, endDate, search, categories }
   const page = router.query.page ? +router.query.page : 1;
   const startDate = router.query.startDate ? router.query.startDate as string : null;
   const endDate = router.query.endDate ? router.query.endDate as string : null;
   const search = router.query.search ? router.query.search as string : null;
-  const id = router.query.id ? router.query.id as string : null;
-
-  // let categories = router.query.categories ? router.query.categories: null
-
-
-  useEffect(() => {
-
-    const validStartDate = dayjs(startDate).isValid() ? startDate : null;
-    const validEndDate = dayjs(endDate).isValid() ? endDate : null;
-    
-    // if(categories !== null) {
-    //   categories = (categories as string).split(Config.filter.delimeter);
-    // }
-
-    const fetchAudio = async () => { 
-
-      const fetchedAuio =  await GetBayaans({
-        page,
-        startDate: validStartDate,
-        endDate: validEndDate,
-        search,
-        isMobile
-        // categories
-      });
-
-      setUpdatedAudioList(fetchedAuio);
-    }
-    
-    fetchAudio().catch(err => console.error(err))
-
-  }, [page, startDate, endDate, search, isMobile]);
 
 
 
   const handlePageChanges = (newPage: number) => {
+
+    setLoading(true);
 
     //add date conditionally else url will show empty query params
     const queryParams = {
@@ -92,7 +68,7 @@ function Home({
     router.push({
       pathname: router.pathname,
       query: queryParams
-    }, undefined, { shallow: true, scroll: true});
+    }, undefined, { shallow: false });
 
 
   }
@@ -107,7 +83,6 @@ function Home({
       ...endDate ? { endDate } : {},
       ...search ? { search } : {},
       id: audio.sys.id
-      // ...categories ? { categories }: {}
     }
 
     router.push({
@@ -138,20 +113,19 @@ function Home({
 
       <StyledWrapper>
 
+        {loading && <Loading/>}
 
         <div className="container">
           <div className="row">
             <div className="col">
 
-
-              {/* <h1 className="heading">Bayaan par les Ulama de Moris</h1> */}
-
+              <h1 className="heading">Bayaan par les Ulama de Moris</h1>
 
               <Filter onSubmit={() => setCurrentAudioId(null)}/>
 
               <div className="audio__list" ref={ref}>
                 {
-                  updatedAudioList?.items.map(audio => {
+                  audioList?.items.map(audio => {
                     return (
                       <AudioCard 
                         key={audio?.sys?.id} 
@@ -166,38 +140,35 @@ function Home({
                 }
               </div>
 
-
-  
             </div>
           </div>
         </div>
 
-      
-      <div className="fixed-bottom">
-        
-        <Pagination
-          classNames={{base: 'pagination',wrapper: 'pagination-ul'}}
-          showControls={true} 
-          initialPage={page ? page : 1}
-          page={page}
-          total={Math.ceil(updatedAudioList.total/pageSize)}
-          onChange={handlePageChanges}
-        />
+        <div className="fixed-bottom">
+          
+          <Pagination
+            classNames={{base: 'pagination',wrapper: 'pagination-ul'}}
+            showControls={true} 
+            initialPage={page ? page : 1}
+            page={page}
+            total={Math.ceil(audioList.total/pageSize)}
+            onChange={handlePageChanges}
+          />
 
-        <footer className="footer">
+          <footer className="footer">
 
-          <div className="container">
-            <div className="row">
-              <div className="col">
-                  <Image loading="lazy" width={80} height={56} className="footer-item img" src="/logo.webp" alt="logo"/>
-                  <p className="footer-item">contact: ulama.moris@gmail.com</p>
-              </div>
-              </div>
-          </div>
+            <div className="container">
+              <div className="row">
+                <div className="col">
+                    <Image loading="lazy" width={80} height={56} className="footer-item img" src="/logo.webp" alt="logo"/>
+                    <p className="footer-item">contact: ulama.moris@gmail.com</p>
+                </div>
+                </div>
+            </div>
 
-        </footer>
+          </footer>
 
-      </div>
+        </div>
 
       </StyledWrapper>
 
@@ -293,12 +264,14 @@ const StyledWrapper = styled.div`
 
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  console.log("high");
   const page = ctx.query?.page;
   const startDate = ctx.query?.startDate as string;
   const endDate = ctx.query?.endDate as string;
   const search = ctx.query?.search as string;
   const id = ctx.query?.id as string;
+
+  const validStartDate = dayjs(startDate).isValid() ? startDate : null;
+  const validEndDate = dayjs(endDate).isValid() ? endDate : null;
 
 
   const { isMobile } = getSelectorsByUserAgent(ctx.req.headers["user-agent"]);
@@ -306,8 +279,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const audioList = await GetBayaans({ 
     page: +page,
-    startDate,
-    endDate,
+    startDate: validStartDate,
+    endDate: validEndDate,
     search,
     isMobile
   });
@@ -334,7 +307,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     props: {
       audioList,
       isMobile,
-      openGraphMeta: GetMetaData()
+      openGraphMeta: GetMetaData(),
     }
   }
 }
