@@ -3,8 +3,6 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 
-import { Input } from "@nextui-org/input";
-
 import type { DateRangeType } from "react-tailwindcss-datepicker"; 
 
 import { styled } from "../styled-system/jsx"
