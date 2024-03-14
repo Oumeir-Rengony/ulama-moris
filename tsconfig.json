@@ -20,6 +20,6 @@
       "@services/*": ["./services/*"],
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "tailwind.config.js", "postcss.config.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "tailwind.config.js", "postcss.config.js", "styled-system"],
   "exclude": ["node_modules"]
 }

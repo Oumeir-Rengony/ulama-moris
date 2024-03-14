@@ -1,4 +1,5 @@
-import { styled, keyframes } from "styled-components"
+import { styled } from "../styled-system/jsx";
+
 
 export interface PulsarProps {
     size?: string,
@@ -7,58 +8,48 @@ export interface PulsarProps {
     duration?: number
 }
 
+
+
 const Pulsar: React.FC<PulsarProps> = ({
     size='8px',
     innerbackground,
     background,
-    duration
+    duration=1.8
 }) => {
     return (
         <StyledWrapper 
             className="pulsar" 
-            $duration={duration} 
-            style={{ width: size, height:size, background }}
+            style={{ 
+                width: size, 
+                height:size, 
+                background,
+                animation: `playingDot ${duration}s cubic-bezier(0, 0, 0.58, 1) both infinite`
+            }}
         >
             <div className="blob" style={{ width: size, height: size, background: innerbackground }} />
         </StyledWrapper>
     )
 }
 
-const pulseAnim = keyframes`
-    0% {
-        transform: scale(1);
-    }
 
-    50% {
-        transform: scale(1.9);
-    }
 
-    100% {
-        transform: scale(1);
-    } 
-`
-
-const StyledWrapper = styled.div<{
-    $duration?: number
-}>`
-&.pulsar {
+const StyledWrapper = styled.div`
     position: absolute;
     right: -4px;
     top: -4px;
-    animation: ${pulseAnim} ${ ({$duration}) => $duration ? $duration : '1.8s'} cubic-bezier(0, 0, 0.58, 1) both infinite;
     padding: 2px;
     opacity: 0.7;
     box-sizing: content-box;
     background-color: #D6E0FF;
     border-radius: 50%;
 
-    .blob {
-        background-color: #4f77eb;
+    & .blob {
+        background-color: #0070f0;
         opacity: 0.7;
         border-radius: 50%;
     }
-}
 `;
+
 
 
 export default Pulsar;

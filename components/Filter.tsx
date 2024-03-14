@@ -3,10 +3,10 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 
-import { Input } from "@nextui-org/input";
-
 import type { DateRangeType } from "react-tailwindcss-datepicker"; 
-import { styled } from "styled-components";
+
+import { styled } from "../styled-system/jsx"
+
 import dayjs from "dayjs";
 import config from "@config/config.json";
 
@@ -104,14 +104,11 @@ const Filter: React.FC<FilterProps> = ({
                 toggleIcon={() => <DateIcon/>}
             />
 
-
-            <Input 
-                color="primary" 
-                classNames={{base: 'input', inputWrapper: 'input-wrapper'}} 
+            <input 
+                className="input"
                 type="text" 
-                variant="bordered" 
-                placeholder="Title" 
-                // isClearable={true}
+                placeholder="Title"
+                aria-label="Title"
                 onChange={(e) => setTitle(e.target.value)}
             />
 
@@ -131,8 +128,6 @@ const Filter: React.FC<FilterProps> = ({
 
 
 const StyledWraper = styled.form`
-
-&.filter {
     margin: 24px 16px 40px;
     display: flex;
     flex-direction: column;
@@ -142,7 +137,7 @@ const StyledWraper = styled.form`
         flex-direction: row;
     }
 
-    .calendar {
+    & .calendar {
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
         border-radius: 8px;
 
@@ -151,18 +146,20 @@ const StyledWraper = styled.form`
         }
     }
 
-    .input {
+    & .input {
+        height: 40px;
+        border: solid rgb(228, 228, 231) 1px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.16);
 
         @media(min-width: 1024px){
             flex: 1;
         }
 
-        .input-wrapper {
-            height: 40px;
-        }
     }
 
-    .search-btn {
+    & .search-btn {
         width: 100%;
         display: flex;
         align-items: center;
@@ -179,16 +176,13 @@ const StyledWraper = styled.form`
             margin-left: auto;
         }
 
-        .search-icon {
+        & .search-icon {
             width: 24px;
             height: 24px;
         }
     }
 
-    
 
-}
-
-`
+`;
 
 export default Filter;
