@@ -67,9 +67,6 @@ const Filter: React.FC<FilterProps> = ({
         //if search has whitespaces return null
         const search = !(/^\s*$/.test(title)) ? title : null;
 
-        // const categories = categorySelected.length > 0 ? categorySelected.join(Config.filter.delimeter): null
-
-
          //add key conditionally else url will show empty query params
         const queryParams = {
             //everytime search is clicked, reset page
@@ -77,13 +74,12 @@ const Filter: React.FC<FilterProps> = ({
             ...validStartDate ? { startDate } : {},
             ...validEndDate ? { endDate } : {},
             ...search ? { search } : {},
-            // ...categories ? { categories } : {}
         }
         
         router.push({
             pathname: router.pathname,
             query: queryParams
-        }, undefined, { shallow: true });
+        }, undefined, { shallow: false });
 
         if(onSubmit){
             onSubmit();

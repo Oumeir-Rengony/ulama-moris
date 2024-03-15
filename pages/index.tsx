@@ -93,6 +93,12 @@ function Home({
   }
 
 
+  const handleSubmit = () => {
+    setLoading(true);
+    setCurrentAudioId(null);
+  }
+
+
   return (
     <>
       <Head>
@@ -121,7 +127,7 @@ function Home({
 
               <h1 className="heading">Bayaan par les Ulama de Moris</h1>
 
-              <Filter onSubmit={() => setCurrentAudioId(null)}/>
+              <Filter onSubmit={handleSubmit}/>
 
               <div className="audio__list" ref={ref}>
                 {
