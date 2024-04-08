@@ -1,0 +1,12 @@
+fragment BayaanFields on Bayaan {
+    sys {
+        id
+    }
+    title,
+    description
+    author
+    date
+    audio {
+        ...AssetsFields
+    }
+}

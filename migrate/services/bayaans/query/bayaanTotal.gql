@@ -1,0 +1,16 @@
+query GetBayaan (
+  $startDate: DateTime, 
+  $endDate: DateTime, 
+  $search: String, 
+) {
+  bayaanCollection (
+    where: {
+      date_gte: $startDate,
+      date_lte: $endDate,
+      title_contains: $search,
+    },
+    limit: 1, 
+  ) {
+    total
+  }
+}

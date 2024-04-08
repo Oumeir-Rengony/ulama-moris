@@ -1,0 +1,21 @@
+{
+    "contentful":{
+        "host": "https://graphql.contentful.com/content/v1/spaces/",
+        "locale": "en-US"
+    },
+    "meta":{
+        "title": "Learn Islam from our Ulama through Hadith and Quran verses",
+        "description": "Explore the depths of Islam with guidance from our esteemed Ulama, delving into the profound teachings of Hadith and Quranic verses. Let our platform be your gateway to enlightenment and spiritual growth"
+    },
+    "bayaan": {
+        "pageSize": {
+            "mobile": 6,
+            "desktop": 8
+        },
+        "dateFilterFormat": "YYYY-MM-DD",
+        "displayFormat": "DD MMMM YYYY"
+    },
+    "filter": {
+        "calendarFormat": "YYYY-MM-DD"
+    }
+}
