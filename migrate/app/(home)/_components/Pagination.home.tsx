@@ -19,9 +19,7 @@ const Pagination = ({
             return
         }
 
-        //add date conditionally else url will show empty query params
         const queryParams = {
-            ...Object.fromEntries(searchParams),
             page: newPage
         }
 

@@ -25,7 +25,7 @@ const AudioList= ({
 
     const newParams = createSearchParams(queryParams).toString();
 
-    router.push(`${pathname}?${newParams}`);
+    router.replace(`${pathname}?${newParams}`, { scroll: false });
   }
 
   return (

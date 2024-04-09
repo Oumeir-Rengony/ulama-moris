@@ -86,9 +86,9 @@ const AudioCard: React.FC<AudioCardProps> = ({
             );
         }
 
+
         if(searchParams.get("id") === index && !isInViewport(audioRef.current)){
             const y = audioRef.current.getBoundingClientRect().top + window.scrollY - 110
-
             window.scrollTo({top: y, behavior: 'smooth'});
         }
 
