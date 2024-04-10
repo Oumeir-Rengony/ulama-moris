@@ -1,4 +1,4 @@
-query GetBayaan (
+query GetBayaans (
   $startDate: DateTime, 
   $endDate: DateTime, 
   $search: String, 

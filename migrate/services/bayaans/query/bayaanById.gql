@@ -1,0 +1,5 @@
+query GetBayaanById ($id: String!,) {
+  bayaan (id: $id) {
+    ...BayaanFields
+  }
+}

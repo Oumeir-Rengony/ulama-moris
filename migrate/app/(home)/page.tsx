@@ -1,11 +1,12 @@
 import { Suspense } from 'react';
 import { headers } from 'next/headers'
-import dayjs from "dayjs";
+import { Metadata, ResolvingMetadata } from 'next';
 import Image from "next/image";
+import dayjs from "dayjs";
 import { getSelectorsByUserAgent } from 'react-device-detect';
 import { styled } from "../../styled-system/jsx";
 
-import { GetBayaanTotal, GetBayaans } from '@services/bayaans/bayaan.service';
+import { GetBayaanTotal, GetBayaans, GetBayaanById } from '@services/bayaans/bayaan.service';
 
 import { AudioProvider} from "../providers";
 
@@ -15,6 +16,37 @@ import AudioList from './_components/AudioList.home';
 import Pagination from './_components/Pagination.home';
 
 import config  from '@config/config.json';
+
+
+export async function generateMetadata(
+  { searchParams } : {  searchParams: { [key: string]: string | string[] | undefined } },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+
+  const { id } = searchParams;
+
+  let bayaan:any = null;
+
+  if(id){
+    bayaan = await GetBayaanById(id)
+  }
+
+  // optionally access and extend (rather than replace) parent metadata
+  const openGraph = (await parent).openGraph;
+
+  return {
+    title: id ? bayaan.title : config.meta.title,
+    description: id ? bayaan.author : config.meta.description,
+    openGraph: { 
+      ...openGraph,
+      title: id ? bayaan.title : config.meta.title,
+      description: id ? bayaan.author : config.meta.description,
+      url: 'https://www.ulama-moris.org/',
+      siteName: 'Ulama De Moris'
+    }
+  }
+
+}
 
 
 
@@ -35,7 +67,6 @@ export default async function Home({
     startDate,
     endDate,
     search,
-    id
   } = searchParams;
 
   const validStartDate = dayjs(startDate as string).isValid() ? startDate : null;

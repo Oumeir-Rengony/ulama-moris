@@ -11,7 +11,6 @@ const Pagination = ({
 
     const router = useRouter();
     const pathname = usePathname();
-    const searchParams = new URLSearchParams(useSearchParams());
 
     const handleChange = (newPage: number) => {
 
@@ -19,11 +18,7 @@ const Pagination = ({
             return
         }
 
-        const queryParams = {
-            page: newPage
-        }
-
-        const newParams = createSearchParams(queryParams).toString();
+        const newParams = createSearchParams({page: newPage}).toString();
 
         router.push(`${pathname}?${newParams}`);
     }

@@ -1,7 +1,8 @@
 
 import { gql } from '@apollo/client';
 import { ExecuteQuery } from '@services/apollo/apollo.service';
-import BayaanQuery from './query/bayaan.gql';
+import BayaansQuery from './query/bayaans.gql';
+import BayaanByIdQuery from './query/bayaanById.gql';
 import BayaanTotalQuery from './query/bayaanTotal.gql';
 import BayaanFragment from './fragments/bayaan.fragment.gql';
 import AssetsFragment from '@services/graphql/assets.fragment.gql';
@@ -36,7 +37,7 @@ export const GetBayaans = async ({
   const QUERY = gql`
     ${AssetsFragment}
     ${BayaanFragment}
-    ${BayaanQuery}
+    ${BayaansQuery}
   `;
 
 
@@ -60,6 +61,28 @@ export const GetBayaans = async ({
 
 
   return result?.bayaanCollection;
+}
+
+
+//Single Entry
+export const GetBayaanById = async (
+  id: string | string[],
+  isPreview: boolean = false
+): Promise<any> => {
+
+  const QUERY = gql`
+    ${AssetsFragment}
+    ${BayaanFragment}
+    ${BayaanByIdQuery}
+  `;
+
+
+  const result = await ExecuteQuery(QUERY, {
+    variables: { id },
+    preview: isPreview
+  });
+
+  return result.bayaan;
 }
 
 
