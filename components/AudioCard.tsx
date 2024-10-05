@@ -53,6 +53,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
     const [showPulsar, setShowPulsar] = useState<boolean>(false);
 
     const audioRef = useRef<HTMLAudioElement>();
+    const cardRef = useRef<HTMLDivElement>();
 
     const router = useRouter();
 
@@ -73,7 +74,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
 
     useEffect(() => {
-        if(!audioRef.current){
+        if(!cardRef.current){
             return
         }
 
@@ -87,9 +88,15 @@ const AudioCard: React.FC<AudioCardProps> = ({
             );
         }
 
+        //use of Audio ref to check if in viewport is better since it makes sure 
+        //the audio is visble instead of only a small section of the card
         if(router.query.id === index && !isInViewport(audioRef.current)){
-            const y = audioRef.current.getBoundingClientRect().top + window.scrollY - 110
 
+            //small offset to give top space
+            const offset = 10 
+
+            //but use Card Ref for scrolling to show card
+            const y = cardRef.current.getBoundingClientRect().top + window.scrollY - offset;
             window.scrollTo({top: y, behavior: 'smooth'});
         }
 
@@ -140,7 +147,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
 
     return (
-        <StyledWrapper className={`audio__card ${className}`}>
+        <StyledWrapper className={`audio__card ${className}`} ref={cardRef}>
             
            { showPulsar && <Pulsar/> }
 
