@@ -92,7 +92,6 @@ const AudioCard: React.FC<AudioCardProps> = ({
         //the audio is visble instead of only a small section of the card
         if(router.query.id === index && !isInViewport(audioRef.current)){
 
-            //small offset to give top space
             const offset = 10 
 
             //but use Card Ref for scrolling to show card
