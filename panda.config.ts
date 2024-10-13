@@ -1,7 +1,7 @@
 import { defineConfig, defineKeyframes } from "@pandacss/dev";
 
 
-export const pulseKeyFrames = defineKeyframes({
+export const keyFrames = defineKeyframes({
   playingDot: {
     '0%': {
         transform: 'scale(1)'
@@ -15,13 +15,29 @@ export const pulseKeyFrames = defineKeyframes({
   },
   loading: {
     '0%,100%': {
-      transform:' scale(0)'
+      transform: 'scale(0)'
     },
     '50%': {
       transform: 'scale(1)'
     }
+  },
+  glow: {
+    '0%': {
+      boxShadow: 'rgb(127, 243, 125, 0.1) 0px 14px 28px, rgb(127, 243, 125, 0.1) 0px 10px 10px'
+    },
+    '10%': {
+      boxShadow: 'rgb(127, 243, 125, 0.25) 0px 14px 28px, rgb(127, 243, 125, 0.25) 0px 10px 10px'
+    },
+    '50%': {
+      boxShadow: 'rgb(127, 243, 125, 35) 0px 14px 28px, rgb(127, 243, 125, 0.35) 0px 10px 10px'
+    },
+    '100%': {
+      boxShadow: 'rgb(127, 243, 125, 0.1) 0px 14px 28px, rgb(127, 243, 125, 0.1) 0px 10px 10px'
+    }
   }
 });
+
+
 
 export default defineConfig({
   preflight: false,
@@ -33,7 +49,7 @@ export default defineConfig({
   theme: {
     extend: {
       keyframes: {
-        ...pulseKeyFrames
+        ...keyFrames
       }
     },
   },

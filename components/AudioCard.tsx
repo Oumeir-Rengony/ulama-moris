@@ -8,7 +8,6 @@ import dayjs from "dayjs";
 import { styled } from "../styled-system/jsx";
 
 
-
 interface Asset {
     title: string;
     description: string;
@@ -50,6 +49,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
 }) => {
 
     const [whatsApp, setWhatsApp] = useState<string>('');
+    const [animateShadow, setAnimateShadow] = useState<boolean>(false);
     const [showPulsar, setShowPulsar] = useState<boolean>(false);
 
     const audioRef = useRef<HTMLAudioElement>();
@@ -98,9 +98,11 @@ const AudioCard: React.FC<AudioCardProps> = ({
             //but use Card Ref for scrolling to show card
             const y = cardRef.current.getBoundingClientRect().top + window.scrollY - offset;
             window.scrollTo({top: y, behavior: 'smooth'});
+
+            setAnimateShadow(true);
         }
 
-    },[audioRef, router.query.id, index])
+    },[cardRef, audioRef, router.query.id, index])
 
 
     useEffect(() => {
@@ -147,9 +149,10 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
 
     return (
-        <StyledWrapper className={`audio__card ${className}`} ref={cardRef}>
+
+        <StyledWrapper className={`audio__card ${animateShadow ? 'shadow-glow' : ""} ${className}`} ref={cardRef}>
             
-           { showPulsar && <Pulsar/> }
+            { showPulsar && <Pulsar/> }
 
             <h2 className="title">{ title }</h2>
 
@@ -165,7 +168,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
                     controls
                     controlsList="nodownload noplaybackrate noremoteplayback nodownload"
                 >
-                    <source src={audio?.url} type={audio.contentType} />
+                    <source src={audio?.url} type={audio?.contentType} />
                 </audio>           
             </figure>
 
@@ -181,10 +184,12 @@ const AudioCard: React.FC<AudioCardProps> = ({
                     </a>
                 </div>
             </div>
-            
+
         </StyledWrapper>
+
     )
 };
+
 
 
 const StyledWrapper = styled.div`
@@ -192,10 +197,32 @@ const StyledWrapper = styled.div`
     max-width: 100%;
     box-shadow: 0px 0px 4px 0px #00000033;
     border-radius: 12px;
-    background: rgb(243,253,255);
     background-image: linear-gradient(135deg, rgba(176,251,175,1), #ffffff 15% , #ffffff 85%, rgba(176,251,175,1));
     padding: 12px 18px;
     margin: 24px 0;
+    transition: 1000ms all ease-in-out 0ms;
+
+
+    &.shadow-glow { 
+        background-size:cover !important;  
+        animation: glow 1.8s ease 4;
+
+        & ::after {
+            width:100%;
+            height:100%;
+            content:'';
+            border-radius:50px;
+            position:absolute;
+            top:0;
+            left:0;
+            z-index:-1;
+            background:inherit;
+            filter:blur(20px);
+            transform:scale(1.05);
+            opacity:0.8;
+        }
+    }
+
 
     & .figure__description {
         font-size: 14px;
