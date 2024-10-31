@@ -1,5 +1,6 @@
 import type { AppProps } from "next/app";
 import { NextUIProvider } from "@nextui-org/system";
+import { Analytics } from "@vercel/analytics/react";
 import { useRouter } from "next/router";
 
 
@@ -47,6 +48,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <NextUIProvider navigate={router.push}>
       <main className={`${Objektiv.className} light`}>
         <Component {...pageProps} />
+        <Analytics/>
       </main>
     </NextUIProvider>
   )
