@@ -55,10 +55,11 @@ function Home({
     const popupReactivateDelay = 30; //36 hours
 
     const dateReAppear = dayjs(popupSeenDate).add(popupReactivateDelay, 'hour');
+
     const currDate = dayjs(new Date());
 
     //if delay to re show modal is not passed return
-    if (currDate.isBefore(dateReAppear)) return;
+    // if (currDate.isBefore(dateReAppear)) return;
     
     const date = new Date();
     localStorage.setItem("popup", date.toISOString());
@@ -158,7 +159,7 @@ function Home({
         {loading && <Loading/>}
 
         <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-          <img src={popupBanners[3]?.image?.url}  alt={activePopup?.image?.title} width="100%" height={600}/>
+          <img src={activePopup?.image?.url}  alt={activePopup?.image?.title} width="100%" height={600}/>
         </Modal>
 
         <div className="container">
