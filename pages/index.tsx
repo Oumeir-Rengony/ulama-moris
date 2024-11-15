@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
@@ -16,6 +16,9 @@ import dayjs from "dayjs";
 import config from "@config/config.json";
 import dynamic from "next/dynamic";
 import { getSelectorsByUserAgent } from "react-device-detect";
+import { useDisclosure } from "@nextui-org/modal";
+import Modal from "@components/Modal";
+import { GetPopupBanner, getRandomPopup } from "@services/popup-banner/pop-up.service";
 
 
 
@@ -26,17 +29,50 @@ function Home({
   audioList,
   isMobile,
   openGraphMeta,
+  popupBanners
 }) {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [metaTitle, setMetaTitle] = useState<string>(config.meta.title);
   const [currentAudioId, setCurrentAudioId] = useState(null);
+  const [activePopup, setActivePopup] = useState<any>();
   const ref = useRef<HTMLDivElement>();
 
 
   const pageSize = isMobile ? config.bayaan.pageSize.mobile : config.bayaan.pageSize.desktop;
 
   const router = useRouter();
+
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+
+  useEffect(() => {
+
+    if (!Array.isArray(popupBanners)) return;
+
+    const popupSeenDate = localStorage.getItem("popup");
+    const popupDelay = 3 * 60 * 1000; // 3min
+    const popupReactivateDelay = 30; //36 hours
+
+    const dateReAppear = dayjs(popupSeenDate).add(popupReactivateDelay, 'hour');
+    const currDate = dayjs(new Date());
+
+    //if delay to re show modal is not passed return
+    if (currDate.isBefore(dateReAppear)) return;
+    
+    const date = new Date();
+    localStorage.setItem("popup", date.toISOString());
+    const randomPopup = getRandomPopup(popupBanners);
+    
+    setTimeout(() => {
+      setActivePopup(randomPopup);
+      onOpen();
+    }, popupDelay)
+    
+
+  },[popupBanners, getRandomPopup])
+
+
 
 
   useEffect(() => {
@@ -49,7 +85,6 @@ function Home({
   const startDate = router.query.startDate ? router.query.startDate as string : null;
   const endDate = router.query.endDate ? router.query.endDate as string : null;
   const search = router.query.search ? router.query.search as string : null;
-
 
 
   const handlePageChanges = (newPage: number) => {
@@ -99,6 +134,7 @@ function Home({
   }
 
 
+
   return (
     <>
       <Head>
@@ -120,6 +156,10 @@ function Home({
       <StyledWrapper>
 
         {loading && <Loading/>}
+
+        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+          <img src={popupBanners[3]?.image?.url}  alt={activePopup?.image?.title} width="100%" height={600}/>
+        </Modal>
 
         <div className="container">
           <div className="row">
@@ -281,13 +321,21 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { isMobile } = getSelectorsByUserAgent(ctx.req.headers["user-agent"]);
   
 
-  const audioList = await GetBayaans({ 
+  const audioListPromise =  GetBayaans({ 
     page: +page,
     startDate: validStartDate,
     endDate: validEndDate,
     search,
     isMobile
   });
+
+  const popupBannerPromise =  GetPopupBanner();
+
+  const [audioList, popupBanners] = await Promise.all([
+    audioListPromise,
+    popupBannerPromise,
+  ]);
+
 
   const GetMetaData = () => {
     if(id === null){
@@ -305,13 +353,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       url: 'https://' + ctx?.req?.headers?.host + ctx?.resolvedUrl
     })
   }
-
  
   return {
     props: {
       audioList,
       isMobile,
       openGraphMeta: GetMetaData(),
+      popupBanners
     }
   }
 }

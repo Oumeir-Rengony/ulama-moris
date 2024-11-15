@@ -1,0 +1,25 @@
+query GetPopupBanner(
+  $currentDate: DateTime,
+  $limit: Int, 
+) {
+  modalCollection (
+    where: {
+      expiry_gte: $currentDate,
+    }
+    limit: $limit, 
+    order: expiry_DESC
+  ) {
+    items {
+      sys {
+        id
+      }
+      title
+      header
+      image {
+        ...AssetsFields
+      }
+      content
+      expiry
+    }
+  }
+}

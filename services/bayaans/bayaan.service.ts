@@ -1,7 +1,6 @@
-
 import { gql } from '@apollo/client'; 
 import { ExecuteQuery } from '@services/apollo/apollo.service';
-import BayaanQuery from './query/bayaan.gql';
+import BayaanQuery from './bayaan.gql';
 import AssetsFragment from '@services/graphql/assets.fragment.gql';
 import dayjs from 'dayjs';
 import Config from "@config/config.json";
