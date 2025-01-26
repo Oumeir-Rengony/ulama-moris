@@ -64,11 +64,13 @@ function Home({
     const date = new Date();
     localStorage.setItem("popup", date.toISOString());
     const randomPopup = getRandomPopup(popupBanners);
-    
-    setTimeout(() => {
-      setActivePopup(randomPopup);
-      onOpen();
-    }, popupDelay)
+
+    if(randomPopup){
+      setTimeout(() => {
+        setActivePopup(randomPopup);
+        onOpen();
+      }, popupDelay)
+    }
     
 
   },[popupBanners, getRandomPopup])
