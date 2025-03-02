@@ -4,13 +4,13 @@ import { defineConfig, defineKeyframes } from "@pandacss/dev";
 export const keyFrames = defineKeyframes({
   playingDot: {
     '0%': {
-        transform: 'scale(1)'
+      transform: 'scale(1)'
     },
     '50%' :{
-        transform: 'scale(1.9)'
+      transform: 'scale(1.9)'
     },
     '100%': {
-        transform: 'scale(1)'
+      transform: 'scale(1)'
     } 
   },
   loading: {
