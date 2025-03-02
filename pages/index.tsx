@@ -21,6 +21,13 @@ import Modal from "@components/Modal";
 import { GetPopupBanner, getRandomPopup } from "@services/popup-banner/pop-up.service";
 
 
+export const MailPlusIcon = () => (
+  <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-mail-plus">
+    <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><path d="M19 16v6"/><path d="M16 19h6"/>
+  </svg>
+)
+
+
 
 const AudioCard = dynamic(() => import('@components/AudioCard'));
 
@@ -168,7 +175,13 @@ function Home({
           <div className="row">
             <div className="col">
 
-              <h1 className="heading">Bayaan par les Ulama de Moris</h1>
+              <div className="heading">
+                <h1 className="heading__title">Bayaan par les Ulama de Moris</h1>
+                <a href="https://www.mufti.mu" target="_blank">
+                  <button className="ask-btn">Ask a Question <MailPlusIcon/> </button>
+                </a>
+              </div>
+
 
               <Filter onSubmit={handleSubmit}/>
 
@@ -229,12 +242,46 @@ const StyledWrapper = styled.div`
   display: flex;
   flex-direction: column;
 
+
   & .heading {
-    text-align: center;
-    margin: 2rem;
-    color: #6d6b6b;
-    font-size: 28px;
-    font-weight: 600;
+    margin: 2rem 1rem 12px 1rem;
+
+    @media(min-width: 992px){
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    & .heading__title {
+      text-align: center;
+      margin: 2rem;
+      color: #6d6b6b;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    & .ask-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      padding: 0 12px;
+      color: #fff;
+      background: rgb(0, 112, 240);
+      height: 40px;
+      border-radius: 8px;
+      gap: 12;
+
+      @media(min-width: 992px){
+        width: unset;
+      }
+
+    }
+  }
+
+  & .filter {
+    margin: 24px 16px 40px;
   }
 
 

@@ -124,7 +124,6 @@ const Filter: React.FC<FilterProps> = ({
 
 
 const StyledWraper = styled.form`
-    margin: 24px 16px 40px;
     display: flex;
     flex-direction: column;
     gap: 12px;
