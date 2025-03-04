@@ -16,7 +16,7 @@ import dayjs from "dayjs";
 import config from "@config/config.json";
 import dynamic from "next/dynamic";
 import { getSelectorsByUserAgent } from "react-device-detect";
-import { useDisclosure } from "@nextui-org/modal";
+import { useDisclosure } from "@heroui/modal";
 import Modal from "@components/Modal";
 import { GetPopupBanner, getRandomPopup } from "@services/popup-banner/pop-up.service";
 import { MailPlusIcon } from "@components/Icons";
@@ -97,9 +97,9 @@ function Home({
     //add date conditionally else url will show empty query params
     const queryParams = {
       page: newPage,
-      ...startDate ? { startDate } : {},
-      ...endDate ? { endDate } : {},
-      ...search ? { search } : {},
+      ...(startDate ? { startDate } : {}),
+      ...(endDate ? { endDate } : {}),
+      ...(search ? { search } : {}),
       // ...categories ? { categories }: {}
     }
 
@@ -116,10 +116,10 @@ function Home({
     setMetaTitle(audio.title);
 
     const queryParams = {
-      ...page ? { page } : {},
-      ...startDate ? { startDate } : {},
-      ...endDate ? { endDate } : {},
-      ...search ? { search } : {},
+      ...(page ? { page } : {}),
+      ...(startDate ? { startDate } : {}),
+      ...(endDate ? { endDate } : {}),
+      ...(search ? { search } : {}),
       id: audio.sys.id
     }
 

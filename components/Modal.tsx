@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import {Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/modal";
-import type { ModalProps } from "@nextui-org/modal";
+import {Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/modal";
+import type { ModalProps } from "@heroui/modal";
 import { styled } from "../styled-system/jsx";
 import { CloseIcon } from "./Icons";
 

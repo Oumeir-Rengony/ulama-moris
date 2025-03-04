@@ -4,7 +4,7 @@ import {
     PaginationItem, 
     PaginationItemRenderProps,
     PaginationItemType 
-} from "@nextui-org/pagination";
+} from "@heroui/pagination";
 
   
 
