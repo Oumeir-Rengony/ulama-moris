@@ -2,10 +2,9 @@
 
 import React from "react";
 import { useState } from "react";
-import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 
-import type { DateRangeType } from "react-tailwindcss-datepicker"; 
 
 import { styled } from "../styled-system/jsx"
 
@@ -13,6 +12,7 @@ import dayjs from "dayjs";
 import config from "@config/config.json";
 import { DateIcon, SearchIcon } from "./Icons";
 
+import { type DateRangeType } from "react-tailwindcss-datepicker"; 
 
 const Datepicker = dynamic(() => import("react-tailwindcss-datepicker").then(mod => mod.default));
 
