@@ -44,7 +44,7 @@ export default defineConfig({
   prefix: "pda",
   hash: true,
   minify: true,
-  include: ["./pages/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
+  include: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
   exclude: [],
   theme: {
     extend: {

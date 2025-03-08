@@ -1,7 +1,9 @@
+"use client"
+
 import React from "react";
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import type { DateRangeType } from "react-tailwindcss-datepicker"; 
 
@@ -32,6 +34,8 @@ const Filter: React.FC<FilterProps> = ({
     const [title, setTitle] = useState<string>("");
 
     const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
 
     //if no inputs are filled, disable search button
     const disabledSearch = dateRange.startDate === null && dateRange.endDate === null && title === "";
@@ -42,7 +46,7 @@ const Filter: React.FC<FilterProps> = ({
         e.preventDefault();
 
         //if page has value, reset to 1
-        const page = router?.query?.page ? 1 : null;
+        const page = searchParams.get("page") ? '1' : null;
 
         const startDate = dayjs(dateRange.startDate).format(config.filter.calendarFormat);
         const endDate = dayjs(dateRange.endDate).format(config.filter.calendarFormat);
@@ -52,20 +56,18 @@ const Filter: React.FC<FilterProps> = ({
 
         //if search has whitespaces return null
         const search = !(/^\s*$/.test(title)) ? title : null;
-
-         //add key conditionally else url will show empty query params
-        const queryParams = {
+        
+          //add key conditionally else url will show empty query params
+        const queryParamsObj = {
             //everytime search is clicked, reset page
             ...page ? { page } : {},  
             ...validStartDate ? { startDate } : {},
             ...validEndDate ? { endDate } : {},
             ...search ? { search } : {},
         }
-        
-        router.push({
-            pathname: router.pathname,
-            query: queryParams
-        }, undefined, { shallow: false });
+
+        const queryParams = new URLSearchParams(queryParamsObj);
+        router.push(`${pathname}?${queryParams.toString()}`);
 
         if(onSubmit){
             onSubmit();

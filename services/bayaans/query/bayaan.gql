@@ -22,9 +22,11 @@ query GetBayaan (
       sys {
         id
       }
-      title,
+      title
       description
       masjid
+      metaTitle
+      metaDescription
       author
       date
       tag

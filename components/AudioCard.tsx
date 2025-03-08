@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/router";
 import config from "@config/config.json";
 import Pulsar from "./Pulsar";
 import dayjs from "dayjs";
@@ -19,6 +18,7 @@ interface Asset {
     width?: string;
     height?: string;
 }
+
 
 export interface AudioCardProps {
     title: string;
@@ -83,9 +83,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
     const audioRef = useRef<HTMLAudioElement>();
     const cardRef = useRef<HTMLDivElement>();
-
-    const router = useRouter();
-
+    
 
     useEffect(() => {
 
@@ -107,6 +105,9 @@ const AudioCard: React.FC<AudioCardProps> = ({
             return
         }
 
+        const queryParams = new URLSearchParams(window.location.search);
+        const queryId = queryParams.get("id");
+
         const isInViewport = (element) => {
             const rect = element.getBoundingClientRect();
             return (
@@ -117,12 +118,13 @@ const AudioCard: React.FC<AudioCardProps> = ({
             );
         }
 
+
         //use of Audio ref to check if in viewport is better since it makes sure 
         //the audio is visble instead of only a small section of the card
-        if(router.query.id === index && !isInViewport(audioRef.current)){
+        if(queryId === index && !isInViewport(audioRef.current)){
 
             //small offset to give top space
-            const offset = 10 
+            const offset = 10;
 
             //but use Card Ref for scrolling to show card
             const y = cardRef.current.getBoundingClientRect().top + window.scrollY - offset;
@@ -131,18 +133,14 @@ const AudioCard: React.FC<AudioCardProps> = ({
             setAnimateShadow(true);
         }
 
-    },[cardRef, audioRef, router.query.id, index])
+    },[cardRef, audioRef, index])
 
 
     useEffect(() => {
         if(typeof window !== 'undefined'){
             const queryParams = new URLSearchParams(window.location.search); 
+            queryParams.set("id", index);
 
-            if(queryParams.has("id")){
-                queryParams.delete("id");
-            }
-
-            queryParams.append("id", index);
             //reset=1 is done so tht social media consider it as a new url to refresh their cache
             const url = `${window.location.origin}/?${queryParams.toString()}&reset=1`;
             setWhatsApp(`whatsapp://send?text=${encodeURIComponent(url)}`);
@@ -170,6 +168,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
 
     const onWhatsAppShare = (e: React.MouseEvent<HTMLAnchorElement>) => {
+
         if(onShare){
             onShare(e);
         }
