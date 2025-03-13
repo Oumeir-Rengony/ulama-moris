@@ -35,7 +35,6 @@ const StyledWrapper = styled.div`
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background-color: #e74c3c;
         opacity: 0.6;
         position: absolute;
         top: 0;

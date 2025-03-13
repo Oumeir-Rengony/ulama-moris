@@ -10,11 +10,13 @@ import { styled } from "../styled-system/jsx"
 
 import dayjs from "dayjs";
 import config from "@config/config.json";
-import { DateIcon, SearchIcon } from "./Icons";
 
 import { type DateRangeType } from "react-tailwindcss-datepicker"; 
 
 const Datepicker = dynamic(() => import("react-tailwindcss-datepicker").then(mod => mod.default));
+
+import { CalendarDays as DateIcon, SearchIcon} from "lucide-react";
+
 
 
 export interface FilterProps {
@@ -85,7 +87,7 @@ const Filter: React.FC<FilterProps> = ({
                 startFrom={new Date()} 
                 value={dateRange} 
                 onChange={setDateRange}
-                toggleIcon={() => <DateIcon/>}
+                toggleIcon={() => <DateIcon size={20}/>}
             />
 
             <input 
@@ -103,7 +105,7 @@ const Filter: React.FC<FilterProps> = ({
                 type="submit"
                 onClick={handleSearch}
             >
-               Search <SearchIcon/>
+               Search <SearchIcon size={20}/>
             </button>
 
         </StyledWraper>

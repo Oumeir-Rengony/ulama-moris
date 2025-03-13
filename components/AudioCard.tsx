@@ -5,7 +5,9 @@ import Pulsar from "./Pulsar";
 import dayjs from "dayjs";
 
 import { styled } from "../styled-system/jsx";
+
 import { DateIcon, LocIcon, UserIcon } from "./Icons";
+import AudioPlayer from "app/_components/audio-player";
 
 
 interface Asset {
@@ -80,19 +82,13 @@ const AudioCard: React.FC<AudioCardProps> = ({
     const [animateShadow, setAnimateShadow] = useState<boolean>(false);
     const [showPulsar, setShowPulsar] = useState<boolean>(false);
 
+    const audioRef = useRef<HTMLAudioElement>(null);
+    const cardRef = useRef<HTMLDivElement>(null);
 
-    const audioRef = useRef<HTMLAudioElement>();
-    const cardRef = useRef<HTMLDivElement>();
-    
 
     useEffect(() => {
 
-        if(!audioRef.current){
-            return;
-        }
-
-
-        if(index !== currentAudioId){
+        if(audioRef.current && index !== currentAudioId){
             audioRef.current.pause();
             setShowPulsar(false);
         }
@@ -141,7 +137,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
             const queryParams = new URLSearchParams(window.location.search); 
             queryParams.set("id", index);
 
-            //reset=1 is done so tht social media consider it as a new url to refresh their cache
+            //reset=1 is done so that social media consider it as a new url to refresh their cache
             const url = `${window.location.origin}/?${queryParams.toString()}&reset=1`;
             setWhatsApp(`whatsapp://send?text=${encodeURIComponent(url)}`);
         }
@@ -167,12 +163,12 @@ const AudioCard: React.FC<AudioCardProps> = ({
     }
 
 
-    const onWhatsAppShare = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // const onWhatsAppShare = (e: React.MouseEvent<HTMLAnchorElement>) => {
 
-        if(onShare){
-            onShare(e);
-        }
-    }
+    //     if(onShare){
+    //         onShare(e);
+    //     }
+    // }
 
 
 
@@ -225,22 +221,18 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
                 </figcaption>
 
-                <audio 
-                    ref={audioRef}
-                    onPlay={onPlay}
-                    onPause={onPause}
-                    className="audio"
-                    controls
-                    controlsList="nodownload noplaybackrate noremoteplayback nodownload"
-                >
-                    <source src={audio?.url} type={audio?.contentType} />
-                </audio>           
+
+                <AudioPlayer audioRef={audioRef}>
+                    <audio ref={audioRef} onPlay={onPlay} onPause={onPause} controls style={{visibility: 'hidden', opacity: 0, width: 0, height: 0}}>
+                        <source src={audio?.url} type={audio?.contentType} />
+                    </audio>
+                </AudioPlayer>
             </figure>
 
 
             <div className="bottom">
                 <div className="share-links">
-                    <a href={whatsApp} onClick={onWhatsAppShare} data-action="share/whatsapp/share">
+                    <a href={whatsApp} data-action="share/whatsapp/share">
                         <Image  width={26} height={26} className="wa-image" src="/wa.png" alt="whats app"/>
                     </a>
                 </div>
@@ -308,7 +300,7 @@ const StyledWrapper = styled.div`
         overflow: hidden;
 
 
-        & .audio {
+        /* & .audio {
             width: 100%;
             height: 34px;
             margin: 12px 0;
@@ -324,14 +316,14 @@ const StyledWrapper = styled.div`
         }
     
         & .audio::-webkit-media-controls-mute-button,
-        & .audio::-webkit-media-controls-volume-slider { 
+        & .audio::-webkit-media-controls-volume-control-container { 
             display: none !important;
         }
 
         & .audio::-webkit-media-controls-timeline {
             width: 100%;
             padding: 0 0 0 4px;
-        }
+        } */
 
     }
 

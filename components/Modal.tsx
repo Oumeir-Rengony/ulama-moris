@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import {Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/modal";
 import type { ModalProps } from "@heroui/modal";
 import { styled } from "../styled-system/jsx";
-import { CloseIcon } from "./Icons";
+import { CircleX as CloseIcon } from "lucide-react"
 
 export interface NextUIModalProps extends ModalProps{
     title?: string;

@@ -2,7 +2,6 @@ import Image from "next/image";
 
 import Pagination from "@components/Pagination";
 import Filter from "@components/Filter";
-// import Loading from "@components/Loading";
 
 import { GetBayaanById, GetBayaans } from "@services/bayaans/bayaan.service";
 
@@ -14,21 +13,17 @@ import { getSelectorsByUserAgent } from "react-device-detect";
 import { headers } from "next/headers";
 import { type ResolvingMetadata, type Metadata } from "next";
 import AudioList from "./_components/audio-list";
-import { MailPlusIcon } from "@components/icons";
-
-
-type Props = {
-  params: { id: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
+import { MailPlus as MailPlusIcon } from "lucide-react";
+import { Suspense } from "react";
+import Loading from "@components/Loading";
 
 
 export async function generateMetadata(
-  { params, searchParams }: Props,
+  { searchParams } : { searchParams: Promise<{ [key: string]: string | string[] | undefined }> },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
 
-  const id = searchParams?.id as string;
+  const id = (await searchParams)?.id as string;
 
   if(!id){
     return null;
@@ -54,10 +49,11 @@ export async function generateMetadata(
 }
 
 
-export default async function Home({
-  params,
-  searchParams
-}:Props) {  
+export default async function Home(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}){  
+  const searchParams = await props.searchParams;
+
   const page = searchParams?.page ? +searchParams?.page : 1;
   const startDate = searchParams?.startDate ? searchParams?.startDate as string : null;
   const endDate = searchParams?.endDate ? searchParams?.endDate as string : null;
@@ -65,19 +61,46 @@ export default async function Home({
   
   const validStartDate = dayjs(startDate).isValid() ? startDate : null;
   const validEndDate = dayjs(endDate).isValid() ? endDate : null;
+
   
-  
-  const { isMobile } = getSelectorsByUserAgent(headers().get('user-agent'));
+  return (
+    <Suspense fallback={<Loading/>}>
+      <HomeLayout
+        key={`${searchParams.page}`}
+        page={page}
+        startDate={validStartDate}
+        endDate={validEndDate}
+        search={search}
+      />    
+    </Suspense>
+
+  );
+}
+
+
+async function HomeLayout({
+  page,
+  startDate,
+  endDate,
+  search
+}:{
+  page: number
+  startDate: string
+  endDate: string
+  search: string
+}){
+
+  const userAgent = (await headers()).get('user-agent');
+  const { isMobile } =  getSelectorsByUserAgent(userAgent);
   const pageSize = isMobile ? config.bayaan.pageSize.mobile : config.bayaan.pageSize.desktop;
 
-  const audioList =  await GetBayaans({ 
-      page: +page,
-      startDate: validStartDate,
-      endDate: validEndDate,
-      search,
-      isMobile
-    });
-
+  const audioList = await GetBayaans({ 
+    page: +page,
+    startDate: startDate,
+    endDate: endDate,
+    search: search,
+    isMobile: isMobile
+  });
 
   return (
     <StyledWrapper>
@@ -89,7 +112,7 @@ export default async function Home({
             <div className="heading">
               <h1 className="heading__title">Bayaan par les Ulama de Moris</h1>
               <a href="https://www.mufti.mu" target="_blank">
-                <button className="ask-btn">Ask a Question <MailPlusIcon/> </button>
+                <button className="ask-btn">Ask a Question <MailPlusIcon size={20}/> </button>
               </a>
             </div>
 
@@ -125,7 +148,7 @@ export default async function Home({
       </div>
 
     </StyledWrapper>
-  );
+  )
 }
 
 

@@ -7,7 +7,8 @@ module.exports = {
     optimizeUniversalDefaults: true
   },
   content: [
-    "./node_modules/@heroui/theme/dist/components/modal.js",
+    // "./node_modules/@heroui/theme/dist/components/modal.js",
+    "./node_modules/@heroui/theme/dist/components/slider.js", 
     "./node_modules/@heroui/theme/dist/components/pagination.js", 
     "./node_modules/react-tailwindcss-datepicker/dist/index.esm.js",
   ],
