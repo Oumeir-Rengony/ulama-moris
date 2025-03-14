@@ -223,7 +223,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
 
                 <AudioPlayer audioRef={audioRef}>
-                    <audio ref={audioRef} onPlay={onPlay} onPause={onPause} controls style={{visibility: 'hidden', opacity: 0, width: 0, height: 0}}>
+                    <audio ref={audioRef} onPlay={onPlay} onPause={onPause} controls>
                         <source src={audio?.url} type={audio?.contentType} />
                     </audio>
                 </AudioPlayer>
@@ -297,34 +297,14 @@ const StyledWrapper = styled.div`
 
     & .figure {
         margin: 0;
-        overflow: hidden;
-
-
-        /* & .audio {
-            width: 100%;
-            height: 34px;
-            margin: 12px 0;
-            background: none;
+        overflow: hidden;  
+        
+        & audio {
+            visibility: hidden;
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
-
-
-        & .audio::-webkit-media-controls-play-button,
-        & .audio::-webkit-media-controls-current-time-display,
-        & .audio::-webkit-media-controls-time-remaining-display{
-            position: relative; 
-            left: -9px;
-        }
-    
-        & .audio::-webkit-media-controls-mute-button,
-        & .audio::-webkit-media-controls-volume-control-container { 
-            display: none !important;
-        }
-
-        & .audio::-webkit-media-controls-timeline {
-            width: 100%;
-            padding: 0 0 0 4px;
-        } */
-
     }
 
 

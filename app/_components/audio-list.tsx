@@ -38,8 +38,8 @@ const AudioList = ({ audioList }: {
                             onAudioPlay={() => onAudioPlay(audioItem?.sys?.id)}
                             {...audioItem}
                         />
-                )
-            })
+                    )
+                })
             }
         </div>        
     )

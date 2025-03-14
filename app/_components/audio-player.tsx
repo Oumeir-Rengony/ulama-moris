@@ -1,6 +1,6 @@
 "use client"
 
-import { startTransition, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { 
   Play as PlayIcon, 
   Pause as PauseIcon,
@@ -46,6 +46,7 @@ const AudioPlayer = ({
   const [duration, setDuration] = useState(0);
   const [mediaTime, setMediaTime] = useState(0);
 
+  const hasSliderChangedRef = useRef<boolean>(false);
 
   useEffect(() => {
 
@@ -57,12 +58,10 @@ const AudioPlayer = ({
     };
 
     const handlePlay = () => {
-      console.log("play")
       setIsPlaying(true);
     }
 
     const handlePause = () => {
-      console.log("pause")
       setIsPlaying(false);
     }
 
@@ -92,25 +91,59 @@ const AudioPlayer = ({
 
 
   const onSliderChange = (value: SliderValue) => {
-    startTransition(() => {
-      setMediaTime(value as number);
-      audioRef.current.currentTime = value as number;
-    })
+    hasSliderChangedRef.current = true;
+    setMediaTime(value as number);
+    audioRef.current.currentTime = value as number;
   }
 
-  const onRewind = () => {
+  const onThumbClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if(hasSliderChangedRef.current){
+      hasSliderChangedRef.current = false;
+      return
+    }
+
+    const thumbRect = e.currentTarget.getBoundingClientRect();
+    const thumbCenter = thumbRect.left + thumbRect.width / 2;
+    const mouseX = e.clientX;
+
+    if (mouseX < thumbCenter) {
+      handleSkip(-45);
+    }
+    else {
+      handleSkip(45);
+    }
+  }
+
+
+  const handleSkip = (skipValue: number) => {
+
     const { currentTime } = audioRef.current;
-    const newTime = Math.max(currentTime - 15, 0);
+
+    let newTime = currentTime + skipValue;
+
+    // Ensure newTime is not below 0
+    if (newTime < 0) {
+      newTime = 0;
+    }
+
+    // Ensure newTime is not above the duration
+    if (newTime > duration) {
+      newTime = duration;
+    }
     setMediaTime(newTime);
     audioRef.current.currentTime = newTime;
+    
+  }
+
+
+  const onRewind = (e: React.MouseEvent<HTMLButtonElement>) => {
+    handleSkip(-15);
   };
 
-  const onFastForward = () => {
-    const { currentTime } = audioRef.current;
-    const newTime = Math.min(currentTime + 15, duration);
-    setMediaTime(newTime);
-    audioRef.current.currentTime = newTime;
+  const onFastForward = (e: React.MouseEvent<HTMLButtonElement>, value: number = 15) => {
+    handleSkip(15);
   };
+
 
 
   return (
@@ -122,6 +155,7 @@ const AudioPlayer = ({
         defaultValue={0}
         maxValue={duration}
         step={0.01}
+        renderThumb={(props) => <div {...props} onClick={onThumbClick} />}
         onChange={onSliderChange}
         classNames={{
           track: "slider-track",
@@ -147,7 +181,7 @@ const StyledWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 10px;
+  padding: 20px;
   border-radius: 10px;
   background: #f2f4f5;
   margin: 20px auto;
@@ -173,8 +207,9 @@ const StyledWrapper = styled.div`
   }
 
   & .slider-thumb:before {
-    width: unset !important;
-    height: unset !important;
+    width: 18px !important;
+    height: 32px !important;
+    border-radius: unset !important;
   }
 
 
@@ -195,6 +230,13 @@ const StyledWrapper = styled.div`
       justify-content: center;
       font-size: 12px;
       /* gap: 4px; */
+    }
+
+
+    & .control-btn:active {
+      & .lucide {
+        stroke: #000000; 
+      }
     }
   } 
   
