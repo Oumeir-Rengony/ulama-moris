@@ -24,8 +24,10 @@ query GetBayaan (
       }
       title,
       description
+      masjid
       author
       date
+      tag
       audio {
         ...AssetsFields
       }

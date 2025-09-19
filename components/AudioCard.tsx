@@ -6,6 +6,7 @@ import Pulsar from "./Pulsar";
 import dayjs from "dayjs";
 
 import { styled } from "../styled-system/jsx";
+import { DateIcon, LocIcon, UserIcon } from "./Icons";
 
 
 interface Asset {
@@ -28,11 +29,36 @@ export interface AudioCardProps {
     onShare? : React.MouseEventHandler<HTMLAnchorElement>;
     className?: string;
     description: HTMLElement | string;
+    masjid: string;
     date: string;
     author: string;
     audio: Asset;
+    tag?: string;
     showPulsar?: boolean;
 };
+
+
+function capitalizeStart(sentence: string) {
+  if (typeof sentence !== 'string' || sentence.length === 0) {
+    return sentence; // Handle empty strings or non-string inputs
+  }
+  return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+}
+
+
+
+const toTitleCase = (str: string) => {
+
+  if (typeof str !== 'string' || str.length === 0) {
+    return str; // Handle empty strings or non-string inputs
+  }
+
+  return str
+    .split(' ')                    
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+}
+
 
 const AudioCard: React.FC<AudioCardProps> = ({
     title,
@@ -43,14 +69,17 @@ const AudioCard: React.FC<AudioCardProps> = ({
     onShare,
     className='',
     description,
+    masjid,
     date,
     author,
     audio,
+    tag
 }) => {
 
     const [whatsApp, setWhatsApp] = useState<string>('');
     const [animateShadow, setAnimateShadow] = useState<boolean>(false);
     const [showPulsar, setShowPulsar] = useState<boolean>(false);
+
 
     const audioRef = useRef<HTMLAudioElement>();
     const cardRef = useRef<HTMLDivElement>();
@@ -154,12 +183,49 @@ const AudioCard: React.FC<AudioCardProps> = ({
             
             { showPulsar && <Pulsar/> }
 
+            { 
+                tag && 
+                    <div className="tag">
+                        { 
+                            tag.split(",").map(t => (
+                                <span className="tag__item"> { toTitleCase(t) }</span> 
+                            ))
+                        }
+                    </div>
+            }
+
             <h2 className="title">{ title }</h2>
 
             <figure className="figure">
-                <figcaption className="figure__description">
-                    <div dangerouslySetInnerHTML={{__html: description}}/>
+                <figcaption className="figure__caption">
+
+                    { description && <div className="figure__desc" dangerouslySetInnerHTML={{__html: description}}/> }
+
+                    <div className="figure__info">
+
+                        <div className="figure__info-item">
+                            <UserIcon color="#71717a" />
+                            <p className="figure__info-title"> { toTitleCase(author) } </p>
+                        </div>
+                        
+                        {
+                            masjid && 
+                                <div className="figure__info-item">
+                                    <LocIcon color="#71717a" />
+                                    <p className="figure__info-title"> { toTitleCase(masjid) } </p>
+                                </div>
+                        }
+
+
+                        <div className="figure__info-item">
+                            <DateIcon size={18} color="#71717a" />
+                            <p className="figure__info-title"> { dayjs(date).format(config.bayaan.displayFormat) } </p>
+                        </div>
+
+                    </div>
+
                 </figcaption>
+
                 <audio 
                     ref={audioRef}
                     onPlay={onPlay}
@@ -172,10 +238,6 @@ const AudioCard: React.FC<AudioCardProps> = ({
                 </audio>           
             </figure>
 
-
-            <p className="info__author"> { author } </p>
-
-            <p className="info__date"> { dayjs(date).format(config.bayaan.displayFormat) }</p>
 
             <div className="bottom">
                 <div className="share-links">
@@ -198,7 +260,7 @@ const StyledWrapper = styled.div`
     box-shadow: 0px 0px 4px 0px #00000033;
     border-radius: 12px;
     background-image: linear-gradient(135deg, rgba(176,251,175,1), #ffffff 15% , #ffffff 85%, rgba(176,251,175,1));
-    padding: 12px 18px;
+    padding: 24px;
     margin: 24px 0;
     transition: 1000ms all ease-in-out 0ms;
 
@@ -223,17 +285,24 @@ const StyledWrapper = styled.div`
         }
     }
 
+    & .tag {
 
-    & .figure__description {
-        font-size: 14px;
+        display: flex;
+        gap: 8px;
+
+        & .tag__item {
+            display: inline-block;
+            background-color: rgba(133, 208, 61, 0.2);
+            color: #378b59;
+            padding: 4px 8px;
+            font-size: 12px;
+            /* infinity number */
+            border-radius: 33554400px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
     }
-    
-    & .title {
-        margin-top: 0;
-        margin-bottom: 12px;
-        font-size: 22px;
-        font-weight: 600;
-    }
+
 
     & .figure {
         margin: 0;
@@ -268,19 +337,39 @@ const StyledWrapper = styled.div`
     }
 
 
-    & .info__author {
-        color: rgb(113, 113, 122);
-        font-weight: 500;
-        margin: 0 0 14px;
+    & .figure__caption {
+        font-size: 14px;
+
+        & .figure__desc {
+            padding-bottom: 12px;
+        }
+    }
+    
+    & .title {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: 18px;
+        font-weight: 600;
     }
 
 
+    & .figure__info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding-bottom: 10px;
 
-    & .info__date {
-        color: rgb(113, 113, 122);
-        font-size: 12px;
-        font-weight: 500;
-        margin: 0;
+        & .figure__info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        & .figure__info-title {
+            color: rgb(113, 113, 122);
+            font-weight: 500;
+        }
+
     }
 
 
