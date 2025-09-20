@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Slider, type SliderValue } from "@heroui/slider";
 import { styled } from "styled-system/jsx";
+import dayjs from "dayjs";
 
 const formatTime = (time) => {
   // Hours, minutes and seconds
@@ -31,24 +32,28 @@ const formatTime = (time) => {
 const AudioPlayer = ({ 
   // src,
   audioRef,
-  // onPlay,
-  // onPause,
-  children
+  onPlay,
+  onPause,
 }: {
   // src: string;
   audioRef: React.MutableRefObject<HTMLAudioElement>;
-  // onPlay: (e?: React.SyntheticEvent<HTMLAudioElement>) => void;
-  // onPause: (e?: React.SyntheticEvent<HTMLAudioElement>) => void;
-  children: React.ReactNode;
+  onPlay?: (e?: React.SyntheticEvent<HTMLAudioElement>) => void;
+  onPause?: (e?: React.SyntheticEvent<HTMLAudioElement>) => void;
 }) => {
  
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [mediaTime, setMediaTime] = useState(0);
 
+  const lastSkipTimeRef = useRef<dayjs.Dayjs | null>(null);
+
   const hasSliderChangedRef = useRef<boolean>(false);
 
   useEffect(() => {
+
+    if(!audioRef.current){
+      return
+    }
 
     const onLoadedMetadata = () => {
       setDuration(audioRef.current.duration);
@@ -85,12 +90,22 @@ const AudioPlayer = ({
 
 
   const togglePlaying = () => {
-    setIsPlaying(!isPlaying);
-    isPlaying ? audioRef.current.pause() : audioRef.current.play();
+    // setIsPlaying(!isPlaying);
+    // isPlaying ? audioRef.current.pause() : audioRef.current.play();
+
+    if (!isPlaying) {
+      // Try to play and catch interruption
+      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {/*ignore*/});
+    } else {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+
   };
 
 
   const onSliderChange = (value: SliderValue) => {
+    if(!value) return;
     hasSliderChangedRef.current = true;
     setMediaTime(value as number);
     audioRef.current.currentTime = value as number;
@@ -106,12 +121,22 @@ const AudioPlayer = ({
     const thumbCenter = thumbRect.left + thumbRect.width / 2;
     const mouseX = e.clientX;
 
+    const cooldown = 500; // ms
+
+    // respect cooldown
+    if (lastSkipTimeRef.current && dayjs().diff(lastSkipTimeRef.current, "ms") < cooldown) {
+      return;
+    }
+
     if (mouseX < thumbCenter) {
       handleSkip(-45);
     }
     else {
       handleSkip(45);
     }
+
+    lastSkipTimeRef.current = dayjs();
+
   }
 
 
@@ -170,7 +195,6 @@ const AudioPlayer = ({
         <button onClick={onRewind} className="control-btn"><RewindIcon size={20} color="#53606c"/> 15s </button>
         <button onClick={onFastForward} className="control-btn"><ForwardIcon size={20} color="#53606c"/> 15s</button>
       </div>
-      { children }
     </StyledWrapper>
   );
 };

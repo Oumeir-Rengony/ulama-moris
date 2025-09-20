@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import { styled } from "../styled-system/jsx";
 
 import { DateIcon, LocIcon, UserIcon } from "./Icons";
+
 import AudioPlayer from "app/_components/audio-player";
 
 
@@ -87,15 +88,34 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
 
     useEffect(() => {
+        const el = new Audio(audio.url);
+        el.preload = "auto";
+        // trigger loading now
+        el.load();               
+
+        el.onplay = () => setShowPulsar(true);
+        el.onpause = () => setShowPulsar(false);
+        el.onended = () => setShowPulsar(false);
+
+        audioRef.current = el;
+
+        return () => {
+            el.pause();
+            audioRef.current = null
+        };
+    }, [audio.url]);
+
+    useEffect(() => {
 
         if(audioRef.current && index !== currentAudioId){
             audioRef.current.pause();
             setShowPulsar(false);
         }
 
-    },[audioRef, index, currentAudioId]);
+    },[index, currentAudioId]);
 
 
+    // Handle scroll + WhatsApp share when index changes
     useEffect(() => {
         if(!cardRef.current){
             return
@@ -115,8 +135,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
         }
 
 
-        //use of Audio ref to check if in viewport is better since it makes sure 
-        //the audio is visble instead of only a small section of the card
+        // Scroll into view if ?id matches
         if(queryId === index && !isInViewport(audioRef.current)){
 
             //small offset to give top space
@@ -129,46 +148,13 @@ const AudioCard: React.FC<AudioCardProps> = ({
             setAnimateShadow(true);
         }
 
-    },[cardRef, audioRef, index])
+        // Update WhatsApp share link
+        queryParams.set("id", index);
+        //reset=1 is done so that social media consider it as a new url to refresh their cache
+        const url = `${window.location.origin}/?${queryParams.toString()}&reset=1`;
+        setWhatsApp(`whatsapp://send?text=${encodeURIComponent(url)}`);
 
-
-    useEffect(() => {
-        if(typeof window !== 'undefined'){
-            const queryParams = new URLSearchParams(window.location.search); 
-            queryParams.set("id", index);
-
-            //reset=1 is done so that social media consider it as a new url to refresh their cache
-            const url = `${window.location.origin}/?${queryParams.toString()}&reset=1`;
-            setWhatsApp(`whatsapp://send?text=${encodeURIComponent(url)}`);
-        }
     },[index])
-
-
-    const onPlay = (e: React.SyntheticEvent<HTMLAudioElement>) => {
-
-        setShowPulsar(true);
-
-        if(onAudioPlay){
-            onAudioPlay(e);
-        }
-    }
-
-
-    const onPause = (e: React.SyntheticEvent<HTMLAudioElement>) => {
-        setShowPulsar(false);
-
-        if(onAudioPause){
-            onAudioPause(e);
-        }
-    }
-
-
-    // const onWhatsAppShare = (e: React.MouseEvent<HTMLAnchorElement>) => {
-
-    //     if(onShare){
-    //         onShare(e);
-    //     }
-    // }
 
 
 
@@ -221,12 +207,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
                 </figcaption>
 
-
-                <AudioPlayer audioRef={audioRef}>
-                    <audio ref={audioRef} onPlay={onPlay} onPause={onPause} controls>
-                        <source src={audio?.url} type={audio?.contentType} />
-                    </audio>
-                </AudioPlayer>
+                <AudioPlayer audioRef={audioRef} />
             </figure>
 
 
