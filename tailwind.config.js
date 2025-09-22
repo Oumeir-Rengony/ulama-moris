@@ -1,5 +1,5 @@
 // tailwind.config.js
-const {nextui} = require("@nextui-org/theme");
+const {heroui} = require("@heroui/theme");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -7,13 +7,14 @@ module.exports = {
     optimizeUniversalDefaults: true
   },
   content: [
-    "./node_modules/@nextui-org/theme/dist/components/modal.js",
-    "./node_modules/@nextui-org/theme/dist/components/pagination.js", 
+    // "./node_modules/@heroui/theme/dist/components/modal.js",
+    "./node_modules/@heroui/theme/dist/components/slider.js", 
+    "./node_modules/@heroui/theme/dist/components/pagination.js", 
     "./node_modules/react-tailwindcss-datepicker/dist/index.esm.js",
   ],
   theme: {
     extend: {},
   },
   darkMode: "class",
-  plugins: [nextui()],
+  plugins: [heroui()],
 };
