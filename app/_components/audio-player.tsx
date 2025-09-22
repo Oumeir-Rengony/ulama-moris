@@ -30,12 +30,10 @@ const formatTime = (time) => {
 };
 
 const AudioPlayer = ({ 
-  // src,
   audioRef,
   onPlay,
   onPause,
 }: {
-  // src: string;
   audioRef: React.MutableRefObject<HTMLAudioElement>;
   onPlay?: (e?: React.SyntheticEvent<HTMLAudioElement>) => void;
   onPause?: (e?: React.SyntheticEvent<HTMLAudioElement>) => void;
