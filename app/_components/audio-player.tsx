@@ -44,6 +44,8 @@ const AudioPlayer = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [mediaTime, setMediaTime] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const lastSkipTimeRef = useRef<dayjs.Dayjs | null>(null);
 
@@ -58,23 +60,46 @@ const AudioPlayer = ({
     const onLoadedMetadata = () => {
       setDuration(audioRef.current.duration);
     }
+
     const onTimeUpdate = () => {
       setMediaTime(audioRef.current.currentTime);
     };
 
     const handlePlay = () => {
       setIsPlaying(true);
+      setIsLoading(true);
     }
 
+    
     const handlePause = () => {
       setIsPlaying(false);
+      setIsLoading(false);
     }
+
+    // buffering/loading
+    const handleWaiting = () => { 
+      setIsLoading(true);
+    }
+      
+    // enough data to play
+    // const handleCanPlay = () => { 
+    //   setIsLoading(false);  
+    // }
+
+    // actually started
+    const handlePlaying = () => {
+      setIsLoading(false);
+    }
+
 
     if(audioRef.current){
       audioRef.current.addEventListener('loadedmetadata', onLoadedMetadata);
       audioRef.current.addEventListener('timeupdate', onTimeUpdate);
       audioRef.current.addEventListener('play', handlePlay);
       audioRef.current.addEventListener('pause', handlePause);
+      audioRef.current.addEventListener("waiting", handleWaiting);
+      // audioRef.current.addEventListener("canplay", handleCanPlay);
+      audioRef.current.addEventListener("playing", handlePlaying);
     }
 
     return () => {
@@ -83,6 +108,9 @@ const AudioPlayer = ({
         audioRef.current.removeEventListener('TimeUpdate', onTimeUpdate);
         audioRef.current.removeEventListener('Play', handlePlay);
         audioRef.current.removeEventListener('Pause', handlePause);
+        audioRef.current.removeEventListener("waiting", handleWaiting);
+        // audioRef.current.removeEventListener("canplay", handleCanPlay);
+        audioRef.current.removeEventListener("playing", handlePlaying);
       }
     }
 
@@ -129,10 +157,10 @@ const AudioPlayer = ({
     }
 
     if (mouseX < thumbCenter) {
-      handleSkip(-45);
+      handleSkip(-15);
     }
     else {
-      handleSkip(45);
+      handleSkip(15);
     }
 
     lastSkipTimeRef.current = dayjs();
@@ -188,9 +216,21 @@ const AudioPlayer = ({
         }}
       />
       <div className="controls">
-        <button onClick={togglePlaying} className="control-btn">
+        {/* <button onClick={togglePlaying} className="control-btn">
           { isPlaying ? <PauseIcon color="#53606c" /> : <PlayIcon color="#53606c" /> }
+        </button> */}
+        
+        <button onClick={togglePlaying} className="control-btn">
+          {isLoading ? (
+            <div className="spinner" />
+          ) : isPlaying ? (
+            <PauseIcon color="#53606c" />
+          ) : (
+            <PlayIcon color="#53606c" />
+          )}
         </button>
+
+
         <p className="time-info">{formatTime(mediaTime)} / {formatTime(duration)}</p>
         <button onClick={onRewind} className="control-btn"><RewindIcon size={20} color="#53606c"/> 15s </button>
         <button onClick={onFastForward} className="control-btn"><ForwardIcon size={20} color="#53606c"/> 15s</button>
@@ -261,6 +301,15 @@ const StyledWrapper = styled.div`
       & .lucide {
         stroke: #000000; 
       }
+    }
+
+    & .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ccc;
+      border-top: 2px solid #53606c;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
     }
   } 
   

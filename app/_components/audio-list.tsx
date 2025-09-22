@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import AudioCard from "@components/AudioCard";
+import ReactDOM from "react-dom";
 
 const AudioList = ({ audioList }: {
     audioList: any
@@ -12,6 +13,16 @@ const AudioList = ({ audioList }: {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+
+    useEffect(() => {
+        if(!audioList && audioList.length <= 0){
+            return
+        }
+
+        audioList.forEach(item => {
+            ReactDOM.preload(item?.audio?.url, { as: "audio", type: "audio/mp4" }as any);
+        });
+    },[audioList]);
 
     const createQueryString = (name: string, value: string) => {
         const params = new URLSearchParams(searchParams.toString())
@@ -24,7 +35,6 @@ const AudioList = ({ audioList }: {
         const queryString = createQueryString('id', `${id}`);
         router.push(`${pathname}?${queryString}`, { scroll: false });
     }
-
 
     return (
         <div className="audio__list">

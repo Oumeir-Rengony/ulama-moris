@@ -34,6 +34,14 @@ export const keyFrames = defineKeyframes({
     '100%': {
       boxShadow: 'rgb(127, 243, 125, 0.1) 0px 14px 28px, rgb(127, 243, 125, 0.1) 0px 10px 10px'
     }
+  },
+  spin: {
+    '0%': { 
+      transform: 'rotate(0deg)'
+    },
+    '100%': {
+      transform: 'rotate(360deg)'
+    }
   }
 });
 
