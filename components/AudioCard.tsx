@@ -6,7 +6,8 @@ import dayjs from "dayjs";
 
 import { styled } from "../styled-system/jsx";
 
-import { DateIcon, LocIcon, UserIcon } from "./Icons";
+import { CalendarDays as DateIcon, MapPin, UserRound } from "lucide-react";
+
 
 import AudioPlayer from "app/_components/audio-player";
 
@@ -168,8 +169,8 @@ const AudioCard: React.FC<AudioCardProps> = ({
                 tag && 
                     <div className="tag">
                         { 
-                            tag.split(",").map(t => (
-                                <span className="tag__item"> { toTitleCase(t) }</span> 
+                            tag.split(",").map((t, index) => (
+                                <span key={index} className="tag__item"> { toTitleCase(t) }</span> 
                             ))
                         }
                     </div>
@@ -185,14 +186,14 @@ const AudioCard: React.FC<AudioCardProps> = ({
                     <div className="figure__info">
 
                         <div className="figure__info-item">
-                            <UserIcon color="#71717a" />
+                            <UserRound size={18} color="#71717a" />
                             <p className="figure__info-title"> { toTitleCase(author) } </p>
                         </div>
                         
                         {
                             masjid && 
                                 <div className="figure__info-item">
-                                    <LocIcon color="#71717a" />
+                                    <MapPin color="#71717a" size={18}/>
                                     <p className="figure__info-title"> { toTitleCase(masjid) } </p>
                                 </div>
                         }

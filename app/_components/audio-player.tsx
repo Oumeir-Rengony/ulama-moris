@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { 
   Play as PlayIcon, 
   Pause as PauseIcon,
-  Rewind as RewindIcon,
-  FastForward as ForwardIcon
+  ChevronsLeft as RewindIcon,
+  ChevronsRight as ForwardIcon
 } from "lucide-react";
 import { Slider, type SliderValue } from "@heroui/slider";
 import { styled } from "styled-system/jsx";
@@ -211,30 +211,33 @@ const AudioPlayer = ({
         renderThumb={(props) => <div {...props} onClick={onThumbClick} />}
         onChange={onSliderChange}
         classNames={{
+          base: "slider-base",
           track: "slider-track",
           thumb: "slider-thumb",
         }}
       />
-      <div className="controls">
-        {/* <button onClick={togglePlaying} className="control-btn">
-          { isPlaying ? <PauseIcon color="#53606c" /> : <PlayIcon color="#53606c" /> }
-        </button> */}
+
+     
+      <div className="media-bar">
+
+        <p className="time-info">{formatTime(mediaTime)}</p>
         
-        <button onClick={togglePlaying} className="control-btn">
-          {isLoading ? (
-            <div className="spinner" />
-          ) : isPlaying ? (
-            <PauseIcon color="#53606c" />
-          ) : (
-            <PlayIcon color="#53606c" />
-          )}
-        </button>
+        <div className="controls">
+          <button onClick={onRewind} className="control-btn btn-skip"><RewindIcon size={24} color="#53606c"/>  </button>
+          {
+            isLoading
+              ? <div className="spinner" />
+              : <button onClick={togglePlaying} className="control-btn btn-play">
+                { isPlaying ? <PauseIcon size={18} color="#53606c"/> : <PlayIcon size={18} color="#53606c"/> }
+              </button>
+          }
+          <button onClick={onFastForward} className="control-btn btn-skip"><ForwardIcon size={24} color="#53606c"/></button>
+        </div>
 
+        <p className="time-info">{formatTime(duration)}</p>
 
-        <p className="time-info">{formatTime(mediaTime)} / {formatTime(duration)}</p>
-        <button onClick={onRewind} className="control-btn"><RewindIcon size={20} color="#53606c"/> 15s </button>
-        <button onClick={onFastForward} className="control-btn"><ForwardIcon size={20} color="#53606c"/> 15s</button>
       </div>
+
     </StyledWrapper>
   );
 };
@@ -245,14 +248,16 @@ const StyledWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 20px;
+  /* padding: 12px; */
   border-radius: 10px;
-  background: #f2f4f5;
+  /* background: #f2f4f5; */
   margin: 20px auto;
   
 
-  & .time-info {
-    color: #53606c;
+ 
+
+  & .slider-base {
+    padding-bottom: 12px;
   }
 
   & .slider-track {
@@ -276,43 +281,62 @@ const StyledWrapper = styled.div`
     border-radius: unset !important;
   }
 
-
-  & .controls {
+  & .media-bar {
     display: flex;
     align-items: center;
-    font-size: 14px;
-    gap: 10px;
+    justify-content: space-between;
+    font-size: 12px;
 
-    @media(min-width: 768px){
-      gap: 16px;
+
+    & .time-info {
+      color: #53606c;
+      
     }
-    
 
-    & .control-btn {
+    & .controls {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
-      /* gap: 4px; */
-    }
+      font-size: 14px;
+      gap: 16px;
 
-
-    & .control-btn:active {
-      & .lucide {
-        stroke: #000000; 
+      @media(min-width: 768px){
+        gap: 16px;
       }
-    }
+      
 
-    & .spinner {
-      width: 20px;
-      height: 20px;
-      border: 2px solid #ccc;
-      border-top: 2px solid #53606c;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-    }
-  } 
-  
+      & .control-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      & .btn-play {
+        background: #b0fbaf;
+        padding: 16px;
+        border-radius: 6px;
+      }
+
+
+      & .control-btn:active {
+        & .lucide {
+          stroke: #000000; 
+        }
+      }
+
+      & .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ccc;
+        border-top: 2px solid #53606c;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+      }
+
+    } 
+
+  }
+
 `;
 
 export default AudioPlayer;
