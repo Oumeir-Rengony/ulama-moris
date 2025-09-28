@@ -61,7 +61,7 @@ const MediaControls = ({
        <p className="time-info">{formatTime(mediaTime)}</p>
         
         <div className="controls">
-          <SkipButton onSkip={onSkip} type="rewind" />
+          <SkipButton onSkip={onSkip} type="rewind" className="control-btn" />
           {
             isLoading
               ? <div className="spinner-container">
