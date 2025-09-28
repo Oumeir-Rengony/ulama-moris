@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import config from "@config/config.json";
-import Pulsar from "./Pulsar";
+import Pulsar from "./pulsar";
 import dayjs from "dayjs";
 
 import { styled } from "../styled-system/jsx";
 
 import { CalendarDays as DateIcon, MapPin, UserRound } from "lucide-react";
-
-
-import AudioPlayer from "app/_components/audio-player";
+import AudioPlayer from "./audio-player/audio-player";
 
 
 interface Asset {

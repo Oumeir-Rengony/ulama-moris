@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import AudioCard from "@components/AudioCard";
+import AudioCard from "@components/audio-card";
 import ReactDOM from "react-dom";
 
 const AudioList = ({ audioList }: {

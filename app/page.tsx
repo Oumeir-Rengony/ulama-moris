@@ -1,7 +1,7 @@
 import Image from "next/image";
 
-import Pagination from "@components/Pagination";
-import Filter from "@components/Filter";
+import Pagination from "@components/pagination";
+import Filter from "@components/filter";
 
 import { GetBayaanById, GetBayaans } from "@services/bayaans/bayaan.service";
 
@@ -15,7 +15,7 @@ import { type ResolvingMetadata, type Metadata } from "next";
 import AudioList from "./_components/audio-list";
 import { MailPlus as MailPlusIcon } from "lucide-react";
 import { Suspense } from "react";
-import Loading from "@components/Loading";
+import Loading from "@components/loading";
 
 
 export async function generateMetadata(

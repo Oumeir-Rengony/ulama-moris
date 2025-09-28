@@ -1,33 +1,11 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react";
-import { 
-  Play as PlayIcon, 
-  Pause as PauseIcon,
-  ChevronsLeft as RewindIcon,
-  ChevronsRight as ForwardIcon
-} from "lucide-react";
 import { Slider, type SliderValue } from "@heroui/slider";
 import { styled } from "styled-system/jsx";
 import dayjs from "dayjs";
+import MediaControls from "./media-controls";
 
-const formatTime = (time) => {
-  // Hours, minutes and seconds
-  const hrs = Math.floor(~~(time / 3600)); // eslint-disable-line
-  const mins = Math.floor(~~((time % 3600) / 60)); // eslint-disable-line
-  const secs = Math.floor(time % 60);
-
-  // Output like "1:01" or "4:03:59" or "123:03:59"
-  let ret = "";
-
-  if (hrs > 0) {
-    ret += `${hrs}:${mins < 10 ? "0" : ""}`;
-  }
-
-  ret += `${mins}:${secs < 10 ? "0" : ""}`;
-  ret += `${secs}`;
-  return ret;
-};
 
 const AudioPlayer = ({ 
   audioRef,
@@ -46,8 +24,8 @@ const AudioPlayer = ({
 
 
   const lastSkipTimeRef = useRef<dayjs.Dayjs | null>(null);
-
   const hasSliderChangedRef = useRef<boolean>(false);
+
 
   useEffect(() => {
 
@@ -110,15 +88,13 @@ const AudioPlayer = ({
         // audioRef.current.removeEventListener("canplay", handleCanPlay);
         audioRef.current.removeEventListener("playing", handlePlaying);
       }
+
     }
 
   },[audioRef.current])
 
 
-  const togglePlaying = () => {
-    // setIsPlaying(!isPlaying);
-    // isPlaying ? audioRef.current.pause() : audioRef.current.play();
-
+  const togglePlay = () => {
     if (!isPlaying) {
       // Try to play and catch interruption
       audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {/*ignore*/});
@@ -136,6 +112,27 @@ const AudioPlayer = ({
     setMediaTime(value as number);
     audioRef.current.currentTime = value as number;
   }
+
+  const handleSkip = (skipValue: number) => {
+
+    const { currentTime } = audioRef.current;
+
+    let newTime = currentTime + skipValue;
+
+    // Ensure newTime is not below 0
+    if (newTime < 0) {
+      newTime = 0;
+    }
+
+    // Ensure newTime is not above the duration
+    if (newTime > duration) {
+      newTime = duration;
+    }
+    setMediaTime(newTime);
+    audioRef.current.currentTime = newTime;
+    
+  }
+
 
   const onThumbClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if(hasSliderChangedRef.current){
@@ -166,36 +163,6 @@ const AudioPlayer = ({
   }
 
 
-  const handleSkip = (skipValue: number) => {
-
-    const { currentTime } = audioRef.current;
-
-    let newTime = currentTime + skipValue;
-
-    // Ensure newTime is not below 0
-    if (newTime < 0) {
-      newTime = 0;
-    }
-
-    // Ensure newTime is not above the duration
-    if (newTime > duration) {
-      newTime = duration;
-    }
-    setMediaTime(newTime);
-    audioRef.current.currentTime = newTime;
-    
-  }
-
-
-  const onRewind = (e: React.MouseEvent<HTMLButtonElement>) => {
-    handleSkip(-15);
-  };
-
-  const onFastForward = (e: React.MouseEvent<HTMLButtonElement>, value: number = 15) => {
-    handleSkip(15);
-  };
-
-
 
   return (
     <StyledWrapper>
@@ -215,26 +182,14 @@ const AudioPlayer = ({
         }}
       />
 
-     
-      <div className="media-bar">
-
-        <p className="time-info">{formatTime(mediaTime)}</p>
-        
-        <div className="controls">
-          <button onClick={onRewind} className="control-btn btn-skip"><RewindIcon size={24} color="#53606c"/>  </button>
-          {
-            isLoading
-              ? <div className="spinner" />
-              : <button onClick={togglePlaying} className="control-btn btn-play">
-                { isPlaying ? <PauseIcon size={18} color="#53606c"/> : <PlayIcon size={18} color="#53606c"/> }
-              </button>
-          }
-          <button onClick={onFastForward} className="control-btn btn-skip"><ForwardIcon size={24} color="#53606c"/></button>
-        </div>
-
-        <p className="time-info">{formatTime(duration)}</p>
-
-      </div>
+      <MediaControls 
+        togglePlay={togglePlay}
+        onSkip={handleSkip}
+        isLoading={isLoading}
+        isPlaying={isPlaying}
+        mediaTime={mediaTime}
+        duration={duration}
+      />
 
     </StyledWrapper>
   );
@@ -246,13 +201,10 @@ const StyledWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  /* padding: 12px; */
   border-radius: 10px;
-  /* background: #f2f4f5; */
   margin: 20px auto;
   
 
- 
 
   & .slider-base {
     padding-bottom: 12px;
@@ -277,62 +229,6 @@ const StyledWrapper = styled.div`
     width: 18px !important;
     height: 32px !important;
     border-radius: unset !important;
-  }
-
-  & .media-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-
-
-    & .time-info {
-      color: #53606c;
-      
-    }
-
-    & .controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      gap: 16px;
-
-      @media(min-width: 768px){
-        gap: 16px;
-      }
-      
-
-      & .control-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      & .btn-play {
-        background: #b0fbaf;
-        padding: 16px;
-        border-radius: 6px;
-      }
-
-
-      & .control-btn:active {
-        & .lucide {
-          stroke: #000000; 
-        }
-      }
-
-      & .spinner {
-        width: 20px;
-        height: 20px;
-        border: 2px solid #ccc;
-        border-top: 2px solid #53606c;
-        border-radius: 50%;
-        animation: spin 0.6s linear infinite;
-      }
-
-    } 
-
   }
 
 `;
