@@ -72,7 +72,7 @@ const MediaControls = ({
                 { isPlaying ? <PauseIcon size={18} color="#53606c"/> : <PlayIcon size={18} color="#53606c"/> }
               </button>
           }
-          <SkipButton onSkip={onSkip} type="forward" />
+          <SkipButton onSkip={onSkip} type="forward" className="control-btn"/>
         </div>
 
         <p className="time-info">{formatTime(duration)}</p>
@@ -114,35 +114,14 @@ const StyledWrapper = styled.div`
          background: #b0fbaf;
          padding: 16px;
          border-radius: 6px;
-      }
 
-
-      & .btn-skip {
-         position: relative;
-         border-radius: 50%;
-         background: #e4e6e7;
-         padding: 8px;
-
-         & .skip-text {
-            position: absolute; 
-            top: -32px; 
-            line-height: 2rem; 
-            font-weight: 700; 
-            color: #2563EB; 
-            opacity: 0;
-            transform : translateY(8px);
-            pointer-events: none;
-            transition-property: all;
-            transition-duration: 300ms; 
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); 
+         &:hover {
+            background: #9ff99d;
          }
 
-         & .visible-skip {
-            opacity: 100%;
-            transform : translateY(0px);
-            pointer-events: unset;
+         &:active {
+            background: #86f286;
          }
-
       }
 
       & .control-btn:active {
