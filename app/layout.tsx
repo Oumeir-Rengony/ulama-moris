@@ -74,7 +74,9 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning lang="en">
-      <head />
+      <head>
+        <meta name="google-site-verification" content="dCyBqbQv8GnhAaPoaGezXNYA5VZ-NrXi-AR4FoxHUuk" />
+      </head>
       <body className={`${Objektiv.className} antialiased`}>
         <HeroProvider themeProps={{ attribute: "class", defaultTheme: "light" }}>
             <main>              
