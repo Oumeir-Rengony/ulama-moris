@@ -40,6 +40,9 @@ export const metadata: Metadata = {
     title: config.meta.title,
     description: config.meta.description,
     icons: "/favicon.ico",
+    alternates: {
+      canonical: "https://www.ulama-moris.org/"
+    },
     // keywords: [],
     // author: "",
     openGraph: {
@@ -73,7 +76,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning lang="en">
+    <html suppressHydrationWarning lang="en-MU">
       <head />
       <body className={`${Objektiv.className} antialiased`}>
         <HeroProvider themeProps={{ attribute: "class", defaultTheme: "light" }}>

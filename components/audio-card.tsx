@@ -31,10 +31,12 @@ export interface AudioCardProps {
     onShare? : React.MouseEventHandler<HTMLAnchorElement>;
     className?: string;
     description: HTMLElement | string;
+    location: string;
     masjid: string;
     date: string;
     author: string;
     audio: Asset;
+    duration?: string;
     tag?: string;
     showPulsar?: boolean;
 };
@@ -71,10 +73,12 @@ const AudioCard: React.FC<AudioCardProps> = ({
     onShare,
     className='',
     description,
+    location,
     masjid,
     date,
     author,
     audio,
+    duration,
     tag
 }) => {
 
@@ -184,21 +188,24 @@ const AudioCard: React.FC<AudioCardProps> = ({
                     <div className="figure__info">
 
                         <div className="figure__info-item">
-                            <UserRound size={18} color="#71717a" />
+                            <UserRound size={18} color="#71717a" aria-hidden="true"/>
+                              <span className="sr-only"><strong>Speaker:</strong></span>
                             <p className="figure__info-title"> { toTitleCase(author) } </p>
                         </div>
                         
                         {
                             masjid && 
-                                <div className="figure__info-item">
-                                    <MapPin color="#71717a" size={18}/>
+                                <a href={location || "#"} target="_blank" className="figure__info-item figure__info-masjid" rel="noopener noreferrer">
+                                    <MapPin color="#71717a" size={18} aria-hidden="true"/>
+                                    <span className="sr-only"><strong>Masjid Location:</strong></span>
                                     <p className="figure__info-title"> { toTitleCase(masjid) } </p>
-                                </div>
+                                </a>
                         }
 
 
                         <div className="figure__info-item">
                             <DateIcon size={18} color="#71717a" />
+                            <span className="sr-only"><strong>Date:</strong></span>
                             <p className="figure__info-title"> { dayjs(date).format(config.bayaan.displayFormat) } </p>
                         </div>
 
@@ -225,7 +232,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
 
 
-const StyledWrapper = styled.div`
+const StyledWrapper = styled.article`
     position: relative;
     max-width: 100%;
     box-shadow: 0px 0px 4px 0px #00000033;
@@ -314,6 +321,11 @@ const StyledWrapper = styled.div`
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        & .figure__info-masjid {
+            pointer-events: none;
+            cursor: unset;
         }
 
         & .figure__info-title {

@@ -3,7 +3,7 @@ import Image from "next/image";
 import Pagination from "@components/pagination";
 import Filter from "@components/filter";
 
-import { GetBayaanById, GetBayaans } from "@services/bayaans/bayaan.service";
+import { createAudioListJsonLd, GetBayaanById, GetBayaans } from "@services/bayaans/bayaan.service";
 
 import { styled } from "../styled-system/jsx";
 
@@ -16,6 +16,7 @@ import AudioList from "./_components/audio-list";
 import { MailPlus as MailPlusIcon } from "lucide-react";
 import { Suspense } from "react";
 import Loading from "@components/loading";
+import { AudioObject, Event, ItemList, WithContext } from 'schema-dts'
 
 
 export async function generateMetadata(
@@ -102,21 +103,34 @@ async function HomeLayout({
     isMobile: isMobile
   });
 
+  const jsonLd = createAudioListJsonLd(audioList?.items);
+
+
   return (
     <StyledWrapper>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+        }}
+      />
 
       <div className="container">
         <div className="row">
           <div className="col">
 
             <div className="heading">
-              <h1 className="heading__title">Bayaan par les Ulama de Moris</h1>
-              <a href="https://www.mufti.mu" target="_blank">
-                <button className="ask-btn">Ask a Question <MailPlusIcon size={20}/> </button>
-              </a>
+              <h1 className="heading__title">Islamic Audio Library</h1>
+              <p className="heading__subtitle">Learn Islam through Audio from Our Ulama</p>
             </div>
 
-            <Filter />
+            <div>
+              <a href="https://www.mufti.mu" className="ask" target="_blank">
+                <button className="ask-btn">Ask a Question <MailPlusIcon size={20}/> </button>
+              </a>
+              <Filter />
+            </div>
 
             <AudioList audioList={audioList?.items}/>
 
@@ -157,23 +171,9 @@ const StyledWrapper = styled.div`
   display: flex;
   flex-direction: column;
 
-
-  & .heading {
-    margin: 2rem 1rem 12px 1rem;
-
-    @media(min-width: 992px){
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    & .heading__title {
-      text-align: center;
-      margin: 2rem;
-      color: #6d6b6b;
-      font-size: 28px;
-      font-weight: 600;
-    }
+  & .ask {
+    display: block;
+    margin: 0 1rem;
 
     & .ask-btn {
       width: 100%;
@@ -193,6 +193,36 @@ const StyledWrapper = styled.div`
       }
 
     }
+
+  }
+
+
+  & .heading {
+    margin: 2rem 0;
+
+
+    @media(min-width: 992px){
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    & .heading__title {
+      text-align: center;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: #6d6b6b;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    & .heading__subtitle {
+      font-size: 14px;
+      color: #74746a;
+      text-align: center;
+
+    }
+
   }
 
   & .filter {

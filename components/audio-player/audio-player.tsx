@@ -34,11 +34,11 @@ const AudioPlayer = ({
     }
 
     const onLoadedMetadata = () => {
-      setDuration(audioRef.current.duration);
+      setDuration(audioRef.current?.duration);
     }
 
     const onTimeUpdate = () => {
-      setMediaTime(audioRef.current.currentTime);
+      setMediaTime(audioRef.current?.currentTime);
     };
 
     const handlePlay = () => {

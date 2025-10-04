@@ -5,7 +5,8 @@ import BayaanByIDQuery from "./query/bayaanByID.gql";
 import AssetsFragment from '@services/graphql/assets.fragment.gql';
 import dayjs from 'dayjs';
 import Config from "@config/config.json";
-
+import {WithContext,  AudioObject, Event, ItemList, Person, Place, PostalAddress } from 'schema-dts';
+import { toISODuration } from '@services/utils/utils.service';
 
 
 export const GetBayaans = async ({ 
@@ -69,18 +70,83 @@ export const GetBayaanById = async (
 ): Promise<any> => {
 
 
-const QUERY = gql`
-  ${AssetsFragment}
-  ${BayaanByIDQuery}
-`;
+  const QUERY = gql`
+    ${AssetsFragment}
+    ${BayaanByIDQuery}
+  `;
 
 
-const result = await ExecuteQuery(QUERY, { 
-  variables: {
-    id
-  }, 
-  preview: isPreview 
-});
+  const result = await ExecuteQuery(QUERY, { 
+    variables: {
+      id
+    }, 
+    preview: isPreview 
+  });
 
 
-return result?.bayaan;}
+  return result?.bayaan;
+}
+
+const getAudioBookJsonLd = (item: any) => {
+
+  const [masjid, address] = item?.masjid ? item?.masjid?.split(",") : ["", ""];
+
+  const eventId = (item?.event && item?.date)
+    ? "https://ulama-moris.org/event/" + item?.event?.replace(/\s+/g, '-').toLowerCase() + '-' + dayjs(item?.date).format('YYYY-MM-DD')
+    : ""
+
+  return {
+    "@type": "AudioObject",
+    name: item?.metaTitle,
+    description: item?.metaDescription,
+    contentUrl: item?.audio?.url,
+    encodingFormat: "audio/mpeg",
+    duration: toISODuration(item?.duration),
+    inLanguage: "mfe",
+    author: {
+      "@type": "Person",
+      "name": item?.author?.replace(/(mufti|mawlana)/gi, ""),
+    } as Person,
+    subjectOf: {
+      "@type": "Event",
+      "@id": eventId,
+      name: item?.metaTitle,
+      startDate: item?.date,
+      eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+      location: {
+        "@type": "Place",
+        name: masjid,
+        url: item?.geoLink,
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: address,
+          addressCountry: "MU"
+        } as PostalAddress
+      } as Place
+    } as Event
+  } as AudioObject
+
+}
+
+
+export const createAudioListJsonLd = (data: any) => {
+
+  const JsonLd: WithContext<ItemList> = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Latest Islamic lectures",
+    itemListElement: data?.map((item: any, index: number) => {
+    return {
+      "@type": "ListItem",
+      position: index,
+      "item": getAudioBookJsonLd(item)
+    }})
+  }
+
+  return JsonLd;
+}
+
+export const createAudioJsonLd = (data: any) => {
+
+  return getAudioBookJsonLd(data);
+}
