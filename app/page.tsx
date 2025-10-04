@@ -122,15 +122,13 @@ async function HomeLayout({
 
             <div className="heading">
               <h1 className="heading__title">Islamic Audio Library</h1>
-              <p className="heading__subtitle">Learn Islam through Audio from Our Ulama</p>
+              <p className="heading__subtitle">
+                <span className="heading__subtitle-text">Learn Islam through Audio from Our Ulama —</span>
+                <span className="heading__subtitle-text">Need Guidance? <a href="https://www.mufti.mu" target="_blank" rel="external" className="ask__link">Ask a Question ✉️</a></span>
+              </p>
             </div>
 
-            <div>
-              <a href="https://www.mufti.mu" className="ask" target="_blank">
-                <button className="ask-btn">Ask a Question <MailPlusIcon size={20}/> </button>
-              </a>
-              <Filter />
-            </div>
+            <Filter />
 
             <AudioList audioList={audioList?.items}/>
 
@@ -171,41 +169,10 @@ const StyledWrapper = styled.div`
   display: flex;
   flex-direction: column;
 
-  & .ask {
-    display: block;
-    margin: 0 1rem;
-
-    & .ask-btn {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      padding: 0 12px;
-      color: #fff;
-      background: rgb(0, 112, 240);
-      height: 40px;
-      border-radius: 8px;
-      gap: 12;
-
-      @media(min-width: 992px){
-        width: unset;
-      }
-
-    }
-
-  }
-
 
   & .heading {
     margin: 2rem 0;
 
-
-    @media(min-width: 992px){
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
 
     & .heading__title {
       text-align: center;
@@ -214,13 +181,40 @@ const StyledWrapper = styled.div`
       color: #6d6b6b;
       font-size: 24px;
       font-weight: 600;
+
+      @media(min-width: 992px){
+        font-size: 32px;
+      }
     }
 
     & .heading__subtitle {
       font-size: 14px;
       color: #74746a;
       text-align: center;
+      padding: 0 12px;
 
+      @media(min-width: 992px){
+        font-size: 18px;
+      } 
+
+      & .heading__subtitle-text {
+        display: block;
+
+        @media(min-width: 768px){
+          display: inline;
+        }
+      }
+        
+      & .ask__link {
+        color: #0070f0;
+        text-decoration: none;
+        font-weight: bold;
+        margin-left: 6px;
+      }
+
+      & .ask__link:hover {
+        text-decoration: underline;
+      }
     }
 
   }
