@@ -9,7 +9,7 @@ import { styled } from "../styled-system/jsx";
 import { CalendarDays, MapPin, UserRound } from "lucide-react";
 import { toTitleCase } from "@services/utils/utils.service";
 import Tag from "./tag";
-import IconLabel from "./Icon-label";
+import IconLabel from "./icon-label";
 import AudioPlayer from "./audio-player/audio-player";
 
 
