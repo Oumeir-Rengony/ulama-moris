@@ -6,8 +6,12 @@ import dayjs from "dayjs";
 
 import { styled } from "../styled-system/jsx";
 
-import { CalendarDays as DateIcon, MapPin, UserRound } from "lucide-react";
+import { CalendarDays, MapPin, UserRound } from "lucide-react";
+import { toTitleCase } from "@services/utils/utils.service";
+import Tag from "./tag";
+import IconLabel from "./Icon-label";
 import AudioPlayer from "./audio-player/audio-player";
+
 
 
 interface Asset {
@@ -47,20 +51,6 @@ function capitalizeStart(sentence: string) {
     return sentence; // Handle empty strings or non-string inputs
   }
   return sentence.charAt(0).toUpperCase() + sentence.slice(1);
-}
-
-
-
-const toTitleCase = (str: string) => {
-
-  if (typeof str !== 'string' || str.length === 0) {
-    return str; // Handle empty strings or non-string inputs
-  }
-
-  return str
-    .split(' ')                    
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ')
 }
 
 
@@ -168,14 +158,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
             { showPulsar && <Pulsar/> }
 
             { 
-                tag && 
-                    <div className="tag">
-                        { 
-                            tag.split(",").map((t, index) => (
-                                <span key={index} className="tag__item"> { toTitleCase(t) }</span> 
-                            ))
-                        }
-                    </div>
+                tag && <Tag title={tag} />
             }
 
             <h2 className="title">{ title }</h2>
@@ -187,27 +170,28 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
                     <div className="figure__info">
 
-                        <div className="figure__info-item">
-                            <UserRound size={18} color="#71717a" aria-hidden="true"/>
-                              <span className="sr-only"><strong>Speaker:</strong></span>
-                            <p className="figure__info-title"> { toTitleCase(author) } </p>
-                        </div>
-                        
+                        <IconLabel 
+                            icon={<UserRound size={18} color="#71717a" aria-hidden="true"/>} 
+                            label={toTitleCase(author)} 
+                            ariaDescription="Speaker" 
+                        />
+
                         {
                             masjid && 
-                                <a href={location || "#"} target="_blank" className="figure__info-item figure__info-masjid" rel="noopener noreferrer">
-                                    <MapPin color="#71717a" size={18} aria-hidden="true"/>
-                                    <span className="sr-only"><strong>Masjid Location:</strong></span>
-                                    <p className="figure__info-title"> { toTitleCase(masjid) } </p>
+                                <a href={location || "#"} target="_blank" className="figure__info-masjid" rel="noopener noreferrer">
+                                    <IconLabel 
+                                        icon={<MapPin size={18} color="#71717a" aria-hidden="true"/>} 
+                                        label={toTitleCase(masjid)} 
+                                        ariaDescription="Masjid"
+                                    />
                                 </a>
                         }
-
-
-                        <div className="figure__info-item">
-                            <DateIcon size={18} color="#71717a" />
-                            <span className="sr-only"><strong>Date:</strong></span>
-                            <p className="figure__info-title"> { dayjs(date).format(config.bayaan.displayFormat) } </p>
-                        </div>
+                        
+                        <IconLabel 
+                            icon={<CalendarDays size={18} color="#71717a" aria-hidden="true"/>} 
+                            label={dayjs(date).format(config.bayaan.displayFormat)} 
+                            ariaDescription="Date" 
+                        />
 
                     </div>
 

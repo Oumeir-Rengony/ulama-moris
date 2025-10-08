@@ -29,7 +29,7 @@ export const keyFrames = defineKeyframes({
       boxShadow: 'rgb(127, 243, 125, 0.25) 0px 14px 28px, rgb(127, 243, 125, 0.25) 0px 10px 10px'
     },
     '50%': {
-      boxShadow: 'rgb(127, 243, 125, 35) 0px 14px 28px, rgb(127, 243, 125, 0.35) 0px 10px 10px'
+      boxShadow: 'rgb(127, 243, 125, 0.35) 0px 14px 28px, rgb(127, 243, 125, 0.35) 0px 10px 10px'
     },
     '100%': {
       boxShadow: 'rgb(127, 243, 125, 0.1) 0px 14px 28px, rgb(127, 243, 125, 0.1) 0px 10px 10px'
