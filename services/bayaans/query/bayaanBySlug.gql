@@ -1,0 +1,9 @@
+query GetBayaan (
+  $slug: String!
+) {
+  bayaanCollection (where: { slug: $slug}) {
+    items {
+      ...BayaanFields
+    }
+  }
+}

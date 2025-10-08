@@ -1,0 +1,17 @@
+fragment BayaanFields on Bayaan {
+   title
+   slug
+   description
+   masjid
+   metaTitle
+   metaDescription
+   event
+   date
+   author
+   duration
+   tag
+   geoLink
+   audio {
+      ...AssetsFields
+   }
+}

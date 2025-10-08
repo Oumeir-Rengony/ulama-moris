@@ -1,0 +1,7 @@
+query GetBayaanSlug {
+  bayaanCollection (where: { slug_exists: true }) {
+    items {
+      slug
+    }
+  }
+}

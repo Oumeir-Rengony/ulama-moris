@@ -3,7 +3,9 @@ import Image from "next/image";
 import Pagination from "@components/pagination";
 import Filter from "@components/filter";
 
-import { createAudioListJsonLd, GetBayaanById, GetBayaans } from "@services/bayaans/bayaan.service";
+import { createAudioListJsonLd, GetBayaanById, getBayaansWithPagination
+  // GetBayaans 
+} from "@services/bayaans/bayaan.service";
 
 import { styled } from "../styled-system/jsx";
 
@@ -13,10 +15,8 @@ import { getSelectorsByUserAgent } from "react-device-detect";
 import { headers } from "next/headers";
 import { type ResolvingMetadata, type Metadata } from "next";
 import AudioList from "./_components/audio-list";
-import { MailPlus as MailPlusIcon } from "lucide-react";
 import { Suspense } from "react";
 import Loading from "@components/loading";
-import { AudioObject, Event, ItemList, WithContext } from 'schema-dts'
 
 
 export async function generateMetadata(
@@ -95,7 +95,7 @@ async function HomeLayout({
   const { isMobile } =  getSelectorsByUserAgent(userAgent);
   const pageSize = isMobile ? config.bayaan.pageSize.mobile : config.bayaan.pageSize.desktop;
 
-  const audioList = await GetBayaans({ 
+  const audioList = await getBayaansWithPagination({ 
     page: +page,
     startDate: startDate,
     endDate: endDate,

@@ -3,66 +3,152 @@ import { ExecuteQuery } from '@services/apollo/apollo.service';
 import BayaanQuery from './query/bayaan.gql';
 import BayaanByIDQuery from "./query/bayaanByID.gql";
 import AssetsFragment from '@services/graphql/assets.fragment.gql';
+import BayaanSlug from './query/bayaanSlug.gql';
+import BayaanFields from './query/bayaan.fragment.gql';
+import BayaanBySlug from './query/bayaanBySlug.gql';
 import dayjs from 'dayjs';
 import Config from "@config/config.json";
-import {WithContext,  AudioObject, Event, ItemList, Person, Place, PostalAddress } from 'schema-dts';
+import { WithContext,  AudioObject, Event, ItemList, Person, Place, PostalAddress } from 'schema-dts';
 import { toISODuration } from '@services/utils/utils.service';
 
 
-export const GetBayaans = async ({ 
-    page, 
+const getBayaansBase = async ({
     startDate = null, 
     endDate = null,  
     search = null, 
-    isMobile = true,
-    // categories = null,
+    limit = 0,
+    skip = 0,
     isPreview = false 
 }: { 
-    page: number; 
+    limit?: number;
+    skip?: number;
     startDate?: string; 
     endDate?: string; 
     search?: string;
-    isMobile?: boolean 
-    // categories: string[] | string,
     isPreview?: boolean; 
-}): Promise<any> => {
-
-  //determine set of pages to fetch
-  const limit = isMobile ? Config.bayaan.pageSize.mobile : Config.bayaan.pageSize.desktop;
-
-  const skipMultiplier = (page === 1) ? 0 : page - 1;
-  const skip = skipMultiplier > 0 ? limit * skipMultiplier : 0;
-  
+}) => {
 
   const QUERY = gql`
     ${AssetsFragment}
+    ${BayaanFields}
     ${BayaanQuery}
   `;
 
-  
-  /* end date of 2023-05-08T00:00:00.00Z will not search for date after midnight.
-  so one day is added to the end date */
-  if(dayjs(endDate).isValid()) {
-    endDate = dayjs(endDate).add(1, 'day').format(Config.bayaan.dateFilterFormat);
-  } 
+  // Inclusive end date logic
+  if (dayjs(endDate).isValid()) {
+    endDate = dayjs(endDate)
+      .add(1, 'day')
+      .format(Config.bayaan.dateFilterFormat);
+  }
+
+  const variables: any = {
+    ...(limit && { limit }),
+    ...(skip && { skip }),
+    ...(startDate && { startDate }),
+    ...(endDate && { endDate }),
+    ...(search && { search }),
+  };
 
 
-  const result = await ExecuteQuery(QUERY, { 
-    variables: { 
-      startDate,
-      endDate,
-      search,
-      // categories,
-      limit, 
-      skip 
-    }, 
-    preview: isPreview 
+  const result = await ExecuteQuery(QUERY, {
+    variables,
+    preview: isPreview,
   });
 
-
-  return result?.bayaanCollection;
+  return result;
 }
 
+export const getBayaansWithPagination = async ({
+  page = 1,
+  startDate = null,
+  endDate = null,
+  search = null,
+  isMobile = true,
+  isPreview = false,
+}: {
+  page?: number;
+  startDate?: string;
+  endDate?: string;
+  search?: string;
+  isMobile?: boolean;
+  isPreview?: boolean;
+}): Promise<any> => {
+  
+  const limit = isMobile
+    ? Config.bayaan.pageSize.mobile
+    : Config.bayaan.pageSize.desktop;
+
+  const skipMultiplier = (page === 1) ? 0 : page - 1;
+  const skip = skipMultiplier > 0 ? limit * skipMultiplier : 0;
+
+  const result = await getBayaansBase({
+    limit,
+    skip,
+    startDate,
+    endDate,
+    search,
+    isPreview,
+  });
+
+  return result?.bayaanCollection;
+};
+
+export const getAllBayaans = async ({
+  startDate = null,
+  endDate = null,
+  search = null,
+  isPreview = false,
+}: {
+  startDate?: string;
+  endDate?: string;
+  search?: string;
+  isPreview?: boolean;
+}): Promise<any> => {
+  
+  const result = await getBayaansBase({
+    startDate,
+    endDate,
+    search,
+    isPreview,
+  });
+
+  return result?.bayaanCollection;
+};
+
+export const getBayaanSlug = async (isPreview: boolean = false): Promise<any> => {
+
+  const QUERY = gql`
+    ${BayaanSlug}
+  `;
+
+  const result = await ExecuteQuery(QUERY, {
+    preview: isPreview,
+  });
+
+  return result.bayaanCollection;
+}
+
+export const getBayaanBySlug = async ({
+  slug="", 
+  isPreview = false
+}: {
+  slug: String,
+  isPreview?: boolean
+}): Promise<any> => {
+
+  const QUERY = gql`
+    ${AssetsFragment}
+    ${BayaanFields}
+    ${BayaanBySlug}
+  `;
+
+  const result = await ExecuteQuery(QUERY, {
+    variables: { slug },
+    preview: isPreview,
+  });
+
+  return result?.bayaanCollection?.items?.[0];
+}
 
 export const GetBayaanById = async (
   id: String,
@@ -72,6 +158,7 @@ export const GetBayaanById = async (
 
   const QUERY = gql`
     ${AssetsFragment}
+    ${BayaanFields}
     ${BayaanByIDQuery}
   `;
 
@@ -128,7 +215,6 @@ const getAudioBookJsonLd = (item: any) => {
 
 }
 
-
 export const createAudioListJsonLd = (data: any) => {
 
   const JsonLd: WithContext<ItemList> = {
@@ -147,6 +233,5 @@ export const createAudioListJsonLd = (data: any) => {
 }
 
 export const createAudioJsonLd = (data: any) => {
-
   return getAudioBookJsonLd(data);
 }

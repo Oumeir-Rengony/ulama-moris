@@ -2,18 +2,6 @@ query GetBayaan (
   $id: String!
 ) {
   bayaan (id: $id) {
-    title
-    description
-    masjid
-    metaTitle
-    metaDescription
-    author
-    date
-    tag
-    duration
-    event
-    audio {
-      ...AssetsFields
-    }
+    ...BayaanFields
   }
 }
