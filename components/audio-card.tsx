@@ -80,24 +80,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
     const cardRef = useRef<HTMLDivElement>(null);
 
 
-    useEffect(() => {
-        const el = new Audio(audio.url);
-        el.preload = "auto";
-        // trigger loading now
-        el.load();               
-
-        el.onplay = () => setShowPulsar(true);
-        el.onpause = () => setShowPulsar(false);
-        el.onended = () => setShowPulsar(false);
-
-        audioRef.current = el;
-
-        return () => {
-            el.pause();
-            audioRef.current = null
-        };
-    }, [audio.url]);
-
+    //pause audio if another is being played
     useEffect(() => {
 
         if(audioRef.current && index !== currentAudioId){
@@ -150,6 +133,24 @@ const AudioCard: React.FC<AudioCardProps> = ({
     },[index])
 
 
+    const onPlay = (e: React.SyntheticEvent<HTMLAudioElement>) => {
+
+        setShowPulsar(true);
+
+        if(onAudioPlay){
+            onAudioPlay(e);
+        }
+    }
+
+
+    const onPause = (e: React.SyntheticEvent<HTMLAudioElement>) => {
+        setShowPulsar(false);
+
+        if(onAudioPause){
+            onAudioPause(e);
+        }
+    }
+
 
     return (
 
@@ -197,7 +198,13 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
                 </figcaption>
 
-                <AudioPlayer audioRef={audioRef} />
+                <AudioPlayer 
+                    audioRef={audioRef} 
+                    src={audio?.url} 
+                    onPlay={onPlay}
+                    onPause={onPause}
+                />
+
             </figure>
 
 
@@ -213,7 +220,6 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
     )
 };
-
 
 
 const StyledWrapper = styled.article`

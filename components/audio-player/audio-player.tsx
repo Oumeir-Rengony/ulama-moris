@@ -1,17 +1,21 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react";
-import { Slider, type SliderValue } from "@heroui/slider";
+import { type SliderValue } from "@heroui/slider";
 import { styled } from "styled-system/jsx";
 import dayjs from "dayjs";
-import MediaControls from "./media-controls";
+import BaseAudioPlayer from "./base-audio-player";
+import AudioSlider from "./audio-slider";
+import AudioControls from "./audio-controls";
 
 
 const AudioPlayer = ({ 
   audioRef,
+  src,
   onPlay,
   onPause,
 }: {
+  src: string;
   audioRef: React.MutableRefObject<HTMLAudioElement>;
   onPlay?: (e?: React.SyntheticEvent<HTMLAudioElement>) => void;
   onPause?: (e?: React.SyntheticEvent<HTMLAudioElement>) => void;
@@ -44,24 +48,21 @@ const AudioPlayer = ({
     const handlePlay = () => {
       setIsPlaying(true);
       setIsLoading(true);
+      onPlay();
     }
 
     
     const handlePause = () => {
       setIsPlaying(false);
       setIsLoading(false);
+      onPause();
     }
 
     // buffering/loading
     const handleWaiting = () => { 
       setIsLoading(true);
     }
-      
-    // enough data to play
-    // const handleCanPlay = () => { 
-    //   setIsLoading(false);  
-    // }
-
+    
     // actually started
     const handlePlaying = () => {
       setIsLoading(false);
@@ -74,7 +75,6 @@ const AudioPlayer = ({
       audioRef.current.addEventListener('play', handlePlay);
       audioRef.current.addEventListener('pause', handlePause);
       audioRef.current.addEventListener("waiting", handleWaiting);
-      // audioRef.current.addEventListener("canplay", handleCanPlay);
       audioRef.current.addEventListener("playing", handlePlaying);
     }
 
@@ -85,7 +85,6 @@ const AudioPlayer = ({
         audioRef.current.removeEventListener('Play', handlePlay);
         audioRef.current.removeEventListener('Pause', handlePause);
         audioRef.current.removeEventListener("waiting", handleWaiting);
-        // audioRef.current.removeEventListener("canplay", handleCanPlay);
         audioRef.current.removeEventListener("playing", handlePlaying);
       }
 
@@ -112,6 +111,7 @@ const AudioPlayer = ({
     setMediaTime(value as number);
     audioRef.current.currentTime = value as number;
   }
+
 
   const handleSkip = (skipValue: number) => {
 
@@ -166,31 +166,22 @@ const AudioPlayer = ({
 
   return (
     <StyledWrapper>
-      <Slider
-        aria-label="audio"
-        value={mediaTime}
-        minValue={0}
-        defaultValue={0}
-        maxValue={duration}
-        step={0.01}
-        renderThumb={(props) => <div {...props} onClick={onThumbClick} />}
-        onChange={onSliderChange}
-        classNames={{
-          base: "slider-base",
-          track: "slider-track",
-          thumb: "slider-thumb",
-        }}
-      />
-
-      <MediaControls 
-        togglePlay={togglePlay}
-        onSkip={handleSkip}
-        isLoading={isLoading}
-        isPlaying={isPlaying}
-        mediaTime={mediaTime}
-        duration={duration}
-      />
-
+      <BaseAudioPlayer audioRef={audioRef} src={src}>
+        <AudioSlider
+          mediaTime={mediaTime}
+          duration={duration}
+          onSliderChange={onSliderChange}
+          onThumbClick={onThumbClick}
+        />
+        <AudioControls
+          isPlaying={isPlaying}
+          mediaTime={mediaTime}
+          duration={duration}
+          isLoading={isLoading}
+          togglePlay={togglePlay}
+          handleSkip={handleSkip}
+        />
+      </BaseAudioPlayer>
     </StyledWrapper>
   );
 };
@@ -203,33 +194,6 @@ const StyledWrapper = styled.div`
   width: 100%;
   border-radius: 10px;
   margin: 20px auto;
-  
-
-
-  & .slider-base {
-    padding-bottom: 12px;
-  }
-
-  & .slider-track {
-    margin-bottom: 16px;
-    cursor: pointer;
-  }
-
-  & .slider-thumb {
-    width: 22px;
-    height: 22px;
-  }
-  
-  & .slider-thumb:after {
-    width: 18px !important;
-    height: 18px !important;
-  }
-
-  & .slider-thumb:before {
-    width: 18px !important;
-    height: 32px !important;
-    border-radius: unset !important;
-  }
 
 `;
 
