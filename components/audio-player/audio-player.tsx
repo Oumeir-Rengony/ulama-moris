@@ -1,187 +1,81 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react";
-import { type SliderValue } from "@heroui/slider";
 import { styled } from "styled-system/jsx";
-import dayjs from "dayjs";
 import BaseAudioPlayer from "./base-audio-player";
 import AudioSlider from "./audio-slider";
 import AudioControls from "./audio-controls";
+import useAudio from "./use-audio";
+import { AudioContext } from "./audio-context";
+import { use } from "react";
 
 
-const AudioPlayer = ({ 
+
+const AudioPlayer = ({
+  id,
   audioRef,
   src,
   onPlay,
   onPause,
 }: {
+  id: string;
   src: string;
-  audioRef: React.MutableRefObject<HTMLAudioElement>;
-  onPlay?: (e?: React.SyntheticEvent<HTMLAudioElement>) => void;
-  onPause?: (e?: React.SyntheticEvent<HTMLAudioElement>) => void;
+  audioRef?: React.MutableRefObject<HTMLAudioElement>;
+  onPlay?: () => void;
+  onPause?: () => void;
 }) => {
+
+  const { 
+    registerAudio, 
+    unregisterAudio, 
+    togglePlay, 
+    isActive 
+  } = use(AudioContext);
  
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [mediaTime, setMediaTime] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-
-
-  const lastSkipTimeRef = useRef<dayjs.Dayjs | null>(null);
-  const hasSliderChangedRef = useRef<boolean>(false);
-
-
-  useEffect(() => {
-
-    if(!audioRef.current){
-      return
-    }
-
-    const onLoadedMetadata = () => {
-      setDuration(audioRef.current?.duration);
-    }
-
-    const onTimeUpdate = () => {
-      setMediaTime(audioRef.current?.currentTime);
-    };
-
-    const handlePlay = () => {
-      setIsPlaying(true);
-      setIsLoading(true);
-      onPlay();
-    }
-
-    
-    const handlePause = () => {
-      setIsPlaying(false);
-      setIsLoading(false);
-      onPause();
-    }
-
-    // buffering/loading
-    const handleWaiting = () => { 
-      setIsLoading(true);
-    }
-    
-    // actually started
-    const handlePlaying = () => {
-      setIsLoading(false);
-    }
-
-
-    if(audioRef.current){
-      audioRef.current.addEventListener('loadedmetadata', onLoadedMetadata);
-      audioRef.current.addEventListener('timeupdate', onTimeUpdate);
-      audioRef.current.addEventListener('play', handlePlay);
-      audioRef.current.addEventListener('pause', handlePause);
-      audioRef.current.addEventListener("waiting", handleWaiting);
-      audioRef.current.addEventListener("playing", handlePlaying);
-    }
-
-    return () => {
-      if(audioRef.current){
-        audioRef.current.removeEventListener('LoadedMetadata', onLoadedMetadata);
-        audioRef.current.removeEventListener('TimeUpdate', onTimeUpdate);
-        audioRef.current.removeEventListener('Play', handlePlay);
-        audioRef.current.removeEventListener('Pause', handlePause);
-        audioRef.current.removeEventListener("waiting", handleWaiting);
-        audioRef.current.removeEventListener("playing", handlePlaying);
-      }
-
-    }
-
-  },[audioRef.current])
-
-
-  const togglePlay = () => {
-    if (!isPlaying) {
-      // Try to play and catch interruption
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {/*ignore*/});
-    } else {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-
-  };
-
-
-  const onSliderChange = (value: SliderValue) => {
-    if(!value) return;
-    hasSliderChangedRef.current = true;
-    setMediaTime(value as number);
-    audioRef.current.currentTime = value as number;
-  }
-
-
-  const handleSkip = (skipValue: number) => {
-
-    const { currentTime } = audioRef.current;
-
-    let newTime = currentTime + skipValue;
-
-    // Ensure newTime is not below 0
-    if (newTime < 0) {
-      newTime = 0;
-    }
-
-    // Ensure newTime is not above the duration
-    if (newTime > duration) {
-      newTime = duration;
-    }
-    setMediaTime(newTime);
-    audioRef.current.currentTime = newTime;
-    
-  }
-
-
-  const onThumbClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if(hasSliderChangedRef.current){
-      hasSliderChangedRef.current = false;
-      return
-    }
-
-    const thumbRect = e.currentTarget.getBoundingClientRect();
-    const thumbCenter = thumbRect.left + thumbRect.width / 2;
-    const mouseX = e.clientX;
-
-    const cooldown = 500; // ms
-
-    // respect cooldown
-    if (lastSkipTimeRef.current && dayjs().diff(lastSkipTimeRef.current, "ms") < cooldown) {
-      return;
-    }
-
-    if (mouseX < thumbCenter) {
-      handleSkip(-15);
-    }
-    else {
-      handleSkip(15);
-    }
-
-    lastSkipTimeRef.current = dayjs();
-
-  }
-
-
+  const {
+    internalAudioRef,
+    // isPlaying,
+    duration,
+    mediaTime,
+    isLoading,
+    // togglePlay,
+    onSliderChange,
+    handleSkip,
+    onThumbClick
+  } = useAudio();
 
   return (
     <StyledWrapper>
-      <BaseAudioPlayer audioRef={audioRef} src={src}>
+
+      <BaseAudioPlayer
+        id={id}
+        internalAudioRef={internalAudioRef}
+        externalAudioRef={audioRef} 
+        registerAudio={registerAudio}
+        unregisterAudio={unregisterAudio}
+        src={src}
+        onPlay={onPlay}
+        onPause={onPause}
+      >
         <AudioSlider
           mediaTime={mediaTime}
           duration={duration}
           onSliderChange={onSliderChange}
           onThumbClick={onThumbClick}
         />
+
         <AudioControls
-          isPlaying={isPlaying}
+          // isPlaying={isPlaying}
+          id={id}
+          isActive={isActive}
           mediaTime={mediaTime}
           duration={duration}
           isLoading={isLoading}
           togglePlay={togglePlay}
           handleSkip={handleSkip}
         />
+        
       </BaseAudioPlayer>
+
     </StyledWrapper>
   );
 };

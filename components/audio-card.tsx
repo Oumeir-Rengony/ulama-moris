@@ -30,9 +30,9 @@ export interface AudioCardProps {
     title: string;
     index?: string;
     currentAudioId?: string;
-    onAudioPlay?: React.ReactEventHandler<HTMLAudioElement>;
-    onAudioPause?: React.ReactEventHandler<HTMLAudioElement>;
-    onShare? : React.MouseEventHandler<HTMLAnchorElement>;
+    onAudioPlay?: () => void
+    onAudioPause?: () => void
+    onShare? : () => void;
     className?: string;
     description: HTMLElement | string;
     location: string;
@@ -81,19 +81,19 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
 
     //pause audio if another is being played
-    useEffect(() => {
+    // useEffect(() => {
 
-        if(audioRef.current && index !== currentAudioId){
-            audioRef.current.pause();
-            setShowPulsar(false);
-        }
+    //     if(audioRef.current && index !== currentAudioId){
+    //         audioRef.current.pause();
+    //         setShowPulsar(false);
+    //     }
 
-    },[index, currentAudioId]);
+    // },[index, currentAudioId]);
 
 
     // Handle scroll + WhatsApp share when index changes
     useEffect(() => {
-        if(!cardRef.current){
+        if(!cardRef.current && !audioRef.current){
             return
         }
 
@@ -112,7 +112,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
 
         // Scroll into view if ?id matches
-        if(queryId === index && !isInViewport(audioRef.current)){
+        if(queryId === index && !isInViewport(audioRef?.current)){
 
             //small offset to give top space
             const offset = 10;
@@ -133,21 +133,21 @@ const AudioCard: React.FC<AudioCardProps> = ({
     },[index])
 
 
-    const onPlay = (e: React.SyntheticEvent<HTMLAudioElement>) => {
+    const onPlay = () => {
 
         setShowPulsar(true);
 
         if(onAudioPlay){
-            onAudioPlay(e);
+            onAudioPlay();
         }
     }
 
 
-    const onPause = (e: React.SyntheticEvent<HTMLAudioElement>) => {
+    const onPause = () => {
         setShowPulsar(false);
 
         if(onAudioPause){
-            onAudioPause(e);
+            onAudioPause();
         }
     }
 
@@ -198,7 +198,8 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
                 </figcaption>
 
-                <AudioPlayer 
+                <AudioPlayer
+                    id={index}
                     audioRef={audioRef} 
                     src={audio?.url} 
                     onPlay={onPlay}

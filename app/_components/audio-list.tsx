@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import AudioCard from "@components/audio-card";
+import { AudioManager } from "@components/audio-player/audio-context";
 
 
 const AudioList = ({ audioList }: {
     audioList: any
 }) => {
-    const [currentAudioId, setCurrentAudioId] = useState(null);
+    // const [currentAudioId, setCurrentAudioId] = useState(null);
 
     const router = useRouter();
     const pathname = usePathname();
@@ -22,26 +23,28 @@ const AudioList = ({ audioList }: {
     }
 
     const onAudioPlay = (id: string) => {
-        setCurrentAudioId(id);
+        // setCurrentAudioId(id);
         const queryString = createQueryString('id', `${id}`);
         router.push(`${pathname}?${queryString}`, { scroll: false });
     }
 
     return (
         <div className="audio__list">
+            <AudioManager>
             {
                 audioList?.map(audioItem => {
                     return (
                         <AudioCard
                             key={audioItem?.sys?.id}
                             index={audioItem?.sys?.id}
-                            currentAudioId={currentAudioId}
+                            // currentAudioId={currentAudioId}
                             onAudioPlay={() => onAudioPlay(audioItem?.sys?.id)}
                             {...audioItem}
                         />
                     )
                 })
             }
+            </AudioManager>
         </div>        
     )
 }
