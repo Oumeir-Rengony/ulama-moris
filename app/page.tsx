@@ -17,6 +17,7 @@ import { type ResolvingMetadata, type Metadata } from "next";
 import AudioList from "./_components/audio-list";
 import { Suspense } from "react";
 import Loading from "@components/loading";
+import Link from "next/link";
 
 
 export async function generateMetadata(
@@ -35,13 +36,13 @@ export async function generateMetadata(
   const openGraph = (await parent).openGraph || {};
  
   return {
-    title: audio.metaTitle || '',
-    description: audio.metaDescription || '',
-    authors: audio.author || '',
+    title: audio?.metaTitle || '',
+    description: audio?.metaDescription || '',
+    authors: audio?.author || '',
     openGraph: {
       ...openGraph,
-      title: audio.metaTitle || '',
-      description: audio.metaDescription || '',
+      title: audio?.metaTitle || '',
+      description: audio?.metaDescription || '',
     },
     alternates: {
       canonical: 'https://ulama-moris.org'

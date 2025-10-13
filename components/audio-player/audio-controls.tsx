@@ -5,18 +5,22 @@ import { formatTime } from "@services/utils/utils.service";
 import { PauseIcon, PlayIcon } from "lucide-react";
 
 const AudioControls = ({
-   isPlaying,
+   // isPlaying,
+   id,
    mediaTime,
    duration,
    isLoading,
    togglePlay,
+   isActive,
    handleSkip
 }: {
-   isPlaying:boolean,
+   // isPlaying:boolean,
+   id: string;
    mediaTime: number,
    duration: number,
    isLoading:boolean,
-   togglePlay: () => void;
+   isActive: (id: string) => boolean
+   togglePlay: (id: string) => void;
    handleSkip: (skipValue: number) => void;
 }) => {
 
@@ -31,16 +35,25 @@ const AudioControls = ({
          }
       }
 
-   }, [])
+   }, []);
+
+   const handleClick = () => {
+
+      if(!id){
+         return;
+      }
+
+      togglePlay(id);
+   }
 
 
    return (
-      <StyledWrapper>
+      <StyledWrapper id={`controls-${id}`}>
          <p className="time-info">{formatTime(mediaTime)}</p>
 
          <div className="controls">
             <SkipButton onSkip={handleSkip} type="rewind" className="control-btn" />
-            {
+            {/* {
                isLoading
                   ? <div className="spinner-container">
                      <div className="spinner" />
@@ -49,7 +62,20 @@ const AudioControls = ({
                   : <button onClick={togglePlay} className="control-btn btn-play">
                      {isPlaying ? <PauseIcon size={18} color="#53606c" /> : <PlayIcon size={18} color="#53606c" />}
                   </button>
+            } */}
+
+            {
+               isLoading && isActive(id) ? (
+                  <div className="spinner-container"><div className="spinner" /></div>
+               ) : (
+                  <button onClick={handleClick} className="control-btn btn-play">
+                     {isActive(id)
+                        ? <PauseIcon size={18} color="#53606c" />
+                        : <PlayIcon size={18} color="#53606c" />}
+                  </button>
+               )
             }
+
             <SkipButton onSkip={handleSkip} type="forward" className="control-btn" />
          </div>
 

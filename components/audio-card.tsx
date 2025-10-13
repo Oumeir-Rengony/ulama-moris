@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import config from "@config/config.json";
 import Pulsar from "./pulsar";
@@ -11,6 +11,7 @@ import { toTitleCase } from "@services/utils/utils.service";
 import Tag from "./tag";
 import IconLabel from "./icon-label";
 import AudioPlayer from "./audio-player/audio-player";
+import { AudioContext } from "./audio-player/audio-context";
 
 
 
@@ -29,10 +30,9 @@ interface Asset {
 export interface AudioCardProps {
     title: string;
     index?: string;
-    currentAudioId?: string;
-    onAudioPlay?: React.ReactEventHandler<HTMLAudioElement>;
-    onAudioPause?: React.ReactEventHandler<HTMLAudioElement>;
-    onShare? : React.MouseEventHandler<HTMLAnchorElement>;
+    onAudioPlay?: () => void
+    onAudioPause?: () => void
+    onShare? : () => void;
     className?: string;
     description: HTMLElement | string;
     location: string;
@@ -43,6 +43,7 @@ export interface AudioCardProps {
     duration?: string;
     tag?: string;
     showPulsar?: boolean;
+    whatsAppLink?: string;
 };
 
 
@@ -57,7 +58,6 @@ function capitalizeStart(sentence: string) {
 const AudioCard: React.FC<AudioCardProps> = ({
     title,
     index,
-    currentAudioId,
     onAudioPlay,
     onAudioPause,
     onShare,
@@ -69,92 +69,86 @@ const AudioCard: React.FC<AudioCardProps> = ({
     author,
     audio,
     duration,
+    whatsAppLink,
     tag
 }) => {
 
-    const [whatsApp, setWhatsApp] = useState<string>('');
-    const [animateShadow, setAnimateShadow] = useState<boolean>(false);
     const [showPulsar, setShowPulsar] = useState<boolean>(false);
 
-    const audioRef = useRef<HTMLAudioElement>(null);
     const cardRef = useRef<HTMLDivElement>(null);
 
-
-    //pause audio if another is being played
-    useEffect(() => {
-
-        if(audioRef.current && index !== currentAudioId){
-            audioRef.current.pause();
-            setShowPulsar(false);
-        }
-
-    },[index, currentAudioId]);
+    // const { currentAudioRef } = use(AudioContext);
 
 
     // Handle scroll + WhatsApp share when index changes
-    useEffect(() => {
-        if(!cardRef.current){
-            return
-        }
+    // useEffect(() => {
 
-        const queryParams = new URLSearchParams(window.location.search);
-        const queryId = queryParams.get("id");
+    //     if(!cardRef.current && !currentAudioRef.current){
+    //         return
+    //     }
 
-        const isInViewport = (element) => {
-            const rect = element.getBoundingClientRect();
-            return (
-                rect.top >= 0 &&
-                rect.left >= 0 &&
-                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-                rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-            );
-        }
+    //     const queryParams = new URLSearchParams(window.location.search);
+    //     const queryId = queryParams.get("id");
 
+    //     const isInViewport = (element) => {
+    //         if(!element){
+    //             return
+    //         }
 
-        // Scroll into view if ?id matches
-        if(queryId === index && !isInViewport(audioRef.current)){
-
-            //small offset to give top space
-            const offset = 10;
-
-            //but use Card Ref for scrolling to show card
-            const y = cardRef.current.getBoundingClientRect().top + window.scrollY - offset;
-            window.scrollTo({top: y, behavior: 'smooth'});
-
-            setAnimateShadow(true);
-        }
-
-        // Update WhatsApp share link
-        queryParams.set("id", index);
-        //reset=1 is done so that social media consider it as a new url to refresh their cache
-        const url = `${window.location.origin}/?${queryParams.toString()}&reset=1`;
-        setWhatsApp(`whatsapp://send?text=${encodeURIComponent(url)}`);
-
-    },[index])
+    //         const rect = element?.getBoundingClientRect();
+    //         return (
+    //             rect.top >= 0 &&
+    //             rect.left >= 0 &&
+    //             rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+    //             rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    //         );
+    //     }
 
 
-    const onPlay = (e: React.SyntheticEvent<HTMLAudioElement>) => {
+    //     // Scroll into view if ?id matches
+    //     if(queryId === index && !isInViewport(currentAudioRef?.current)){
+
+    //         //small offset to give top space
+    //         const offset = 10;
+
+    //         //but use Card Ref for scrolling to show card
+    //         const y = cardRef?.current?.getBoundingClientRect().top + window.scrollY - offset;
+    //         window.scrollTo({top: y, behavior: 'smooth'});
+
+    //         setAnimateShadow(true);
+    //     }
+
+    //     // Update WhatsApp share link
+    //     queryParams.set("id", index);
+    //     //reset=1 is done so that social media consider it as a new url to refresh their cache
+    //     const url = `${window.location.origin}/?${queryParams.toString()}&reset=1`;
+    //     setWhatsApp(`whatsapp://send?text=${encodeURIComponent(url)}`);
+
+    // },[index, currentAudioRef.current])
+
+
+    const onPlay = () => {
 
         setShowPulsar(true);
 
         if(onAudioPlay){
-            onAudioPlay(e);
+            onAudioPlay();
         }
     }
 
 
-    const onPause = (e: React.SyntheticEvent<HTMLAudioElement>) => {
+    const onPause = () => {
         setShowPulsar(false);
 
         if(onAudioPause){
-            onAudioPause(e);
+            onAudioPause();
         }
     }
 
 
     return (
 
-        <StyledWrapper className={`audio__card ${animateShadow ? 'shadow-glow' : ""} ${className}`} ref={cardRef}>
+        <StyledWrapper className={`audio__card ${className}`} ref={cardRef} id={`card-${index}`}>
             
             { showPulsar && <Pulsar/> }
 
@@ -198,8 +192,8 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
                 </figcaption>
 
-                <AudioPlayer 
-                    audioRef={audioRef} 
+                <AudioPlayer
+                    id={index}
                     src={audio?.url} 
                     onPlay={onPlay}
                     onPause={onPause}
@@ -210,7 +204,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
             <div className="bottom">
                 <div className="share-links">
-                    <a href={whatsApp} data-action="share/whatsapp/share">
+                    <a href={whatsAppLink} data-action="share/whatsapp/share">
                         <Image  width={26} height={26} className="wa-image" src="/wa.png" alt="whats app"/>
                     </a>
                 </div>
@@ -232,26 +226,6 @@ const StyledWrapper = styled.article`
     margin: 24px 0;
     transition: 1000ms all ease-in-out 0ms;
 
-
-    &.shadow-glow { 
-        background-size:cover !important;  
-        animation: glow 1.8s ease 4;
-
-        & ::after {
-            width:100%;
-            height:100%;
-            content:'';
-            border-radius:50px;
-            position:absolute;
-            top:0;
-            left:0;
-            z-index:-1;
-            background:inherit;
-            filter:blur(20px);
-            transform:scale(1.05);
-            opacity:0.8;
-        }
-    }
 
     & .tag {
 
