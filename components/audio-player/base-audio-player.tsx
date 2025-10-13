@@ -19,7 +19,6 @@ export function mergeRefs<T = any>(
 const BaseAudioPlayer = ({
   id,
   internalAudioRef,
-  externalAudioRef,
   registerAudio,
   unregisterAudio,
   src,
@@ -29,7 +28,6 @@ const BaseAudioPlayer = ({
 }: {
   id: string;
   internalAudioRef: React.MutableRefObject<HTMLAudioElement | null>;
-  externalAudioRef: React.MutableRefObject<HTMLAudioElement | null>;
   registerAudio: (id: string, ref: MutableRefObject<HTMLAudioElement | null>) => void;
   unregisterAudio:(id: string) => void;
   src: string;
@@ -55,7 +53,7 @@ const BaseAudioPlayer = ({
     <>
       {children}
       <audio
-        ref={mergeRefs(internalAudioRef, externalAudioRef)}
+        ref={internalAudioRef}
         src={src}
         preload="metadata"
         onPlay={onPlay ? onPlay : null}

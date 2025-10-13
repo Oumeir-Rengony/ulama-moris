@@ -129,7 +129,7 @@ const useAudio = () => {
       const thumbCenter = thumbRect.left + thumbRect.width / 2;
       const mouseX = e.clientX;
 
-      const cooldown = 400; // ms
+      const cooldown = 200; // ms
 
       // respect cooldown
       if (lastSkipTimeRef.current && dayjs().diff(lastSkipTimeRef.current, "ms") < cooldown) {

@@ -48,7 +48,7 @@ const AudioControls = ({
 
 
    return (
-      <StyledWrapper>
+      <StyledWrapper id={`controls-${id}`}>
          <p className="time-info">{formatTime(mediaTime)}</p>
 
          <div className="controls">

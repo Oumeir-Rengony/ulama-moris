@@ -16,6 +16,9 @@
 
 /*! purgecss end ignore */
 
+html {
+  scroll-behavior: smooth;
+}
 
 body {
 	margin: 0;

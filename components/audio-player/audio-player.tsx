@@ -12,14 +12,12 @@ import { use } from "react";
 
 const AudioPlayer = ({
   id,
-  audioRef,
   src,
   onPlay,
   onPause,
 }: {
   id: string;
   src: string;
-  audioRef?: React.MutableRefObject<HTMLAudioElement>;
   onPlay?: () => void;
   onPause?: () => void;
 }) => {
@@ -49,7 +47,6 @@ const AudioPlayer = ({
       <BaseAudioPlayer
         id={id}
         internalAudioRef={internalAudioRef}
-        externalAudioRef={audioRef} 
         registerAudio={registerAudio}
         unregisterAudio={unregisterAudio}
         src={src}
