@@ -81,3 +81,10 @@ export const createQueryString = (searchParams: ReadonlyURLSearchParams, {
   params.set(name, value)
   return params.toString()
 }
+
+export const arrayify = (input: string | string[] | undefined): string[] => {
+  if (!input) {
+    return [];
+  }
+  return Array.isArray(input) ? input : [input];
+}

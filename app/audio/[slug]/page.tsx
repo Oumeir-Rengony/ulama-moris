@@ -4,9 +4,11 @@ import { styled } from "styled-system/jsx";
 import IconLabel from "@components/icon-label";
 import { CalendarDays, Clock, MapPin, UserRound } from "lucide-react";
 import dayjs from "dayjs";
-import { toTitleCase } from "@services/utils/utils.service";
+import { arrayify, toTitleCase } from "@services/utils/utils.service";
 import { AudioManager } from "@components/audio-player/audio-context";
 import AudioPlayer from "@components/audio-player/audio-player";
+import RelatedList from "app/_components/related-list";
+import { Suspense } from "react";
 export const dynamic = 'force-static';
 export const revalidate = 60;
 
@@ -29,19 +31,20 @@ export default async function Page({
 
    const { slug } = await params;
 
-   const data = await getBayaanBySlug({ slug });
+   const { bayaan, total } = await getBayaanBySlug({ slug });
 
    const {
       audio,
       author,
       date,
       description,
-      duration,
       location,
       masjid,
       title,
-      tag
-   } = data;
+      event,
+      category
+   } = bayaan;
+
 
    const sanitizeDesc = description === "<p><br></p>" ? "" : description;
 
@@ -52,7 +55,14 @@ export default async function Page({
             <div className="row">
                <div className="col">
                   
-                  <Tag title={tag} className="audio-tag"/>
+                   <div className="tag-list">
+                     { 
+                        category &&
+                           arrayify(category).map((cat, idx) => (
+                              <Tag key={idx} title={cat} />
+                           ))
+                     }
+                  </div>
 
                   <h1 className="heading">{ title }</h1>
 
@@ -93,7 +103,7 @@ export default async function Page({
                      </div>
 
                      <AudioManager>
-                        <AudioPlayer id={data?.sys?.id} src={audio?.url}/>
+                        <AudioPlayer id={bayaan?.sys?.id} src={audio?.url}/>
                      </AudioManager>
                   </div>
 
@@ -108,6 +118,15 @@ export default async function Page({
 
                   <div className="lecture">
                      <h2 className="lecture__subtitle"> More Lectures </h2>
+
+                     <Suspense>
+                        <RelatedList 
+                           event={event}
+                           date={date}
+                           category={category}
+                           totalBayaans={total}
+                        />
+                     </Suspense>
                   </div>
 
                </div>
@@ -125,10 +144,12 @@ const StyledWrapper = styled.div`
    padding: 24px;
 
 
-   & .audio-tag {
+   & .tag-list {
+      display: flex;
+      gap: 8px;
       margin-bottom: 16px;
 
-      & .tag__item {
+      & .tag {
          font-size: 14px;
          border-radius: 12px;
          padding: 4px 16px;

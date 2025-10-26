@@ -27,36 +27,22 @@ const StyledCard = styled.article`
     rgba(176, 251, 175, 1)
   );
   padding: 24px;
-  margin: 24px 0;
-  transition: 1000ms background ease-in-out;
+  transition: 100ms background ease-in-out;
+
+  &.base__card:hover {
+    /* box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); */
+    box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
+    outline: solid oklab(0.45 -0.14 0.06 / 0.5) 2px;
+  }
+  
 `
 
 const Tag = ({ tag }: { tag: string }) => {
   return (
-    <StyledTag>
-      <TagComponent title={tag} />
-    </StyledTag>
+    <TagComponent title={tag} />
   )
 };
 
-const StyledTag = styled.div`
-  & .tag {
-    display: flex;
-    gap: 8px;
-
-    & .tag__item {
-      display: inline-block;
-      background-color: rgba(133, 208, 61, 0.2);
-      color: #378b59;
-      padding: 4px 8px;
-      font-size: 12px;
-      /* infinity number */
-      border-radius: 33554400px;
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
-  }
-`;
 
 
 const Title = ({ title }: { title: string }) => (

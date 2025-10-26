@@ -12,7 +12,7 @@ fragment BayaanFields on Bayaan {
    date
    author
    duration
-   tag
+   category
    geoLink
    audio {
       ...AssetsFields

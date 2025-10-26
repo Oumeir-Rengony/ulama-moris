@@ -1,25 +1,54 @@
 import RelatedCard from "@components/audio-card/related-card";
-import { createQueryString, getWhatsAppLink } from "@services/utils/utils.service";
+import { getRelatedBayaans,  } from "@services/bayaans/bayaan.service";
+import { styled } from "styled-system/jsx";
 
 
-const RelatedList = ({ id }: { id: string}) => {
+const RelatedList = async ({ 
+   event,
+   date,
+   category,
+   totalBayaans 
+}: { 
+   event: string;
+   date: string;
+   category: string[] | string;
+   totalBayaans: number;
+}) => {
 
+   const audioList = await getRelatedBayaans({
+      event, 
+      date, 
+      category, 
+      totalBayaans
+   });
+   
 
    return (
-      <div className="related__list">
+      <StyledWrapper>
          {
             audioList?.map((audioItem) => {
                return (
-                  <RelatedCard
-                        key={audioItem?.sys?.id}
+                  <div className="related__card" key={audioItem?.sys?.id}>
+                     <RelatedCard
                         index={audioItem?.sys?.id}
                         {...audioItem}
-                  />
+                     />
+                  </div>
                )
             })
          }
-      </div>        
+      </StyledWrapper>        
    )
 }
+
+const StyledWrapper = styled.div`
+   display: flex;
+   flex-direction: column;
+   gap: 24px;
+
+   & .related__card {
+      
+   }
+`
 
 export default RelatedList;

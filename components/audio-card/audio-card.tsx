@@ -4,6 +4,7 @@ import { styled } from "styled-system/jsx";
 
 import { Card } from "@components/audio-card/base-card";
 import AudioPlayer from "@components/audio-player/audio-player";
+import { arrayify } from "@services/utils/utils.service";
 
 interface Asset {
   title: string;
@@ -30,7 +31,7 @@ export interface AudioCardProps {
   author: string;
   audio: Asset;
   duration?: string;
-  tag?: string;
+  category?: string | string[];
   showPulsar?: boolean;
   whatsAppLink?: string;
 }
@@ -49,7 +50,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
   author,
   audio,
   whatsAppLink,
-  tag,
+  category,
 }) => {
   const [showPulsar, setShowPulsar] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -78,7 +79,14 @@ const AudioCard: React.FC<AudioCardProps> = ({
 
         {showPulsar && <Pulsar />}
 
-        {tag && <Card.Tag tag={tag} />}
+        <div className="tag-list">
+          { 
+            category &&
+                arrayify(category).map((cat, idx) => (
+                  <Card.Tag key={idx} tag={cat} />
+                ))
+          }
+        </div>
         
         <Card.Title title={title} />
 
@@ -99,7 +107,10 @@ const AudioCard: React.FC<AudioCardProps> = ({
 };
 
 const StyledWrapper = styled.article`
-
+  & .tag-list {
+    display: flex;
+    gap: 8px;
+  }
 `;
 
 export default AudioCard;

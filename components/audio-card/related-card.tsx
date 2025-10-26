@@ -1,5 +1,6 @@
 import { styled } from "styled-system/jsx";
 import { Card } from "@components/audio-card/base-card";
+import { arrayify } from "@services/utils/utils.service";
 
 
 export interface RelatedCardProps {
@@ -11,7 +12,7 @@ export interface RelatedCardProps {
    date: string;
    author: string;
    duration?: string;
-   tag?: string;
+   category?: string | string[];
 }
 
 
@@ -23,14 +24,20 @@ const RelatedCard: React.FC<RelatedCardProps> = ({
    masjid,
    date,
    author,
-   tag,
+   category,
 }) => {
 
    return (
-      <StyledWrapper className={`related__card ${className}`} >
+      <StyledWrapper>
          <Card>
-
-            { tag && <Card.Tag tag={tag} /> }
+            <div className="tag-list">
+               { 
+                  category &&
+                     arrayify(category).map((cat, idx) => (
+                        <Card.Tag key={idx} tag={cat} />
+                     ))
+               }
+            </div>
 
             <Card.Title title={title} />
 
@@ -43,7 +50,16 @@ const RelatedCard: React.FC<RelatedCardProps> = ({
    );
 };
 
-const StyledWrapper = styled.article`
+const StyledWrapper = styled.div`
+
+   & .base__card {
+      cursor: pointer;
+   }
+
+   & .tag-list {
+      display: flex;
+      gap: 8px;
+   }
 
 `;
 

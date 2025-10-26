@@ -148,7 +148,10 @@ export const getBayaanBySlug = async ({
     preview: isPreview,
   });
 
-  return result?.bayaanCollection?.items?.[0];
+  return {
+    bayaan: result?.bayaanCollection?.items?.[0],
+    total: result?.bayaanCollection?.total
+  }
 }
 
 export const GetBayaanById = async (
@@ -182,24 +185,42 @@ const getEventID = (event: string, date: string) => {
     : ""
 }
 
-export const getRelatedEvents = async ({ 
+const selectUniqueBayaan= (data: any[], limit=4) => {
+  const seen = new Set();
+  const final = [];
+
+  for (const set of data) {
+    for (const bayaan of set) {
+      const key = bayaan.sys?.id
+      if (!seen.has(key)) {
+        seen.add(key);
+        final.push(bayaan);
+      }
+      if (final.length === limit) return final;
+    }
+  }
+
+  return final;
+}
+
+
+export const getRelatedBayaans = async ({ 
   event, 
-  date 
+  date,
+  category,
+  totalBayaans
 }: { 
   event: string, 
-  date: string 
-}, isPreview: boolean): Promise<any> =>  {
+  date: string,
+  category: string[] | string,
+  totalBayaans: number
+}, isPreview: boolean = false): Promise<any> =>  {
 
-  const EVENT_RELATED_QUERY = gql`
+  const RELATED_QUERY = gql`
+    ${AssetsFragment}
     ${BayaanFields}
     ${RelatedBayaanQuery}
   `;
-
-   const CATEGORY_RELATED_QUERY = gql`
-    ${BayaanFields}
-    ${RelatedBayaanQuery}
-  `;
-
 
   //need to filter date to be within the same day
 
@@ -209,24 +230,21 @@ export const getRelatedEvents = async ({
   // Get the start of the next day
   const date_lt = dayjs(date).add(1, 'day').startOf('day');
 
-  const eventRelatedResult =  ExecuteQuery(EVENT_RELATED_QUERY, {
+  const result =  await ExecuteQuery(RELATED_QUERY, {
     variables: {
       event: event,
       date_gte: date_gte,
-      date_lt: date_lt
+      date_lt: date_lt,
+      category: category,
+      total: totalBayaans
     },
     preview: isPreview,
   });
 
-  const categroRelatedResult =  ExecuteQuery(CATEGORY_RELATED_QUERY, {
-    variables: {
-      event: event,
-      date_gte: date_gte,
-      date_lt: date_lt
-    },
-    preview: isPreview,
-  });
-
+  //order of data is by priority
+  const sortedResult = selectUniqueBayaan([result?.event?.items, result?.category?.items, result?.random?.items]) 
+  return sortedResult;
+  
 }
 
 const getAudioBookJsonLd = (item: any) => {
