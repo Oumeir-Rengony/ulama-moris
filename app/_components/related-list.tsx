@@ -1,14 +1,17 @@
 import RelatedCard from "@components/audio-card/related-card";
 import { getRelatedBayaans,  } from "@services/bayaans/bayaan.service";
+import Link from "next/link";
 import { styled } from "styled-system/jsx";
 
 
 const RelatedList = async ({ 
+   slug,
    event,
    date,
    category,
    totalBayaans 
 }: { 
+   slug: string;
    event: string;
    date: string;
    category: string[] | string;
@@ -16,10 +19,11 @@ const RelatedList = async ({
 }) => {
 
    const audioList = await getRelatedBayaans({
+      currentSlug: slug,
       event, 
       date, 
       category, 
-      totalBayaans
+      totalBayaans,
    });
    
 
@@ -28,12 +32,12 @@ const RelatedList = async ({
          {
             audioList?.map((audioItem) => {
                return (
-                  <div className="related__card" key={audioItem?.sys?.id}>
+                  <Link href={`/audio/${audioItem?.slug}`} className="related__card" key={audioItem?.sys?.id} passHref legacyBehavior>
                      <RelatedCard
                         index={audioItem?.sys?.id}
                         {...audioItem}
                      />
-                  </div>
+                  </Link>
                )
             })
          }
@@ -46,9 +50,6 @@ const StyledWrapper = styled.div`
    flex-direction: column;
    gap: 24px;
 
-   & .related__card {
-      
-   }
 `
 
 export default RelatedList;

@@ -205,11 +205,13 @@ const selectUniqueBayaan= (data: any[], limit=4) => {
 
 
 export const getRelatedBayaans = async ({ 
+  currentSlug,
   event, 
   date,
   category,
   totalBayaans
 }: { 
+  currentSlug: string
   event: string, 
   date: string,
   category: string[] | string,
@@ -230,13 +232,17 @@ export const getRelatedBayaans = async ({
   // Get the start of the next day
   const date_lt = dayjs(date).add(1, 'day').startOf('day');
 
+  const randomSkip = Math.max(0, Math.floor(Math.random() * (totalBayaans - 4)));
+
+
   const result =  await ExecuteQuery(RELATED_QUERY, {
     variables: {
       event: event,
       date_gte: date_gte,
       date_lt: date_lt,
       category: category,
-      total: totalBayaans
+      skip: randomSkip,
+      currentSlug: currentSlug
     },
     preview: isPreview,
   });

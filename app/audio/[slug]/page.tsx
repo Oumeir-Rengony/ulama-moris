@@ -9,6 +9,7 @@ import { AudioManager } from "@components/audio-player/audio-context";
 import AudioPlayer from "@components/audio-player/audio-player";
 import RelatedList from "app/_components/related-list";
 import { Suspense } from "react";
+import { Metadata, ResolvingMetadata } from "next";
 export const dynamic = 'force-static';
 export const revalidate = 60;
 
@@ -19,6 +20,32 @@ export async function generateStaticParams() {
    return audioList?.items?.map((audio) => ({
       slug: audio?.slug,
    }))
+}
+
+export async function generateMetadata(
+  { params } : { params: Promise<{ slug: string }> },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+
+   const { slug } = await params;
+
+   const { bayaan } = await getBayaanBySlug({ slug });
+
+  const openGraph = (await parent).openGraph || {};
+ 
+  return {
+    title: bayaan?.metaTitle || '',
+    description: bayaan?.metaDescription || '',
+    authors: bayaan?.author || '',
+    openGraph: {
+      ...openGraph,
+      title: bayaan?.metaTitle || '',
+      description: bayaan?.metaDescription || '',
+    },
+    alternates: {
+      canonical: `https://ulama-moris.org/audio/${slug}`
+    }
+  }
 }
 
 // Multiple versions of this page will be statically generated
@@ -121,6 +148,7 @@ export default async function Page({
 
                      <Suspense>
                         <RelatedList 
+                           slug={slug}
                            event={event}
                            date={date}
                            category={category}
