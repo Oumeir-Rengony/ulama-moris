@@ -1,3 +1,5 @@
+import { ReadonlyURLSearchParams } from "next/navigation";
+
 export const toISODuration = (timeStr: string) => {
    if (!timeStr) return;
 
@@ -52,3 +54,37 @@ export const formatTime = (time: number) => {
   ret += `${secs}`;
   return ret;
 };
+
+
+export const getWhatsAppLink = (pathname: string, queryString: string) => {
+
+  if(!queryString && !pathname){
+    return
+  }
+
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://ulama-moris.org';
+
+  //reset=1 is done so that social media consider it as a new url to refresh their cache
+  const fullUrl = `${origin}${pathname}?${queryString.toString()}&reset=1`;
+  return encodeURIComponent(fullUrl);
+}
+
+    
+export const createQueryString = (searchParams: ReadonlyURLSearchParams, { 
+  name, 
+  value 
+}: {
+  name: string, 
+  value: string
+}) => {
+  const params = new URLSearchParams(searchParams.toString())
+  params.set(name, value)
+  return params.toString()
+}
+
+export const arrayify = (input: string | string[] | undefined): string[] => {
+  if (!input) {
+    return [];
+  }
+  return Array.isArray(input) ? input : [input];
+}

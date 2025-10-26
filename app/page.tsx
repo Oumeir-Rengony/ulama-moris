@@ -226,6 +226,9 @@ const StyledWrapper = styled.div`
 
 
   & .audio__list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
     max-width: 100%;
     margin: 1rem;
 
