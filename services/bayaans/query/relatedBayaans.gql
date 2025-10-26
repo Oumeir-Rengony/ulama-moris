@@ -1,0 +1,8 @@
+query relatedBayaan($event: String, $date_gte: DateTime, $date_lt: DateTime) {
+  bayaanCollection(where: { event: $event, date_gte:$date_gte, date_lt: $date_lt }, limit: 4){
+      total
+      items {
+         ...BayaanFields
+      }
+	}
+}

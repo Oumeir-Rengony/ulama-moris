@@ -2,31 +2,31 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import AudioCard from "@components/audio-card";
+import AudioCard from "@components/audio-card/audio-card";
+import { createQueryString, getWhatsAppLink } from "@services/utils/utils.service";
 import { AudioManager } from "@components/audio-player/audio-context";
 
 
 const AudioList = ({ audioList }: {
     audioList: any
 }) => {
-    // const [currentAudioId, setCurrentAudioId] = useState(null);
     const mountRef = useRef(false);
     
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     
-    const id = searchParams.get("id");
+    const queryParamId = searchParams.get("id");
     
 
     useEffect(() => {
 
-        if (!id || mountRef.current) {
+        if (!queryParamId || mountRef.current) {
             return
         }
 
-        const cardEl = document?.querySelector(`#card-${id}`);
-        const controlsEl = document?.querySelector(`#controls-${id}`);
+        const cardEl = document?.querySelector(`#card-${queryParamId}`);
+        const controlsEl = document?.querySelector(`#controls-${queryParamId}`);
         mountRef.current = true; // prevent reruns
 
         if(!cardEl && !controlsEl){
@@ -51,33 +51,16 @@ const AudioList = ({ audioList }: {
             cardEl.scrollIntoView({ behavior: 'smooth' });
         }
 
-    },[id]);
+    },[queryParamId]);
 
 
-    const getWhatsAppLink = (id: string) => {
-
-        if(!id){
-            return
-        }
-
-        const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://ulama-moris.org';
-
-        const queryString = createQueryString("id", id)
-
-        //reset=1 is done so that social media consider it as a new url to refresh their cache
-        const fullUrl = `${origin}${pathname}?${queryString.toString()}&reset=1`;
-        return encodeURIComponent(fullUrl);
-    }
-    
-    const createQueryString = (name: string, value: string) => {
-        const params = new URLSearchParams(searchParams.toString())
-        params.set(name, value)
-        return params.toString()
+    const generateWhatsAppLink = (id: string) => {
+        const queryString = createQueryString(searchParams, { name: "id", value: id});
+        return getWhatsAppLink(pathname, queryString)
     }
 
     const onAudioPlay = (id: string) => {
-        // setCurrentAudioId(id);
-        const queryString = createQueryString('id', `${id}`);
+        const queryString = createQueryString(searchParams, { name: "id", value: id});
         router.push(`${pathname}?${queryString}`, { scroll: false });
     }
 
@@ -85,14 +68,13 @@ const AudioList = ({ audioList }: {
         <div className="audio__list">
             <AudioManager>
             {
-                audioList?.map(audioItem => {
+                audioList?.map((audioItem) => {
                     return (
                         <AudioCard
                             key={audioItem?.sys?.id}
                             index={audioItem?.sys?.id}
-                            // currentAudioId={currentAudioId}
                             onAudioPlay={() => onAudioPlay(audioItem?.sys?.id)}
-                            whatsAppLink={`whatsapp://send?text=${getWhatsAppLink(audioItem?.sys?.id)}`}
+                            whatsAppLink={`whatsapp://send?text=${generateWhatsAppLink(audioItem?.sys?.id)}`}
                             {...audioItem}
                         />
                     )

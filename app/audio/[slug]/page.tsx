@@ -1,0 +1,205 @@
+import { getBayaanBySlug, getBayaanSlug } from "@services/bayaans/bayaan.service";
+import Tag from "@components/tag";
+import { styled } from "styled-system/jsx";
+import IconLabel from "@components/icon-label";
+import { CalendarDays, Clock, MapPin, UserRound } from "lucide-react";
+import dayjs from "dayjs";
+import { toTitleCase } from "@services/utils/utils.service";
+import { AudioManager } from "@components/audio-player/audio-context";
+import AudioPlayer from "@components/audio-player/audio-player";
+export const dynamic = 'force-static';
+export const revalidate = 60;
+
+// Return a list of `params` to populate the [slug] dynamic segment
+export async function generateStaticParams() {
+   const audioList = await getBayaanSlug();
+
+   return audioList?.items?.map((audio) => ({
+      slug: audio?.slug,
+   }))
+}
+
+// Multiple versions of this page will be statically generated
+// using the `params` returned by `generateStaticParams`
+export default async function Page({
+   params,
+}: {
+   params: Promise<{ slug: string }>
+}) {
+
+   const { slug } = await params;
+
+   const data = await getBayaanBySlug({ slug });
+
+   const {
+      audio,
+      author,
+      date,
+      description,
+      duration,
+      location,
+      masjid,
+      title,
+      tag
+   } = data;
+
+   const sanitizeDesc = description === "<p><br></p>" ? "" : description;
+
+   return (
+      <StyledWrapper className="brt">
+
+         <div className="container" style={{maxWidth: "720px"}}>
+            <div className="row">
+               <div className="col">
+                  
+                  <Tag title={tag} className="audio-tag"/>
+
+                  <h1 className="heading">{ title }</h1>
+
+                  <div className="details">
+
+                     <IconLabel
+                        icon={<CalendarDays size={16} color="#71717a" aria-hidden="true"/>}
+                        label={dayjs(date).format("MMM DD, YYYY")} 
+                        ariaDescription="Date"
+                     />
+
+                     <IconLabel 
+                        icon={<UserRound size={16} color="#71717a" aria-hidden="true"/>} 
+                        label={toTitleCase(author)} 
+                        ariaDescription="Speaker" 
+                     />
+
+                     {
+                        masjid && 
+                           <a href={location || "#"} target="_blank" className="figure__info-masjid" rel="noopener noreferrer">
+                              <IconLabel 
+                                    icon={<MapPin size={16} color="#71717a" aria-hidden="true"/>} 
+                                    label={toTitleCase(masjid)} 
+                                    ariaDescription="Masjid"
+                              />
+                           </a>
+                     }
+                     
+                  </div>
+
+                  <div className="player">
+                     <div className="image-wrapper">
+                        <img 
+                           src="https://images.ctfassets.net/n7lbwg9xm90s/0RStDo82kDxqEY0TRkB8f/8b67a58a4038b3dddc00b3348ceb529c/Frame_1.png"
+                           alt={title || "Audio Image"}
+                           className="image"
+                        />
+                     </div>
+
+                     <AudioManager>
+                        <AudioPlayer id={data?.sys?.id} src={audio?.url}/>
+                     </AudioManager>
+                  </div>
+
+                  { 
+                     sanitizeDesc && 
+
+                        <div className="desc">
+                           <h2 className="desc__subtitle"> About this episode </h2>
+                           <div className="desc__para" dangerouslySetInnerHTML={{__html: sanitizeDesc}} />
+                        </div>
+                  }
+
+                  <div className="lecture">
+                     <h2 className="lecture__subtitle"> More Lectures </h2>
+                  </div>
+
+               </div>
+            </div>
+          </div>
+
+
+      </StyledWrapper>
+   )
+}
+
+
+const StyledWrapper = styled.div`
+   min-height: 100vh;
+   padding: 24px;
+
+
+   & .audio-tag {
+      margin-bottom: 16px;
+
+      & .tag__item {
+         font-size: 14px;
+         border-radius: 12px;
+         padding: 4px 16px;
+      }
+
+   }
+
+   & .heading {
+      font-size: 24px;
+      line-height: 1.25;
+      font-weight: 700;
+      color: #202318;
+      margin-bottom: 16px;
+   }  
+
+
+   & .details {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 40px;
+
+      & .icon__label-text {
+         font-size: 14px;
+      }
+
+   }
+
+   & .player {
+      padding-bottom: 12px;
+
+      & .image-wrapper {
+         max-width: 400px;
+         margin-right: auto;
+         margin-left: auto;
+         margin-bottom: 20px;
+
+
+         & .image {
+            width: 100%;
+            border-radius: 20px;
+         }
+
+      }
+
+   }
+
+   & .desc {
+      margin-bottom: 16px;
+
+      & .desc__subtitle {
+         margin-bottom: 16px;
+         font-size: 20px;
+         font-weight: 600;
+      }
+
+      & .desc__para {
+         color: #71717a;
+         line-height: 26px;
+      }
+   }
+
+   & .lecture {
+
+      & .lecture__subtitle {
+         margin-bottom: 16px;
+         font-size: 20px;
+         font-weight: 600;
+      }
+
+   }
+
+
+`

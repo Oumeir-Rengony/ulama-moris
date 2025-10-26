@@ -6,6 +6,7 @@ import AssetsFragment from '@services/graphql/assets.fragment.gql';
 import BayaanSlug from './query/bayaanSlug.gql';
 import BayaanFields from './query/bayaan.fragment.gql';
 import BayaanBySlug from './query/bayaanBySlug.gql';
+import RelatedBayaanQuery from "./query/relatedBayaans.gql";
 import dayjs from 'dayjs';
 import Config from "@config/config.json";
 import { WithContext,  AudioObject, Event, ItemList, Person, Place, PostalAddress } from 'schema-dts';
@@ -174,13 +175,63 @@ export const GetBayaanById = async (
   return result?.bayaan;
 }
 
+
+const getEventID = (event: string, date: string) => {
+  return (event && date)
+    ? "https://ulama-moris.org/event/" + event?.replace(/\s+/g, '-').toLowerCase() + '-' + dayjs(date).format('YYYY-MM-DD')
+    : ""
+}
+
+export const getRelatedEvents = async ({ 
+  event, 
+  date 
+}: { 
+  event: string, 
+  date: string 
+}, isPreview: boolean): Promise<any> =>  {
+
+  const EVENT_RELATED_QUERY = gql`
+    ${BayaanFields}
+    ${RelatedBayaanQuery}
+  `;
+
+   const CATEGORY_RELATED_QUERY = gql`
+    ${BayaanFields}
+    ${RelatedBayaanQuery}
+  `;
+
+
+  //need to filter date to be within the same day
+
+  // Get the start of the given date
+  const date_gte = dayjs(date).startOf('day');
+
+  // Get the start of the next day
+  const date_lt = dayjs(date).add(1, 'day').startOf('day');
+
+  const eventRelatedResult =  ExecuteQuery(EVENT_RELATED_QUERY, {
+    variables: {
+      event: event,
+      date_gte: date_gte,
+      date_lt: date_lt
+    },
+    preview: isPreview,
+  });
+
+  const categroRelatedResult =  ExecuteQuery(CATEGORY_RELATED_QUERY, {
+    variables: {
+      event: event,
+      date_gte: date_gte,
+      date_lt: date_lt
+    },
+    preview: isPreview,
+  });
+
+}
+
 const getAudioBookJsonLd = (item: any) => {
 
   const [masjid, address] = item?.masjid ? item?.masjid?.split(",") : ["", ""];
-
-  const eventId = (item?.event && item?.date)
-    ? "https://ulama-moris.org/event/" + item?.event?.replace(/\s+/g, '-').toLowerCase() + '-' + dayjs(item?.date).format('YYYY-MM-DD')
-    : ""
 
   return {
     "@type": "AudioObject",
@@ -196,8 +247,8 @@ const getAudioBookJsonLd = (item: any) => {
     } as Person,
     subjectOf: {
       "@type": "Event",
-      "@id": eventId,
-      name: item?.metaTitle,
+      "@id": getEventID(item?.event, item?.date),
+      name: item?.event,
       startDate: item?.date,
       eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
       location: {

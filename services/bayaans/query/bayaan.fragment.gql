@@ -1,4 +1,7 @@
 fragment BayaanFields on Bayaan {
+   sys {
+      id
+   }
    title
    slug
    description
