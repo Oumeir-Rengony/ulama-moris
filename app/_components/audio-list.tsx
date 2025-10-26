@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import AudioCard from "@components/audio-card/audio-card";
-import { createQueryString, getWhatsAppLink } from "@services/utils/utils.service";
+import { createQueryString } from "@services/utils/utils.service";
 import { AudioManager } from "@components/audio-player/audio-context";
 
 
@@ -54,10 +54,10 @@ const AudioList = ({ audioList }: {
     },[queryParamId]);
 
 
-    const generateWhatsAppLink = (id: string) => {
-        const queryString = createQueryString(searchParams, { name: "id", value: id});
-        return getWhatsAppLink(pathname, queryString)
-    }
+    // const generateWhatsAppLink = (id: string) => {
+    //     const queryString = createQueryString(searchParams, { name: "id", value: id});
+    //     return getWhatsAppLink(pathname, queryString)
+    // }
 
     const onAudioPlay = (id: string) => {
         const queryString = createQueryString(searchParams, { name: "id", value: id});
@@ -74,7 +74,8 @@ const AudioList = ({ audioList }: {
                             key={audioItem?.sys?.id}
                             index={audioItem?.sys?.id}
                             onAudioPlay={() => onAudioPlay(audioItem?.sys?.id)}
-                            whatsAppLink={`whatsapp://send?text=${generateWhatsAppLink(audioItem?.sys?.id)}`}
+                            // whatsAppLink={`whatsapp://send?text=${generateWhatsAppLink(audioItem?.sys?.id)}`}
+                            whatsAppLink={`whatsapp://send?text=${origin}/audio/${audioItem?.slug}`}
                             {...audioItem}
                         />
                     )

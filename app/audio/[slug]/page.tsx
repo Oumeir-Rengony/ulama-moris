@@ -13,6 +13,8 @@ import { Metadata, ResolvingMetadata } from "next";
 export const dynamic = 'force-static';
 export const revalidate = 60;
 
+export const dynamicParams = true;
+
 // Return a list of `params` to populate the [slug] dynamic segment
 export async function generateStaticParams() {
    const audioList = await getBayaanSlug();
