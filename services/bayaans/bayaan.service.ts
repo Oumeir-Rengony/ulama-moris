@@ -253,9 +253,34 @@ export const getRelatedBayaans = async ({
   
 }
 
+const getEventJsonLd = (item: any, masjid?: string, address?: string): Event | null => {
+  if (!item?.event) return null;
+
+  return {
+    "@type": "Event",
+    "@id": getEventID(item.event, item.date),
+    name: item.event,
+    startDate: item.date,
+    eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+    location: {
+      "@type": "Place",
+      name: masjid,
+      url: item?.geoLink,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: address,
+        addressCountry: "MU",
+      } as PostalAddress,
+    } as Place,
+  } as Event;
+
+};
+
 const getAudioBookJsonLd = (item: any) => {
 
   const [masjid, address] = item?.masjid ? item?.masjid?.split(",") : ["", ""];
+
+  const event = getEventJsonLd(item, masjid, address)
 
   return {
     "@type": "AudioObject",
@@ -269,23 +294,7 @@ const getAudioBookJsonLd = (item: any) => {
       "@type": "Person",
       "name": item?.author?.replace(/(mufti|mawlana)/gi, ""),
     } as Person,
-    subjectOf: {
-      "@type": "Event",
-      "@id": getEventID(item?.event, item?.date),
-      name: item?.event,
-      startDate: item?.date,
-      eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
-      location: {
-        "@type": "Place",
-        name: masjid,
-        url: item?.geoLink,
-        address: {
-          "@type": "PostalAddress",
-          addressLocality: address,
-          addressCountry: "MU"
-        } as PostalAddress
-      } as Place
-    } as Event
+    ...(event && { subjectOf: event }), // only include if present
   } as AudioObject
 
 }

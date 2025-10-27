@@ -272,7 +272,9 @@ const StyledWrapper = styled.div`
 
 
     & .footer {
-      background: #767677;
+      background: oklab(1 0 0 / 0.5);
+      backdrop-filter: blur(8px);
+      border: solid oklab(0.9 -0.005 0.00866025 / 0.5) 1px;
 
       & .col {
         display: flex;
@@ -284,7 +286,7 @@ const StyledWrapper = styled.div`
 
       & .footer-item {
         font-size: 14px;
-        color: white;
+        color: #71717a;
         padding: 0 12px;
       }
 

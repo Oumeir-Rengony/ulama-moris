@@ -23,4 +23,7 @@ html {
 body {
 	margin: 0;
 	padding: 0;
+	background-color: #f7faf2;
+	backdrop-filter: blur(8px);
+
 }

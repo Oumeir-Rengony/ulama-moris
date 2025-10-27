@@ -18,16 +18,18 @@ const useAudio = () => {
 
    useEffect(() => {
 
-      if (!internalAudioRef.current) {
+      const audioEl = internalAudioRef.current;
+
+      if (!audioEl) {
          return
       }
 
       const onLoadedMetadata = () => {
-         setDuration(internalAudioRef.current?.duration);
+         setDuration(audioEl?.duration);
       }
 
       const onTimeUpdate = () => {
-         setMediaTime(internalAudioRef.current?.currentTime);
+         setMediaTime(audioEl?.currentTime);
       };
 
       const handlePlay = () => {
@@ -51,28 +53,28 @@ const useAudio = () => {
       }
 
 
-      if (internalAudioRef.current) {
-         internalAudioRef.current.addEventListener('loadedmetadata', onLoadedMetadata);
-         internalAudioRef.current.addEventListener('timeupdate', onTimeUpdate);
-         internalAudioRef.current.addEventListener('play', handlePlay);
-         internalAudioRef.current.addEventListener('pause', handlePause);
-         internalAudioRef.current.addEventListener("waiting", handleWaiting);
-         internalAudioRef.current.addEventListener("playing", handlePlaying);
+      if (audioEl) {
+         audioEl.addEventListener('loadedmetadata', onLoadedMetadata);
+         audioEl.addEventListener('timeupdate', onTimeUpdate);
+         audioEl.addEventListener('play', handlePlay);
+         audioEl.addEventListener('pause', handlePause);
+         audioEl.addEventListener("waiting", handleWaiting);
+         audioEl.addEventListener("playing", handlePlaying);
       }
 
       return () => {
-         if (internalAudioRef.current) {
-            internalAudioRef.current.removeEventListener('loadedMetadata', onLoadedMetadata);
-            internalAudioRef.current.removeEventListener('timeUpdate', onTimeUpdate);
-            internalAudioRef.current.removeEventListener('play', handlePlay);
-            internalAudioRef.current.removeEventListener('pause', handlePause);
-            internalAudioRef.current.removeEventListener("waiting", handleWaiting);
-            internalAudioRef.current.removeEventListener("playing", handlePlaying);
+         if (audioEl) {
+            audioEl.removeEventListener('loadedMetadata', onLoadedMetadata);
+            audioEl.removeEventListener('timeUpdate', onTimeUpdate);
+            audioEl.removeEventListener('play', handlePlay);
+            audioEl.removeEventListener('pause', handlePause);
+            audioEl.removeEventListener("waiting", handleWaiting);
+            audioEl.removeEventListener("playing", handlePlaying);
          }
 
       }
 
-   }, [internalAudioRef.current])
+   }, [])
 
 
    // const togglePlay = () => {

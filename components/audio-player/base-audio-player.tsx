@@ -47,7 +47,7 @@ const BaseAudioPlayer = ({
     
     return () => unregisterAudio(id);
 
-  }, [id, internalAudioRef]);
+  }, [id, registerAudio, unregisterAudio, internalAudioRef]);
 
   return (
     <>

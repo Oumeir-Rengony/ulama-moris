@@ -1,8 +1,8 @@
-import { getBayaanBySlug, getBayaanSlug } from "@services/bayaans/bayaan.service";
+import { createAudioJsonLd, getBayaanBySlug, getBayaanSlug } from "@services/bayaans/bayaan.service";
 import Tag from "@components/tag";
 import { styled } from "styled-system/jsx";
 import IconLabel from "@components/icon-label";
-import { CalendarDays, Clock, MapPin, UserRound } from "lucide-react";
+import { ArrowLeft, CalendarDays, Clock, MapPin, UserRound } from "lucide-react";
 import dayjs from "dayjs";
 import { arrayify, toTitleCase } from "@services/utils/utils.service";
 import { AudioManager } from "@components/audio-player/audio-context";
@@ -10,6 +10,7 @@ import AudioPlayer from "@components/audio-player/audio-player";
 import RelatedList from "app/_components/related-list";
 import { Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
+import Link from "next/link";
 export const dynamic = 'force-static';
 export const revalidate = 60;
 
@@ -62,6 +63,8 @@ export default async function Page({
 
    const { bayaan, total } = await getBayaanBySlug({ slug });
 
+   const jsonLd = createAudioJsonLd(bayaan);
+
    const {
       audio,
       author,
@@ -78,14 +81,32 @@ export default async function Page({
    const sanitizeDesc = description === "<p><br></p>" ? "" : description;
 
    return (
-      <StyledWrapper className="brt">
+      <StyledWrapper>
+
+         <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+               __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+            }}
+         />
+
+         <div className="header">
+            <div style={{maxWidth: "720px", margin: '0 auto'}}>
+               <Link href="/" className="home-link"> 
+                  <ArrowLeft size={20} className="arrow"/> 
+                  <button>Back to Lectures</button>
+               </Link>
+            </div>
+         </div>
+
 
          <div className="container" style={{maxWidth: "720px"}}>
             <div className="row">
                <div className="col">
-                  
-                   <div className="tag-list">
-                     { 
+
+            
+                  <div className="tag-list">
+                     {  
                         category &&
                            arrayify(category).map((cat, idx) => (
                               <Tag key={idx} title={cat} />
@@ -125,9 +146,12 @@ export default async function Page({
                   <div className="player">
                      <div className="image-wrapper">
                         <img 
-                           src="https://images.ctfassets.net/n7lbwg9xm90s/0RStDo82kDxqEY0TRkB8f/8b67a58a4038b3dddc00b3348ceb529c/Frame_1.png"
+                           src="https://images.ctfassets.net/n7lbwg9xm90s/7CDEWt7qQ4mJuVNTyhrcsG/bceace8b3d44c7ea4fb47b1244d26529/ulama-moris-logo.webp"
                            alt={title || "Audio Image"}
                            className="image"
+                           width="300"
+                           height="300"
+                           fetchPriority="high"
                         />
                      </div>
 
@@ -170,9 +194,29 @@ export default async function Page({
 
 
 const StyledWrapper = styled.div`
+
+& .header {
+   width:  100%;
+   background: oklab(1 0 0 / 0.5);
+   backdrop-filter: blur(8px);
+   border: solid oklab(0.9 -0.005 0.00866025 / 0.5) 1px;
+   padding: 16px;
+
+   & .home-link {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: transform 0.3s ease;
+
+      &:hover {
+         transform: translateX(-3px);
+      }
+   }
+}
+
+& .container {
    min-height: 100vh;
    padding: 24px;
-
 
    & .tag-list {
       display: flex;
@@ -251,6 +295,6 @@ const StyledWrapper = styled.div`
       }
 
    }
-
+}
 
 `
