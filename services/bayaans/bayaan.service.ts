@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { gql } from '@apollo/client'; 
 import { ExecuteQuery } from '@services/apollo/apollo.service';
 import BayaanQuery from './query/bayaan.gql';
@@ -13,7 +14,7 @@ import { WithContext,  AudioObject, Event, ItemList, Person, Place, PostalAddres
 import { toISODuration } from '@services/utils/utils.service';
 
 
-const getBayaansBase = async ({
+const getBayaansBase = cache(async ({
     startDate = null, 
     endDate = null,  
     search = null, 
@@ -57,9 +58,9 @@ const getBayaansBase = async ({
   });
 
   return result;
-}
+});
 
-export const getBayaansWithPagination = async ({
+export const getBayaansWithPagination = cache(async ({
   page = 1,
   startDate = null,
   endDate = null,
@@ -92,9 +93,9 @@ export const getBayaansWithPagination = async ({
   });
 
   return result?.bayaanCollection;
-};
+});
 
-export const getAllBayaans = async ({
+export const getAllBayaans = cache(async ({
   startDate = null,
   endDate = null,
   search = null,
@@ -114,9 +115,9 @@ export const getAllBayaans = async ({
   });
 
   return result?.bayaanCollection;
-};
+});
 
-export const getBayaanSlug = async (isPreview: boolean = false): Promise<any> => {
+export const getBayaanSlug = cache(async (isPreview: boolean = false): Promise<any[]> => {
 
   const QUERY = gql`
     ${BayaanSlug}
@@ -126,10 +127,10 @@ export const getBayaanSlug = async (isPreview: boolean = false): Promise<any> =>
     preview: isPreview,
   });
 
-  return result.bayaanCollection;
-}
+  return result?.bayaanCollection?.items;
+})
 
-export const getBayaanBySlug = async ({
+export const getBayaanBySlug = cache(async ({
   slug="", 
   isPreview = false
 }: {
@@ -152,9 +153,9 @@ export const getBayaanBySlug = async ({
     bayaan: result?.bayaanCollection?.items?.[0],
     total: result?.bayaanCollection?.total
   }
-}
+})
 
-export const GetBayaanById = async (
+export const GetBayaanById = cache(async (
   id: String,
   isPreview:boolean = false 
 ): Promise<any> => {
@@ -176,7 +177,7 @@ export const GetBayaanById = async (
 
 
   return result?.bayaan;
-}
+});
 
 
 const getEventID = (event: string, date: string) => {
@@ -204,7 +205,7 @@ const selectUniqueBayaan= (data: any[], limit=4) => {
 }
 
 
-export const getRelatedBayaans = async ({ 
+export const getRelatedBayaans = cache(async ({ 
   currentSlug,
   event, 
   date,
@@ -251,7 +252,7 @@ export const getRelatedBayaans = async ({
   const sortedResult = selectUniqueBayaan([result?.event?.items, result?.category?.items, result?.random?.items]) 
   return sortedResult;
   
-}
+});
 
 const getEventJsonLd = (item: any, masjid?: string, address?: string): Event | null => {
   if (!item?.event) return null;

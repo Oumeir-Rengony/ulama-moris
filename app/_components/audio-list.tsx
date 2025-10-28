@@ -75,7 +75,7 @@ const AudioList = ({ audioList }: {
                             index={audioItem?.sys?.id}
                             onAudioPlay={() => onAudioPlay(audioItem?.sys?.id)}
                             // whatsAppLink={`whatsapp://send?text=${generateWhatsAppLink(audioItem?.sys?.id)}`}
-                            whatsAppLink={`whatsapp://send?text=${origin}/audio/${audioItem?.slug}`}
+                            whatsAppLink={`whatsapp://send?text=${process.env.NEXT_PUBLIC_SITE_URL}/audio/${audioItem?.slug}`}
                             {...audioItem}
                         />
                     )

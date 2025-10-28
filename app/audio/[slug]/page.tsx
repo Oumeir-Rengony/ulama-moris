@@ -11,8 +11,7 @@ import RelatedList from "app/_components/related-list";
 import { Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
-export const dynamic = 'force-static';
-export const revalidate = 60;
+
 
 export const dynamicParams = true;
 
@@ -20,7 +19,7 @@ export const dynamicParams = true;
 export async function generateStaticParams() {
    const audioList = await getBayaanSlug();
 
-   return audioList?.items?.map((audio) => ({
+   return audioList?.map((audio) => ({
       slug: audio?.slug,
    }))
 }

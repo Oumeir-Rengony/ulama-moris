@@ -1,6 +1,9 @@
 query GetBayaanSlug {
   bayaanCollection (where: { slug_exists: true }) {
     items {
+      sys{
+        publishedAt
+      }
       slug
     }
   }

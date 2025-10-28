@@ -17,9 +17,8 @@ import { type ResolvingMetadata, type Metadata } from "next";
 import AudioList from "./_components/audio-list";
 import { Suspense } from "react";
 import Loading from "@components/loading";
-import Link from "next/link";
 
-
+//dynamic api, force page to be dynamic
 export async function generateMetadata(
   { searchParams } : { searchParams: Promise<{ [key: string]: string | string[] | undefined }> },
   parent: ResolvingMetadata
@@ -49,7 +48,6 @@ export async function generateMetadata(
     }
   }
 }
-
 
 export default async function Home(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
