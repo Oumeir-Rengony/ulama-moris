@@ -11,7 +11,7 @@ import React, {
 interface IAudioContext {
    audioRefs: React.MutableRefObject<Map<string, HTMLAudioElement>>;
    currentId: string | null;
-   currentAudioRef: React.MutableRefObject<HTMLAudioElement | null>;
+   activeAudioRef: React.MutableRefObject<HTMLAudioElement | null>;
    registerAudio: (id: string, ref: MutableRefObject<HTMLAudioElement | null>) => void;
    unregisterAudio: (id: string) => void;
    togglePlay: (id: string) => void;
@@ -23,7 +23,7 @@ interface IAudioContext {
 export const AudioContext = createContext<IAudioContext>({
    audioRefs: { current: new Map() },
    currentId: null,
-   currentAudioRef: { current: null },
+   activeAudioRef: { current: null },
    registerAudio: () => { },
    unregisterAudio: () => { },
    togglePlay: () => { },
@@ -35,8 +35,8 @@ export const AudioContext = createContext<IAudioContext>({
 
 export const AudioManager = ({ children }: { children: React.ReactNode }) => {
    const audioRefs = useRef<Map<string, HTMLAudioElement>>(new Map());
-   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
-   const [currentId, setCurrentId] = useState<string | null>(null);
+   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+   const [currentId, setCurrentId] = useState<string | null>(null)
 
    /** register a ref */
    const registerAudio = useCallback((id: string, ref: MutableRefObject<HTMLAudioElement | null>) => {
@@ -50,14 +50,14 @@ export const AudioManager = ({ children }: { children: React.ReactNode }) => {
       audioRefs.current.delete(id);
       if (currentId === id) {
          setCurrentId(null);
-         currentAudioRef.current = null;
+         activeAudioRef.current = null;
       }
    }, [currentId]);
 
 
    const pauseCurrent = useCallback(() => {
-      if (currentAudioRef.current) {
-         currentAudioRef.current.pause();
+      if (activeAudioRef.current) {
+         activeAudioRef.current.pause();
       }
    }, []);
 
@@ -67,11 +67,11 @@ export const AudioManager = ({ children }: { children: React.ReactNode }) => {
       if (!target) return;
 
       // pause previous
-      if (currentAudioRef.current && currentAudioRef.current !== target) {
-         currentAudioRef.current.pause();
+      if (activeAudioRef.current && activeAudioRef.current !== target) {
+         activeAudioRef.current.pause();
       }
 
-      currentAudioRef.current = target;
+      activeAudioRef.current = target;
       setCurrentId(id);
 
       // optionally start playback (you can remove this if you want manual play control)
@@ -89,7 +89,7 @@ export const AudioManager = ({ children }: { children: React.ReactNode }) => {
          // Pause if playing
          target.pause();
          // Clear active tracking so UI resets
-         currentAudioRef.current = null;
+         activeAudioRef.current = null;
          setCurrentId(null);
       }
    };
@@ -116,7 +116,7 @@ export const AudioManager = ({ children }: { children: React.ReactNode }) => {
          value={{
             audioRefs,
             currentId,
-            currentAudioRef,
+            activeAudioRef,
             registerAudio,
             unregisterAudio,
             togglePlay,

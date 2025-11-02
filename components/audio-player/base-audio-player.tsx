@@ -1,21 +1,5 @@
 import { MutableRefObject, useEffect } from "react";
 
-export function mergeRefs<T = any>(
-  ...refs: Array<React.Ref<T> | undefined>
-): React.RefCallback<T> {
-  return (value: T) => {
-    refs.forEach((ref) => {
-      if (!ref) return;
-      if (typeof ref === "function") {
-        ref(value);
-      } else {
-        // @ts-ignore
-        ref.current = value;
-      }
-    });
-  };
-}
-
 const BaseAudioPlayer = ({
   id,
   internalAudioRef,
@@ -24,6 +8,7 @@ const BaseAudioPlayer = ({
   src,
   onPlay,
   onPause,
+  crossOrigin,
   children
 }: {
   id: string;
@@ -33,7 +18,8 @@ const BaseAudioPlayer = ({
   src: string;
   onPlay?: () => void;
   onPause?: () => void;
-  children: React.ReactNode
+  children: React.ReactNode;
+  crossOrigin?: "anonymous" | "use-credentials" | "" | undefined;
 }) => {
 
 
@@ -49,6 +35,7 @@ const BaseAudioPlayer = ({
 
   }, [id, registerAudio, unregisterAudio, internalAudioRef]);
 
+
   return (
     <>
       {children}
@@ -60,6 +47,7 @@ const BaseAudioPlayer = ({
         onPause={onPause ? onPause : null}
         controls={false}
         style={{ display: 'none' }}
+        crossOrigin={crossOrigin || ""}
       />
     </>
   )

@@ -148,14 +148,14 @@ export default async function Page({
                            src="https://images.ctfassets.net/n7lbwg9xm90s/7CDEWt7qQ4mJuVNTyhrcsG/bceace8b3d44c7ea4fb47b1244d26529/ulama-moris-logo.webp"
                            alt={title || "Audio Image"}
                            className="image"
-                           width="300"
-                           height="300"
+                           width={400}
+                           height={400}
                            fetchPriority="high"
                         />
                      </div>
 
                      <AudioManager>
-                        <AudioPlayer id={bayaan?.sys?.id} src={audio?.url}/>
+                        <AudioPlayer id={bayaan?.sys?.id} src={audio?.url} />
                      </AudioManager>
                   </div>
 
@@ -258,12 +258,12 @@ const StyledWrapper = styled.div`
          max-width: 400px;
          margin-right: auto;
          margin-left: auto;
-         margin-bottom: 20px;
-
+         margin-bottom: 40px;
 
          & .image {
             width: 100%;
             border-radius: 20px;
+            z-index: 2;
          }
 
       }

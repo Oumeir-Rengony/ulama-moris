@@ -15,11 +15,13 @@ const AudioPlayer = ({
   src,
   onPlay,
   onPause,
+  crossOrigin
 }: {
   id: string;
   src: string;
   onPlay?: () => void;
   onPause?: () => void;
+  crossOrigin?: "anonymous" | "use-credentials" | "" | undefined;
 }) => {
 
   const { 
@@ -52,6 +54,7 @@ const AudioPlayer = ({
         src={src}
         onPlay={onPlay}
         onPause={onPause}
+        crossOrigin={crossOrigin}
       >
         <AudioSlider
           mediaTime={mediaTime}
