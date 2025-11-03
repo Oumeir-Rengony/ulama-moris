@@ -17,5 +17,8 @@
     },
     "filter": {
         "calendarFormat": "YYYY-MM-DD"
+    },
+    "localstorageKey": {
+        "audioTime": "audioTime"
     }
 }

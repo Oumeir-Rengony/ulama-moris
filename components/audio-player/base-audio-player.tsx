@@ -8,6 +8,8 @@ const BaseAudioPlayer = ({
   src,
   onPlay,
   onPause,
+  onTimeUpdate,
+  onEnded,
   crossOrigin,
   children
 }: {
@@ -18,6 +20,8 @@ const BaseAudioPlayer = ({
   src: string;
   onPlay?: () => void;
   onPause?: () => void;
+  onTimeUpdate?: () => void;
+  onEnded?: () => void;
   children: React.ReactNode;
   crossOrigin?: "anonymous" | "use-credentials" | "" | undefined;
 }) => {
@@ -43,6 +47,8 @@ const BaseAudioPlayer = ({
         ref={internalAudioRef}
         src={src}
         preload="metadata"
+        onTimeUpdate={onTimeUpdate}
+        onEnded={onEnded}
         onPlay={onPlay ? onPlay : null}
         onPause={onPause ? onPause : null}
         controls={false}

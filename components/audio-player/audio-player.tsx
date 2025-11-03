@@ -6,7 +6,9 @@ import AudioSlider from "./audio-slider";
 import AudioControls from "./audio-controls";
 import useAudio from "./use-audio";
 import { AudioContext } from "./audio-context";
-import { use } from "react";
+import { use, useEffect } from "react";
+import { useThrottle } from "hooks/useThrottle";
+import config from "config/config.json";
 
 
 
@@ -43,6 +45,30 @@ const AudioPlayer = ({
     onThumbClick
   } = useAudio();
 
+  useEffect(() => {
+    const lastPlayed = localStorage.getItem(config.localstorageKey.audioTime);
+    if (lastPlayed) {
+      const { audioId, time } = JSON.parse(lastPlayed);
+      if (audioId === id && internalAudioRef.current) {
+        internalAudioRef.current.currentTime = time;
+      }
+    }
+  }, [id]);
+
+  const saveTimestamp = useThrottle(() => {
+    if (!internalAudioRef.current) return;
+    const currentTime = internalAudioRef.current.currentTime;
+    localStorage.setItem(
+      config.localstorageKey.audioTime,
+      JSON.stringify({ audioId: id, time: currentTime })
+    );
+  }, 2500); //Save at most once every 2.5 seconds
+
+
+  const removeTimestamp = () => {
+    localStorage.removeItem(config.localstorageKey.audioTime)
+  }
+
   return (
     <StyledWrapper>
 
@@ -54,6 +80,8 @@ const AudioPlayer = ({
         src={src}
         onPlay={onPlay}
         onPause={onPause}
+        onTimeUpdate={saveTimestamp}
+        onEnded={removeTimestamp}
         crossOrigin={crossOrigin}
       >
         <AudioSlider
