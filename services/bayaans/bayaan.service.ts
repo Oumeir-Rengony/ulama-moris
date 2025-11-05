@@ -14,7 +14,7 @@ import { WithContext,  AudioObject, Event, ItemList, Person, Place, PostalAddres
 import { toISODuration } from '@services/utils/utils.service';
 
 
-const getBayaansBase = cache(async ({
+export const getBayaansBase = cache(async ({
     startDate = null, 
     endDate = null,  
     search = null, 

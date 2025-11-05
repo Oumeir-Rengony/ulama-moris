@@ -11,6 +11,7 @@ import RelatedList from "app/_components/related-list";
 import { Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
+// import AudioPlayerVisualizer from "app/_components/audio-player-visualizer";
 
 
 export const dynamicParams = true;
@@ -156,6 +157,7 @@ export default async function Page({
 
                      <AudioManager>
                         <AudioPlayer id={bayaan?.sys?.id} src={audio?.url} />
+                        {/* <AudioPlayerVisualizer id={bayaan?.sys?.id} src={audio?.url} /> */}
                      </AudioManager>
                   </div>
 
