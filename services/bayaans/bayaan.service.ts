@@ -232,7 +232,7 @@ export const getRelatedBayaans = cache(async ({
   date: string,
   category: string[] | string,
   totalBayaans: number,
-  limit: number;
+  limit?: number;
 }, isPreview: boolean = false): Promise<any> =>  {
 
   const RELATED_QUERY = gql`

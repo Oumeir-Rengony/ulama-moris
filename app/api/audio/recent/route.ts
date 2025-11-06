@@ -1,6 +1,7 @@
 import { getBayaansBase } from "@services/bayaans/bayaan.service";
 import crypto from "crypto";
 
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
