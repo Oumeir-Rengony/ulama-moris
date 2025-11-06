@@ -8,6 +8,7 @@ import BayaanSlug from './query/bayaanSlug.gql';
 import BayaanFields from './query/bayaan.fragment.gql';
 import BayaanBySlug from './query/bayaanBySlug.gql';
 import RelatedBayaanQuery from "./query/relatedBayaans.gql";
+import BayaanTotalQuery from "./query/bayaanTotal.gql";
 import dayjs from 'dayjs';
 import Config from "@config/config.json";
 import { WithContext,  AudioObject, Event, ItemList, Person, Place, PostalAddress } from 'schema-dts';
@@ -179,6 +180,19 @@ export const GetBayaanById = cache(async (
   return result?.bayaan;
 });
 
+const getTotalBayaan = cache(async (isPreview?: boolean):Promise<number> => {
+
+  const QUERY = gql`
+    ${BayaanTotalQuery}
+  `;
+
+  const result = await ExecuteQuery(QUERY, {
+    preview: isPreview
+  })
+
+  return result?.bayaanCollection?.total;
+})
+
 
 const getEventID = (event: string, date: string) => {
   return (event && date)
@@ -210,13 +224,15 @@ export const getRelatedBayaans = cache(async ({
   event, 
   date,
   category,
-  totalBayaans
+  totalBayaans,
+  limit=4
 }: { 
   currentSlug: string
   event: string, 
   date: string,
   category: string[] | string,
-  totalBayaans: number
+  totalBayaans: number,
+  limit: number;
 }, isPreview: boolean = false): Promise<any> =>  {
 
   const RELATED_QUERY = gql`
@@ -228,13 +244,19 @@ export const getRelatedBayaans = cache(async ({
   //need to filter date to be within the same day
 
   // Get the start of the given date
-  const date_gte = dayjs(date).startOf('day');
+  const date_gte = date ? dayjs(date).startOf('day') : null;
 
   // Get the start of the next day
-  const date_lt = dayjs(date).add(1, 'day').startOf('day');
+  const date_lt = date ? dayjs(date).add(1, 'day').startOf('day') : null;
 
-  const randomSkip = Math.max(0, Math.floor(Math.random() * (totalBayaans - 4)));
+  let total = totalBayaans;
 
+  //required for mufti.mu as total won't be avalaible
+  if(!totalBayaans){
+    total = await getTotalBayaan(false);
+  }
+
+  const randomSkip = Math.max(0, Math.floor(Math.random() * (total - 4)));
 
   const result =  await ExecuteQuery(RELATED_QUERY, {
     variables: {
@@ -243,7 +265,8 @@ export const getRelatedBayaans = cache(async ({
       date_lt: date_lt,
       category: category,
       skip: randomSkip,
-      currentSlug: currentSlug
+      currentSlug: currentSlug,
+      limit: limit
     },
     preview: isPreview,
   });

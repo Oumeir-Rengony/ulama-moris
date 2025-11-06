@@ -30,9 +30,8 @@ export async function GET(request: Request) {
     const limitParam = url.searchParams.get('limit');
     const limit = limitParam ? parseInt(limitParam, 10) : 4; // default 4
 
-    // Call getBayaansBase with the limit
+
     const bayaans = await getBayaansBase({ limit });
-    console.log("success")
 
     return Response.json({ status: 'success', data: bayaans?.bayaanCollection?.items });
   } catch (error) {
