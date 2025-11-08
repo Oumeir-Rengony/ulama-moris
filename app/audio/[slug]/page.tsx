@@ -195,7 +195,7 @@ export default async function Page({
 
                   <section className="fatwas">
                      <h2 className="fatwas__subtitle"> Related Fatwas </h2>
-                     <p className="fatwas__para">Below is a list of fatwas available on <a className="mufti-link" href={Config.fatwas.domain}>mufti.mu</a> (Darul Iftaa Nu'maniyyah)</p>
+                     <p className="fatwas__para">Below is a list of fatwas available on <a className="mufti-link" target="_blank" href={Config.fatwas.domain}>mufti.mu</a> (Darul Iftaa Nu'maniyyah)</p>
 
                      <Suspense>
                         <RelatedFatwasList relatedFatwasPromise={relatedFatwasPromise}/>
