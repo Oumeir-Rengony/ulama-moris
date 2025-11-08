@@ -15,6 +15,7 @@ import { getRelatedFatwas } from "@services/fatwas/fatwas.service"
 import RelatedFatwasList from "app/_components/related-fatwas-list";
 import { getRelatedBayaans } from "@services/bayaans/bayaan.service";
 import Config from "@config/config.json";
+import Image from "next/image";
 // import AudioPlayerVisualizer from "app/_components/audio-player-visualizer";
 
 
@@ -160,7 +161,7 @@ export default async function Page({
 
                   <div className="player">
                      <div className="image-wrapper">
-                        <img
+                        <Image
                            src="https://images.ctfassets.net/n7lbwg9xm90s/7CDEWt7qQ4mJuVNTyhrcsG/bceace8b3d44c7ea4fb47b1244d26529/ulama-moris-logo.webp"
                            alt={title || "Audio Image"}
                            className="image"
@@ -195,7 +196,7 @@ export default async function Page({
 
                   <section className="fatwas">
                      <h2 className="fatwas__subtitle"> Related Fatwas </h2>
-                     <p className="fatwas__para">Below is a list of fatwas available on <a className="mufti-link" target="_blank" href={Config.fatwas.domain}>mufti.mu</a> (Darul Iftaa Nu'maniyyah)</p>
+                     <p className="fatwas__para">Below is a list of fatwas available on <a className="mufti-link" target="_blank" href={Config.fatwas.domain}>mufti.mu</a> (Darul Iftaa Nu&apos;maniyyah)</p>
 
                      <Suspense>
                         <RelatedFatwasList relatedFatwasPromise={relatedFatwasPromise}/>

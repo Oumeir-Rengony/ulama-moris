@@ -53,7 +53,7 @@ const AudioPlayer = ({
         internalAudioRef.current.currentTime = time;
       }
     }
-  }, [id]);
+  }, [id, internalAudioRef]);
 
   const saveTimestamp = useThrottle(() => {
     if (!internalAudioRef.current) return;
