@@ -20,5 +20,8 @@
     },
     "localstorageKey": {
         "audioTime": "audioTime"
+    },
+    "fatwas": {
+        "domain": "https://www.mufti.mu"
     }
 }

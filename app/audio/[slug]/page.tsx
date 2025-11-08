@@ -7,10 +7,14 @@ import dayjs from "dayjs";
 import { arrayify, toTitleCase } from "@services/utils/utils.service";
 import { AudioManager } from "@components/audio-player/audio-context";
 import AudioPlayer from "@components/audio-player/audio-player";
-import RelatedList from "app/_components/related-list";
+import RelatedAudioList from "app/_components/related-audio-list";
 import { Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
+import { getRelatedFatwas } from "@services/fatwas/fatwas.service"
+import RelatedFatwasList from "app/_components/related-fatwas-list";
+import { getRelatedBayaans } from "@services/bayaans/bayaan.service";
+import Config from "@config/config.json";
 // import AudioPlayerVisualizer from "app/_components/audio-player-visualizer";
 
 
@@ -26,29 +30,29 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(
-  { params } : { params: Promise<{ slug: string }> },
-  parent: ResolvingMetadata
+   { params }: { params: Promise<{ slug: string }> },
+   parent: ResolvingMetadata
 ): Promise<Metadata> {
 
    const { slug } = await params;
 
    const { bayaan } = await getBayaanBySlug({ slug });
 
-  const openGraph = (await parent).openGraph || {};
- 
-  return {
-    title: bayaan?.metaTitle || '',
-    description: bayaan?.metaDescription || '',
-    authors: bayaan?.author || '',
-    openGraph: {
-      ...openGraph,
+   const openGraph = (await parent).openGraph || {};
+
+   return {
       title: bayaan?.metaTitle || '',
       description: bayaan?.metaDescription || '',
-    },
-    alternates: {
-      canonical: `https://ulama-moris.org/audio/${slug}`
-    }
-  }
+      authors: bayaan?.author || '',
+      openGraph: {
+         ...openGraph,
+         title: bayaan?.metaTitle || '',
+         description: bayaan?.metaDescription || '',
+      },
+      alternates: {
+         canonical: `https://ulama-moris.org/audio/${slug}`
+      }
+   }
 }
 
 // Multiple versions of this page will be statically generated
@@ -77,6 +81,17 @@ export default async function Page({
       category
    } = bayaan;
 
+    const relatedAudioPromise = getRelatedBayaans({
+      currentSlug: slug,
+      event, 
+      date, 
+      category, 
+      totalBayaans: total,
+   });
+
+   const relatedFatwasPromise = getRelatedFatwas(category);
+
+
 
    const sanitizeDesc = description === "<p><br></p>" ? "" : description;
 
@@ -91,61 +106,61 @@ export default async function Page({
          />
 
          <div className="header">
-            <div style={{maxWidth: "720px", margin: '0 auto'}}>
-               <Link href="/" className="home-link"> 
-                  <ArrowLeft size={20} className="arrow"/> 
+            <div style={{ maxWidth: "720px", margin: '0 auto' }}>
+               <Link href="/" className="home-link">
+                  <ArrowLeft size={20} className="arrow" />
                   <button>Back to Lectures</button>
                </Link>
             </div>
          </div>
 
 
-         <div className="container" style={{maxWidth: "720px"}}>
+         <div className="container" style={{ maxWidth: "720px" }}>
             <div className="row">
                <div className="col">
 
-            
+
                   <div className="tag-list">
-                     {  
+                     {
                         category &&
-                           arrayify(category).map((cat, idx) => (
-                              <Tag key={idx} title={cat} />
-                           ))
+                        arrayify(category).map((cat, idx) => (
+                           <Tag key={idx} title={cat} />
+                        ))
                      }
                   </div>
 
-                  <h1 className="heading">{ title }</h1>
+                  <h1 className="heading">{title}</h1>
 
                   <div className="details">
 
                      <IconLabel
-                        icon={<CalendarDays size={16} color="#71717a" aria-hidden="true"/>}
-                        label={dayjs(date).format("MMM DD, YYYY")} 
+                        icon={<CalendarDays size={16} color="#71717a" aria-hidden="true" />}
+                        label={dayjs(date).format("MMM DD, YYYY")}
                         ariaDescription="Date"
                      />
 
-                     <IconLabel 
-                        icon={<UserRound size={16} color="#71717a" aria-hidden="true"/>} 
-                        label={toTitleCase(author)} 
-                        ariaDescription="Speaker" 
+                     <IconLabel
+                        icon={<UserRound size={16} color="#71717a" aria-hidden="true" />}
+                        label={toTitleCase(author)}
+                        ariaDescription="Speaker"
                      />
 
                      {
-                        masjid && 
-                           <a href={location || "#"} target="_blank" className="figure__info-masjid" rel="noopener noreferrer">
-                              <IconLabel 
-                                    icon={<MapPin size={16} color="#71717a" aria-hidden="true"/>} 
-                                    label={toTitleCase(masjid)} 
-                                    ariaDescription="Masjid"
-                              />
-                           </a>
+                        masjid &&
+                        <a href={location || "#"} target="_blank" className="figure__info-masjid" rel="noopener noreferrer">
+                           <IconLabel
+                              icon={<MapPin size={16} color="#71717a" aria-hidden="true" />}
+                              label={toTitleCase(masjid)}
+                              ariaDescription="Masjid"
+                           />
+                        </a>
                      }
-                     
+
                   </div>
 
                   <div className="player">
                      <div className="image-wrapper">
-                        <img 
+                        <img
                            src="https://images.ctfassets.net/n7lbwg9xm90s/7CDEWt7qQ4mJuVNTyhrcsG/bceace8b3d44c7ea4fb47b1244d26529/ulama-moris-logo.webp"
                            alt={title || "Audio Image"}
                            className="image"
@@ -161,32 +176,35 @@ export default async function Page({
                      </AudioManager>
                   </div>
 
-                  { 
-                     sanitizeDesc && 
+                  {
+                     sanitizeDesc &&
 
-                        <div className="desc">
-                           <h2 className="desc__subtitle"> About this episode </h2>
-                           <div className="desc__para" dangerouslySetInnerHTML={{__html: sanitizeDesc}} />
-                        </div>
+                     <div className="desc">
+                        <h2 className="desc__subtitle"> About this episode </h2>
+                        <div className="desc__para" dangerouslySetInnerHTML={{ __html: sanitizeDesc }} />
+                     </div>
                   }
 
-                  <div className="lecture">
+                  <section className="lecture">
                      <h2 className="lecture__subtitle"> More Lectures </h2>
 
                      <Suspense>
-                        <RelatedList 
-                           slug={slug}
-                           event={event}
-                           date={date}
-                           category={category}
-                           totalBayaans={total}
-                        />
+                        <RelatedAudioList relatedAudioPromise={relatedAudioPromise}/>
                      </Suspense>
-                  </div>
+                  </section>
+
+                  <section className="fatwas">
+                     <h2 className="fatwas__subtitle"> Related Fatwas </h2>
+                     <p className="fatwas__para">Below is a list of fatwas available on <a className="mufti-link" href={Config.fatwas.domain}>mufti.mu</a> (Darul Iftaa Nu'maniyyah)</p>
+
+                     <Suspense>
+                        <RelatedFatwasList relatedFatwasPromise={relatedFatwasPromise}/>
+                     </Suspense>
+                  </section>
 
                </div>
             </div>
-          </div>
+         </div>
 
 
       </StyledWrapper>
@@ -273,7 +291,7 @@ const StyledWrapper = styled.div`
    }
 
    & .desc {
-      margin-bottom: 16px;
+      margin-bottom: 24px;
 
       & .desc__subtitle {
          margin-bottom: 16px;
@@ -290,9 +308,41 @@ const StyledWrapper = styled.div`
    & .lecture {
 
       & .lecture__subtitle {
+         margin-bottom: 24px;
+         font-size: 20px;
+         font-weight: 600;
+      }
+
+      margin-bottom: 24px;
+
+   }
+
+   & .fatwas {
+
+      & .fatwas__subtitle {
          margin-bottom: 16px;
          font-size: 20px;
          font-weight: 600;
+      }
+
+      & .fatwas__para {
+         color: #71717a;
+         line-height: 26px;
+         margin-bottom: 24px;
+
+         & .mufti-link {
+            color: #7abd3b;
+            transition: color 0.1s ease;
+
+            &:hover {
+               color: #059669;
+            }
+         }
+
+      }
+
+      & .tag-list {
+         margin-bottom: 12px;
       }
 
    }

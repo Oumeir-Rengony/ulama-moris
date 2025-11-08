@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import AudioCard from "@components/audio-card/audio-card";
+import AudioCard from "@components/card/audio-card";
 import { createQueryString } from "@services/utils/utils.service";
 import { AudioManager } from "@components/audio-player/audio-context";
 

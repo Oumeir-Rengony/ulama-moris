@@ -1,5 +1,5 @@
 import { styled } from "styled-system/jsx";
-import { Card } from "@components/audio-card/base-card";
+import { Card } from "@components/card/base-card";
 import { arrayify } from "@services/utils/utils.service";
 
 

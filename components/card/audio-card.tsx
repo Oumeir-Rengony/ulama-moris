@@ -2,7 +2,7 @@ import Pulsar from "@components/pulsar";
 import { useRef, useState } from "react";
 import { styled } from "styled-system/jsx";
 
-import { Card } from "@components/audio-card/base-card";
+import { Card } from "@components/card/base-card";
 import AudioPlayer from "@components/audio-player/audio-player";
 import { arrayify } from "@services/utils/utils.service";
 
