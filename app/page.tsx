@@ -1,11 +1,8 @@
-import Image from "next/image";
-
+import AudioList from "./_components/audio-list";
 import Pagination from "@components/pagination";
 import Filter from "@components/filter";
 
-import { createAudioListJsonLd, GetBayaanById, getBayaansWithPagination
-  // GetBayaans 
-} from "@services/bayaans/bayaan.service";
+import { createAudioListJsonLd, GetBayaanById, getBayaansWithPagination  } from "@services/bayaans/bayaan.service";
 
 import { styled } from "../styled-system/jsx";
 
@@ -14,9 +11,9 @@ import config from "@config/config.json";
 import { getSelectorsByUserAgent } from "react-device-detect";
 import { headers } from "next/headers";
 import { type ResolvingMetadata, type Metadata } from "next";
-import AudioList from "./_components/audio-list";
 import { Suspense } from "react";
 import Loading from "@components/loading";
+import Footer from "@components/footer";
 
 //dynamic api, force page to be dynamic
 export async function generateMetadata(
@@ -145,16 +142,7 @@ async function HomeLayout({
           total={Math.ceil(audioList.total/pageSize)}
         />
 
-        <footer className="footer">
-          <div className="container">
-            <div className="row">
-              <div className="col">
-                  <Image loading="lazy" width={90} height={56} className="footer-item img" src="/logo.webp" alt="logo"/>
-                  <p className="footer-item">contact: ulama.moris@gmail.com</p>
-              </div>
-              </div>
-          </div>
-        </footer>
+        <Footer />
 
       </div>
 
@@ -268,32 +256,6 @@ const StyledWrapper = styled.div`
       }
     }
 
-
-    & .footer {
-      background: oklab(1 0 0 / 0.5);
-      backdrop-filter: blur(8px);
-      border: solid oklab(0.9 -0.005 0.00866025 / 0.5) 1px;
-
-      & .col {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 80px;
-      }
-      
-
-      & .footer-item {
-        font-size: 14px;
-        color: #71717a;
-        padding: 0 12px;
-      }
-
-      & .img {
-        width: 90px;
-        height: auto;
-      }
-
-    }
 
   }
 

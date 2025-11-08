@@ -1,7 +1,6 @@
 import { Metadata, Viewport } from "next";
 import localFont from 'next/font/local';
 import { HeroProvider } from "./_components/hero-provider";
-import { Analytics } from "@vercel/analytics/next";
 import config from "@config/config.json";
 import "public/styles/bootstrap-grid/bootstrap-grid.min.css";
 import "public/styles/global.css";
@@ -52,9 +51,9 @@ export const metadata: Metadata = {
         type: 'website',
         url: 'https://ulama-moris.org',
         images: {
-            width: 900,
-            height: 600,
-            url: 'https://www.ulama-moris.org/og1.png'
+          width: 900,
+          height: 600,
+          url: 'https://www.ulama-moris.org/og1.png'
         }
     }
       

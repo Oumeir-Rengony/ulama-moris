@@ -16,6 +16,7 @@ import RelatedFatwasList from "app/_components/related-fatwas-list";
 import { getRelatedBayaans } from "@services/bayaans/bayaan.service";
 import Config from "@config/config.json";
 import Image from "next/image";
+import Footer from "@components/footer";
 // import AudioPlayerVisualizer from "app/_components/audio-player-visualizer";
 
 
@@ -116,7 +117,7 @@ export default async function Page({
          </div>
 
 
-         <div className="container" style={{ maxWidth: "720px" }}>
+         <div className="container" style={{ maxWidth: "720px", minHeight: '100vh', padding: '24px' }}>
             <div className="row">
                <div className="col">
 
@@ -207,6 +208,7 @@ export default async function Page({
             </div>
          </div>
 
+         <Footer />
 
       </StyledWrapper>
    )
@@ -235,8 +237,6 @@ const StyledWrapper = styled.div`
 }
 
 & .container {
-   min-height: 100vh;
-   padding: 24px;
 
    & .tag-list {
       display: flex;
