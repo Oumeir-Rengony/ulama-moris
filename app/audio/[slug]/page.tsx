@@ -11,8 +11,8 @@ import RelatedAudioList from "app/_components/related-audio-list";
 import { Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
-import { getRelatedFatwas } from "@services/fatwas/fatwas.service"
-import RelatedFatwasList from "app/_components/related-fatwas-list";
+// import { getRelatedFatwas } from "@services/fatwas/fatwas.service"
+// import RelatedFatwasList from "app/_components/related-fatwas-list";
 import { getRelatedBayaans } from "@services/bayaans/bayaan.service";
 import Config from "@config/config.json";
 import Image from "next/image";
@@ -95,7 +95,7 @@ export default async function Page({
       totalBayaans: total,
    });
 
-   const relatedFatwasPromise = getRelatedFatwas(category);
+   // const relatedFatwasPromise = getRelatedFatwas(category);
 
 
 
@@ -203,9 +203,9 @@ export default async function Page({
                      <h2 className="fatwas__subtitle"> Related Fatwas </h2>
                      <p className="fatwas__para">You can find more fatwas on <a className="mufti-link" target="_blank" href={Config.fatwas.domain}>mufti.mu</a> (Darul Iftaa Nu&apos;maniyyah)</p>
 
-                     <Suspense>
+                     {/* <Suspense>
                         <RelatedFatwasList relatedFatwasPromise={relatedFatwasPromise}/>
-                     </Suspense>
+                     </Suspense> */}
                   </section>
 
                </div>
