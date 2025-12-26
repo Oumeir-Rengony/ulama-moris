@@ -53,7 +53,7 @@ export const metadata: Metadata = {
         images: {
           width: 900,
           height: 600,
-          url: 'https://www.ulama-moris.org/og1.png'
+          url: 'https://images.ctfassets.net/n7lbwg9xm90s/3piSujtUCq7IuclAQAeqtl/a3d014dd9277e17f73d07b31bb661724/open-graph-image.png'
         }
     }
       

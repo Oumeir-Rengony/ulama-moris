@@ -50,6 +50,10 @@ export async function generateMetadata(
          ...openGraph,
          title: bayaan?.metaTitle || '',
          description: bayaan?.metaDescription || '',
+         url: `https://ulama-moris.org/audio/${slug}`,
+         audio: {
+            url: bayaan?.audio?.url || ''
+         },   
       },
       alternates: {
          canonical: `https://ulama-moris.org/audio/${slug}`
@@ -197,7 +201,7 @@ export default async function Page({
 
                   <section className="fatwas">
                      <h2 className="fatwas__subtitle"> Related Fatwas </h2>
-                     <p className="fatwas__para">Below is a list of fatwas available on <a className="mufti-link" target="_blank" href={Config.fatwas.domain}>mufti.mu</a> (Darul Iftaa Nu&apos;maniyyah)</p>
+                     <p className="fatwas__para">You can find more fatwas on <a className="mufti-link" target="_blank" href={Config.fatwas.domain}>mufti.mu</a> (Darul Iftaa Nu&apos;maniyyah)</p>
 
                      <Suspense>
                         <RelatedFatwasList relatedFatwasPromise={relatedFatwasPromise}/>
