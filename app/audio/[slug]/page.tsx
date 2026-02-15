@@ -80,7 +80,6 @@ export default async function Page({
       author,
       date,
       description,
-      location,
       masjid,
       title,
       event,
@@ -100,6 +99,7 @@ export default async function Page({
 
 
    const sanitizeDesc = description === "<p><br></p>" ? "" : description;
+
 
    return (
       <StyledWrapper>
@@ -153,10 +153,10 @@ export default async function Page({
 
                      {
                         masjid &&
-                        <a href={location || "#"} target="_blank" className="figure__info-masjid" rel="noopener noreferrer">
+                        <a href={masjid?.geoLink || "#"} target="_blank" className="figure__info-masjid" rel="noopener noreferrer">
                            <IconLabel
                               icon={<MapPin size={16} color="#71717a" aria-hidden="true" />}
-                              label={toTitleCase(masjid)}
+                              label={toTitleCase(masjid?.title)}
                               ariaDescription="Masjid"
                            />
                         </a>

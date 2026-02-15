@@ -3,12 +3,16 @@ import { Card } from "@components/card/base-card";
 import { arrayify } from "@services/utils/utils.service";
 
 
+interface Masjid{
+   title: string;
+   geoLink: string
+}
 export interface RelatedCardProps {
    title: string;
    className?: string;
    description: HTMLElement | string;
    location: string;
-   masjid: string;
+   masjid?: Masjid;
    date: string;
    author: string;
    duration?: string;
@@ -20,7 +24,6 @@ const RelatedCard: React.FC<RelatedCardProps> = ({
    title,
    className = "",
    description,
-   location,
    masjid,
    date,
    author,
@@ -43,7 +46,7 @@ const RelatedCard: React.FC<RelatedCardProps> = ({
 
             {description && <Card.Description description={description} />}
 
-            <Card.MediaInfo author={author} masjid={masjid} location={location} date={date} />
+            <Card.MediaInfo author={author} masjid={masjid?.title} location={masjid?.geoLink} date={date} />
 
          </Card>
       </StyledWrapper>
