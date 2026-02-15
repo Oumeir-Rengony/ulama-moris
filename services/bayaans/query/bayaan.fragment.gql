@@ -5,7 +5,6 @@ fragment BayaanFields on Bayaan {
    title
    slug
    description
-   masjid
    metaTitle
    metaDescription
    event
@@ -13,7 +12,10 @@ fragment BayaanFields on Bayaan {
    author
    duration
    category
-   geoLink
+   masjid {
+      title
+      geoLink
+   }
    audio {
       ...AssetsFields
    }

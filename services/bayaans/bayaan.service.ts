@@ -289,7 +289,7 @@ const getEventJsonLd = (item: any, masjid?: string, address?: string): Event | n
     location: {
       "@type": "Place",
       name: masjid,
-      url: item?.geoLink,
+      url: item?.masjid?.geoLink,
       address: {
         "@type": "PostalAddress",
         addressLocality: address,
@@ -302,7 +302,7 @@ const getEventJsonLd = (item: any, masjid?: string, address?: string): Event | n
 
 const getAudioBookJsonLd = (item: any) => {
 
-  const [masjid, address] = item?.masjid ? item?.masjid?.split(",") : ["", ""];
+  const [masjid, address] = item?.masjid?.title ? item?.masjid?.title?.split(",") : ["", ""];
 
   const event = getEventJsonLd(item, masjid, address)
 

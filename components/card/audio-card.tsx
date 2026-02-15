@@ -17,6 +17,11 @@ interface Asset {
   height?: string;
 }
 
+interface Masjid {
+  title: string;
+  geoLink: string;
+}
+
 export interface AudioCardProps {
   title: string;
   index?: string;
@@ -26,7 +31,7 @@ export interface AudioCardProps {
   className?: string;
   description: HTMLElement | string;
   location: string;
-  masjid: string;
+  masjid: Masjid;
   date: string;
   author: string;
   audio: Asset;
@@ -44,7 +49,6 @@ const AudioCard: React.FC<AudioCardProps> = ({
   onAudioPause,
   className = "",
   description,
-  location,
   masjid,
   date,
   author,
@@ -93,7 +97,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
         <figure className="figure">
           <figcaption className="figure__caption">
             {description && <Card.Description description={description} />}
-            <Card.MediaInfo author={author} masjid={masjid} location={location} date={date} />
+            <Card.MediaInfo author={author} masjid={masjid?.title} location={masjid?.geoLink} date={date} />
           </figcaption>
 
           <AudioPlayer id={index} src={audio?.url} onPlay={onPlay} onPause={onPause} />
