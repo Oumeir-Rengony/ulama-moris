@@ -30,9 +30,8 @@ const StyledCard = styled.article`
   transition: 100ms background ease-in-out;
 
   &.base__card:hover {
-    /* box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); */
-    box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
-    outline: solid oklab(0.45 -0.14 0.06 / 0.5) 2px;
+    /* box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px; */
+    /* outline: solid oklab(0.45 -0.14 0.06 / 0.5) 2px; */
   }
   
 `

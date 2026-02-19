@@ -110,7 +110,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
   );
 };
 
-const StyledWrapper = styled.article`
+const StyledWrapper = styled.div`
   & .tag-list {
     display: flex;
     gap: 8px;

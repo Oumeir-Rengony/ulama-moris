@@ -27,17 +27,27 @@ const BaseAudioPlayer = ({
 }) => {
 
 
+  // useEffect(() => {
+
+  //   if(!internalAudioRef.current && id){
+  //     return
+  //   }
+    
+  //   registerAudio(id, internalAudioRef);
+    
+  //   return () => unregisterAudio(id);
+
+  // }, [id, registerAudio, unregisterAudio, internalAudioRef]);
+
+
   useEffect(() => {
+    if (!id) return;
 
-    if(!internalAudioRef.current && id){
-      return
-    }
-    
     registerAudio(id, internalAudioRef);
-    
-    return () => unregisterAudio(id);
 
+    return () => unregisterAudio(id);
   }, [id, registerAudio, unregisterAudio, internalAudioRef]);
+
 
 
   return (

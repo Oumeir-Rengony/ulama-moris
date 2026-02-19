@@ -40,19 +40,33 @@ export const AudioManager = ({ children }: { children: React.ReactNode }) => {
 
    /** register a ref */
    const registerAudio = useCallback((id: string, ref: MutableRefObject<HTMLAudioElement | null>) => {
-      if (ref.current) {
-         audioRefs.current.set(id, ref.current);
-      }
+      // if (ref.current) {
+         audioRefs.current.set(id, ref.current!);
+      // }
    }, []);
 
-   /** unregister a ref */
+   // /** unregister a ref */
+   // const unregisterAudio = useCallback((id: string) => {
+   //    audioRefs.current.delete(id);
+   //    if (currentId === id) {
+   //       setCurrentId(null);
+   //       activeAudioRef.current = null;
+   //    }
+   // }, [currentId]);
+
+
+    /** unregister a ref */
    const unregisterAudio = useCallback((id: string) => {
+      const target = audioRefs.current.get(id);
+
       audioRefs.current.delete(id);
-      if (currentId === id) {
-         setCurrentId(null);
+
+      if (activeAudioRef.current === target) {
          activeAudioRef.current = null;
+         setCurrentId(null);
       }
-   }, [currentId]);
+
+   }, []);
 
 
    const pauseCurrent = useCallback(() => {

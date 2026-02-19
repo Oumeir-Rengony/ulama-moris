@@ -64,8 +64,8 @@ const useAudio = () => {
 
       return () => {
          if (audioEl) {
-            audioEl.removeEventListener('loadedMetadata', onLoadedMetadata);
-            audioEl.removeEventListener('timeUpdate', onTimeUpdate);
+            audioEl.addEventListener('loadedmetadata', onLoadedMetadata);
+            audioEl.addEventListener('timeupdate', onTimeUpdate);
             audioEl.removeEventListener('play', handlePlay);
             audioEl.removeEventListener('pause', handlePause);
             audioEl.removeEventListener("waiting", handleWaiting);
@@ -131,7 +131,7 @@ const useAudio = () => {
       const thumbCenter = thumbRect.left + thumbRect.width / 2;
       const mouseX = e.clientX;
 
-      const cooldown = 200; // ms
+      const cooldown = 140; // ms
 
       // respect cooldown
       if (lastSkipTimeRef.current && dayjs().diff(lastSkipTimeRef.current, "ms") < cooldown) {
