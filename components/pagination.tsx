@@ -28,7 +28,7 @@ const NextUIPagination: React.FC<PaginationProps> = (props) => {
         )
 
         return (
-          <PaginationItem role={null} isDisabled={disabled} {...props} key={key}/>
+          <PaginationItem role={undefined} isDisabled={disabled} {...props} key={key}/>
         );
     };
 

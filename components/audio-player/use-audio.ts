@@ -93,7 +93,7 @@ const useAudio = () => {
    // };
 
    const onSliderChange = (value: SliderValue) => {
-      if (!value && !internalAudioRef.current) return;
+      if (!value || !internalAudioRef.current) return;
       hasSliderChangedRef.current = true;
       setMediaTime(value as number);
       internalAudioRef.current.currentTime = value as number;

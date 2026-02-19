@@ -104,7 +104,7 @@ export const CreateApolloClient = ():ApolloClient<NormalizedCacheObject> => {
 };
 
 
-export const ExecuteQuery = async (query: DocumentNode, { variables = null , preview = false }) => {
+export const ExecuteQuery = async (query: DocumentNode, { variables = {} , preview = false }) => {
   const client = CreateApolloClient();
   const result = await client.query({ 
     query: query, 

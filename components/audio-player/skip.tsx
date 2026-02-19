@@ -13,7 +13,7 @@ interface SkipButtonProps {
 
 function SkipButton({ type, size, color, onSkip, className }: SkipButtonProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const timeoutRef = useRef(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {

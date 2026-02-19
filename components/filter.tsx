@@ -18,7 +18,10 @@ const Datepicker = dynamic(() => import("react-tailwindcss-datepicker").then(mod
 import { CalendarDays as DateIcon, SearchIcon} from "lucide-react";
 
 
-
+const defaultDate = {
+    startDate: '',
+    endDate: ''
+};
 export interface FilterProps {
     onSubmit?: Function;
 }
@@ -28,10 +31,7 @@ const Filter: React.FC<FilterProps> = ({
 }) => {
 
 
-    const [dateRange, setDateRange] = useState<DateRangeType>({
-        startDate: '',
-        endDate: ''
-    });
+    const [dateRange, setDateRange] = useState<DateRangeType>(defaultDate);
 
     const [title, setTitle] = useState<string>("");
 
@@ -86,7 +86,7 @@ const Filter: React.FC<FilterProps> = ({
                 primaryColor="blue"
                 startFrom={new Date()} 
                 value={dateRange} 
-                onChange={setDateRange}
+                onChange={(value) => setDateRange(value || defaultDate)}
                 toggleIcon={() => <DateIcon size={20}/>}
             />
 

@@ -25,7 +25,7 @@ export async function generateMetadata(
   const id = (await searchParams)?.id as string;
 
   if(!id){
-    return null;
+    return {};
   }
   
   const audio = await GetBayaanById(id);
@@ -53,12 +53,12 @@ export default async function Home(props: {
   const searchParams = await props.searchParams;
 
   const page = searchParams?.page ? +searchParams?.page : 1;
-  const startDate = searchParams?.startDate ? searchParams?.startDate as string : null;
-  const endDate = searchParams?.endDate ? searchParams?.endDate as string : null;
-  const search = searchParams?.search ? searchParams?.search as string : null;
+  const startDate = searchParams?.startDate ? searchParams?.startDate as string : "";
+  const endDate = searchParams?.endDate ? searchParams?.endDate as string : "";
+  const search = searchParams?.search ? searchParams?.search as string : "";
   
-  const validStartDate = dayjs(startDate).isValid() ? startDate : null;
-  const validEndDate = dayjs(endDate).isValid() ? endDate : null;
+  const validStartDate = dayjs(startDate).isValid() ? startDate : "";
+  const validEndDate = dayjs(endDate).isValid() ? endDate : "";
 
   
   return (
@@ -89,7 +89,7 @@ async function HomeLayout({
 }){
 
   const userAgent = (await headers()).get('user-agent');
-  const { isMobile } =  getSelectorsByUserAgent(userAgent);
+  const { isMobile } =  getSelectorsByUserAgent(userAgent || "");
   const pageSize = isMobile ? config.bayaan.pageSize.mobile : config.bayaan.pageSize.desktop;
 
   const audioList = await getBayaansWithPagination({ 

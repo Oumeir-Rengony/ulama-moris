@@ -17,9 +17,9 @@ import { toISODuration } from '@services/utils/utils.service';
 type Local = "local" | "international";
 
 export const getBayaansBase = cache(async ({
-    startDate = null, 
-    endDate = null,  
-    search = null, 
+    startDate = "", 
+    endDate = "",  
+    search = "", 
     limit = 0,
     skip = 0,
     type,
@@ -67,9 +67,9 @@ export const getBayaansBase = cache(async ({
 
 export const getBayaansWithPagination = cache(async ({
   page = 1,
-  startDate = null,
-  endDate = null,
-  search = null,
+  startDate = "",
+  endDate = "",
+  search = "",
   type,
   isMobile = true,
   isPreview = false,
@@ -104,10 +104,10 @@ export const getBayaansWithPagination = cache(async ({
 });
 
 export const getAllBayaans = cache(async ({
-  startDate = null,
-  endDate = null,
+  startDate = "",
+  endDate = "",
   type,
-  search = null,
+  search = "",
   isPreview = false,
 }: {
   startDate?: string;

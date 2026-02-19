@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useRef } from "react";
+import { JSX, useEffect, useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import AudioCard from "@components/card/audio-card";
+import AudioCard, { AudioCardProps } from "@components/card/audio-card";
 import { createQueryString } from "@services/utils/utils.service";
 import { AudioManager } from "@components/audio-player/audio-context";
 
@@ -33,7 +33,7 @@ const AudioList = ({ audioList }: {
             return
         }
 
-        const isInViewport = (element) => {
+        const isInViewport = (element: Element | null) => {
             if(!element){
                 return
             }
@@ -48,7 +48,7 @@ const AudioList = ({ audioList }: {
         }
 
         if (!isInViewport(controlsEl)) {
-            cardEl.scrollIntoView({ behavior: 'smooth' });
+            cardEl?.scrollIntoView({ behavior: 'smooth' });
         }
 
     },[queryParamId]);
@@ -68,7 +68,7 @@ const AudioList = ({ audioList }: {
         <div className="audio__list">
             <AudioManager>
             {
-                audioList?.map((audioItem) => {
+                audioList?.map((audioItem: any) => {
                     return (
                         <AudioCard
                             key={audioItem?.sys?.id}

@@ -46,7 +46,7 @@ const RelatedCard: React.FC<RelatedCardProps> = ({
 
             {description && <Card.Description description={description} />}
 
-            <Card.MediaInfo author={author} masjid={masjid?.title} location={masjid?.geoLink} date={date} />
+            <Card.MediaInfo author={author} masjid={masjid?.title || ""} location={masjid?.geoLink || ""} date={date} />
 
          </Card>
       </StyledWrapper>

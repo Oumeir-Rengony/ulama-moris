@@ -13,7 +13,7 @@ const RelatedFatwasList = async ({
 
    return (
       <StyledWrapper>
-         {fatwas?.data?.map((fatwa) => (
+         {fatwas?.data?.map((fatwa: any) => (
             <Link key={fatwa?.sys?.id} target="_blank" href={`${Config?.fatwas?.domain}/fatwas/${fatwa?.slug}`} passHref legacyBehavior>
                <a target="_blank" rel="noopener noreferrer" className="fatwas__card">
                   <RelatedFatwaCard {...fatwa} />

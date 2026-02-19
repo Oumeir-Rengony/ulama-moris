@@ -29,8 +29,8 @@ export async function GET(request: Request) {
       }
 
       const url = new URL(request.url);
-      const category = url.searchParams.get('category');
-      const limit = url.searchParams.get('limit');
+      const category = url.searchParams.get('category') || "";
+      const limit = url.searchParams.get('limit') || "3";
 
 
       //mufti.mu dont have access to currentSlug, date & total, hence null

@@ -6,6 +6,9 @@ import { styled } from "styled-system/jsx";
 const RelatedFatwaCard = ({
    title,
    category,
+}: {
+   title: string;
+   category?: string
 }) => {
    return (
       <StyledWrapper>

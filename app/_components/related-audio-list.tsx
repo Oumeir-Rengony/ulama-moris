@@ -14,7 +14,7 @@ const RelatedAudioList = async ({
    return (
       <StyledWrapper>
          {
-            audioList?.map((audioItem) => {
+            audioList?.map((audioItem: any) => {
                return (
                   <Link href={`/audio/${audioItem?.slug}`} className="related__card" key={audioItem?.sys?.id} passHref legacyBehavior>
                      <RelatedCard

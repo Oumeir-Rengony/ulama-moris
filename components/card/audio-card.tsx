@@ -100,7 +100,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
             <Card.MediaInfo author={author} masjid={masjid?.title} location={masjid?.geoLink} date={date} />
           </figcaption>
 
-          <AudioPlayer id={index} src={audio?.url} onPlay={onPlay} onPause={onPause} />
+          <AudioPlayer id={index || "0"} src={audio?.url} onPlay={onPlay} onPause={onPause} />
         </figure>
 
        { whatsAppLink && <Card.Footer whatsAppLink={whatsAppLink}/>}
