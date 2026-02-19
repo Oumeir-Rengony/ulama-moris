@@ -14,6 +14,7 @@ import Config from "@config/config.json";
 import { WithContext,  AudioObject, Event, ItemList, Person, Place, PostalAddress } from 'schema-dts';
 import { toISODuration } from '@services/utils/utils.service';
 
+type Local = "local" | "international";
 
 export const getBayaansBase = cache(async ({
     startDate = null, 
@@ -21,6 +22,7 @@ export const getBayaansBase = cache(async ({
     search = null, 
     limit = 0,
     skip = 0,
+    type,
     isPreview = false 
 }: { 
     limit?: number;
@@ -28,6 +30,7 @@ export const getBayaansBase = cache(async ({
     startDate?: string; 
     endDate?: string; 
     search?: string;
+    type?: Local,
     isPreview?: boolean; 
 }) => {
 
@@ -50,6 +53,7 @@ export const getBayaansBase = cache(async ({
     ...(startDate && { startDate }),
     ...(endDate && { endDate }),
     ...(search && { search }),
+    local: type
   };
 
 
@@ -66,6 +70,7 @@ export const getBayaansWithPagination = cache(async ({
   startDate = null,
   endDate = null,
   search = null,
+  type,
   isMobile = true,
   isPreview = false,
 }: {
@@ -73,6 +78,7 @@ export const getBayaansWithPagination = cache(async ({
   startDate?: string;
   endDate?: string;
   search?: string;
+  type?: Local;
   isMobile?: boolean;
   isPreview?: boolean;
 }): Promise<any> => {
@@ -89,6 +95,7 @@ export const getBayaansWithPagination = cache(async ({
     skip,
     startDate,
     endDate,
+    type,
     search,
     isPreview,
   });
@@ -99,10 +106,12 @@ export const getBayaansWithPagination = cache(async ({
 export const getAllBayaans = cache(async ({
   startDate = null,
   endDate = null,
+  type,
   search = null,
   isPreview = false,
 }: {
   startDate?: string;
+  type?: Local;
   endDate?: string;
   search?: string;
   isPreview?: boolean;
@@ -111,6 +120,7 @@ export const getAllBayaans = cache(async ({
   const result = await getBayaansBase({
     startDate,
     endDate,
+    type,
     search,
     isPreview,
   });
@@ -118,7 +128,7 @@ export const getAllBayaans = cache(async ({
   return result?.bayaanCollection;
 });
 
-export const getBayaanSlug = cache(async (isPreview: boolean = false): Promise<any[]> => {
+export const getBayaanSlug = cache(async (isPreview: boolean = false, type?: Local): Promise<any[]> => {
 
   const QUERY = gql`
     ${BayaanSlug}
@@ -126,6 +136,9 @@ export const getBayaanSlug = cache(async (isPreview: boolean = false): Promise<a
 
   const result = await ExecuteQuery(QUERY, {
     preview: isPreview,
+    variables: {
+      local: type
+    }
   });
 
   return result?.bayaanCollection?.items;

@@ -82,6 +82,12 @@ export const createQueryString = (searchParams: ReadonlyURLSearchParams, {
   return params.toString()
 }
 
+export const sleep = (ms: number) =>  {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 export const arrayify = (input: string | string[] | undefined): string[] => {
   if (!input) {
     return [];

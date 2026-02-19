@@ -1,5 +1,5 @@
-query GetBayaanSlug {
-  bayaanCollection (where: { slug_exists: true }) {
+query GetBayaanSlug($local: [String]) {
+  bayaanCollection (where: { slug_exists: true, local_contains_all: $local }) {
     items {
       sys{
         publishedAt

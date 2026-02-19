@@ -2,6 +2,7 @@ query GetBayaan (
   $startDate: DateTime, 
   $endDate: DateTime, 
   $search: String, 
+  $local: [String]
   # $categories: [String],
   $limit: Int, 
   $skip: Int
@@ -11,6 +12,7 @@ query GetBayaan (
       date_gte: $startDate,
       date_lte: $endDate,
       title_contains: $search,
+      local_contains_all: $local
       # category_in: $categories,
     },
     limit: $limit, 

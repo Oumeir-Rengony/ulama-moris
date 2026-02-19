@@ -7,6 +7,7 @@ fragment BayaanFields on Bayaan {
    description
    metaTitle
    metaDescription
+   local
    event
    date
    author

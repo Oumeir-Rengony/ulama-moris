@@ -1,10 +1,8 @@
-import AudioList from "./_components/audio-list";
+import AudioList from "../_components/audio-list";
 import Pagination from "@components/pagination";
 import Filter from "@components/filter";
 
 import { createAudioListJsonLd, GetBayaanById, getBayaansWithPagination  } from "@services/bayaans/bayaan.service";
-
-import { styled } from "../styled-system/jsx";
 
 import dayjs from "dayjs";
 import config from "@config/config.json";
@@ -15,6 +13,8 @@ import { Suspense } from "react";
 import Loading from "@components/loading";
 import Footer from "@components/footer";
 import BayaanSwicther from "@components/bayaan-switcher";
+import { styled } from "styled-system/jsx";
+
 
 //dynamic api, force page to be dynamic
 export async function generateMetadata(
@@ -47,7 +47,7 @@ export async function generateMetadata(
   }
 }
 
-export default async function Home(props: {
+export default async function International(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }){  
   const searchParams = await props.searchParams;
@@ -63,7 +63,7 @@ export default async function Home(props: {
   
   return (
     <Suspense fallback={<Loading/>}>
-      <HomeLayout
+      <PageLayout
         key={`${searchParams.page}`}
         page={page}
         startDate={validStartDate}
@@ -76,7 +76,7 @@ export default async function Home(props: {
 }
 
 
-async function HomeLayout({
+async function PageLayout({
   page,
   startDate,
   endDate,
@@ -96,7 +96,7 @@ async function HomeLayout({
     page: +page,
     startDate: startDate,
     endDate: endDate,
-    type: "local",
+    type: "international",
     search: search,
     isMobile: isMobile
   });
