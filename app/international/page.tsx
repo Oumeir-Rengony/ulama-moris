@@ -16,6 +16,9 @@ import BayaanSwicther from "@components/bayaan-switcher";
 import { styled } from "styled-system/jsx";
 
 
+const metaDesc = "Discover inspiring talks on the life and teachings of Prophet Muhammad (ﷺ) by respected Ulama from outside Mauritius, grounded in the Qur’an and Sunnah to help you strengthen your faith and grow spiritually—wherever you are.";
+
+
 
 
 
@@ -29,25 +32,23 @@ export async function generateMetadata(
 
   if(!id){
     return {
-      title: config.meta.title,
-      description: config.meta.description,
+      title: "Listen to Qur’an, Hadith & Islamic Lectures | Ulama Moris",
+      description: metaDesc,
       icons: "/favicon.ico",
       alternates: {
         canonical: "https://ulama-moris.org/international"
       },
-      // keywords: [],
-      // author: "",
       openGraph: {
-          title: config.meta.title,
-          description: config.meta.description,
-          siteName: "Ulama Moris",
-          type: 'website',
-          url: 'https://ulama-moris.org/international',
-          images: {
-            width: 900,
-            height: 600,
-            url: 'https://images.ctfassets.net/n7lbwg9xm90s/3piSujtUCq7IuclAQAeqtl/a3d014dd9277e17f73d07b31bb661724/open-graph-image.png'
-          }
+        title: config.meta.title,
+        description: "Discover inspiring talks on the life and teachings of Prophet Muhammad (ﷺ) by respected Ulama from outside Mauritius, grounded in the Qur’an and Sunnah to help you strengthen your faith and grow spiritually—wherever you are.",
+        siteName: "Ulama Moris",
+        type: 'website',
+        url: 'https://ulama-moris.org/international',
+        images: {
+          width: 900,
+          height: 600,
+          url: 'https://images.ctfassets.net/n7lbwg9xm90s/3piSujtUCq7IuclAQAeqtl/a3d014dd9277e17f73d07b31bb661724/open-graph-image.png'
+        }
       }
     }
   }
@@ -58,15 +59,16 @@ export async function generateMetadata(
  
   return {
     title: audio?.metaTitle || '',
-    description: audio?.metaDescription || '',
+    description: audio?.metaDescription || metaDesc,
     authors: audio?.author || '',
     openGraph: {
       ...openGraph,
       title: audio?.metaTitle || '',
-      description: audio?.metaDescription || '',
+      description: audio?.metaDescription || metaDesc,
+      url: 'https://ulama-moris.org/international',
     },
     alternates: {
-      canonical: 'https://ulama-moris.org'
+      canonical: 'https://ulama-moris.org/international'
     }
   }
 }
