@@ -16,6 +16,9 @@ import BayaanSwicther from "@components/bayaan-switcher";
 import { styled } from "styled-system/jsx";
 
 
+
+
+
 //dynamic api, force page to be dynamic
 export async function generateMetadata(
   { searchParams } : { searchParams: Promise<{ [key: string]: string | string[] | undefined }> },
@@ -25,7 +28,28 @@ export async function generateMetadata(
   const id = (await searchParams)?.id as string;
 
   if(!id){
-    return {};
+    return {
+      title: config.meta.title,
+      description: config.meta.description,
+      icons: "/favicon.ico",
+      alternates: {
+        canonical: "https://ulama-moris.org/international"
+      },
+      // keywords: [],
+      // author: "",
+      openGraph: {
+          title: config.meta.title,
+          description: config.meta.description,
+          siteName: "Ulama Moris",
+          type: 'website',
+          url: 'https://ulama-moris.org/international',
+          images: {
+            width: 900,
+            height: 600,
+            url: 'https://images.ctfassets.net/n7lbwg9xm90s/3piSujtUCq7IuclAQAeqtl/a3d014dd9277e17f73d07b31bb661724/open-graph-image.png'
+          }
+      }
+    }
   }
   
   const audio = await GetBayaanById(id);
@@ -159,6 +183,18 @@ const StyledWrapper = styled.div`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+
+  & .tabs {
+
+    @media(min-width: 768px){
+      width: max-content;
+      
+      & .tab {
+        flex: unset;
+      }
+    }
+
+  }
 
 
   & .heading {

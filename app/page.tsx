@@ -23,9 +23,10 @@ export async function generateMetadata(
 ): Promise<Metadata> {
 
   const id = (await searchParams)?.id as string;
+  const parentMeta = (await parent) || {};
 
   if(!id){
-    return {};
+    return parentMeta as Metadata
   }
   
   const audio = await GetBayaanById(id);
@@ -126,11 +127,13 @@ async function HomeLayout({
               </p>
             </div>
 
-            <Filter />
 
+            <Filter />
+            
             <BayaanSwicther />
 
             <AudioList audioList={audioList?.items}/>
+
 
           </div>
         </div>
@@ -159,6 +162,18 @@ const StyledWrapper = styled.div`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+
+  & .tabs {
+
+    @media(min-width: 768px){
+      width: max-content;
+      
+      & .tab {
+        flex: unset;
+      }
+    }
+
+  }
 
 
   & .heading {
@@ -239,8 +254,23 @@ const StyledWrapper = styled.div`
     }
 
     & .audio__card {
+
       @media(min-width: 768px){
         margin: 0;
+      }
+     
+    }
+
+    & .base__card {
+      height: 100%;
+
+      & .figure__desc {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+        padding-bottom: 0;
+        margin-bottom: 12px;
       }
     }
 
