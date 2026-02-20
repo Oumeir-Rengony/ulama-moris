@@ -282,6 +282,19 @@ const StyledWrapper = styled.div`
       }
     }
 
+    & .base__card {
+      height: 100%;
+
+      & .figure__desc {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+        padding-bottom: 0;
+        margin-bottom: 12px;
+      }
+    }
+
 
   }
 
