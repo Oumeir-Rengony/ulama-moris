@@ -83,7 +83,7 @@ function RelatedLectureCard({
 }) {
 
   return (
-    <Link href={`/audio/${slug}`}>
+    <Link href={`/audio/${slug}`} prefetch={false}>
       <article className="h-full group rounded-xl border border-border bg-card p-4 transition-all duration-300 hover:border-primary/40 hover:shadow-lg">
         <h4 className="mb-2 font-semibold text-foreground transition-colors group-hover:text-primary line-clamp-2">
           {item.title}
@@ -146,7 +146,7 @@ export default async function AudioDetailPage({
           <p className="mb-8 text-muted-foreground">
             The audio lecture you&apos;re looking for could not be found.
           </p>
-          <Link href="/">
+          <Link href="/" prefetch={false}>
             <Button>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
@@ -163,6 +163,7 @@ export default async function AudioDetailPage({
       <main className="mx-auto max-w-4xl px-4 py-8">
         {/* Back Button */}
         <Link
+          prefetch={false}
           href="/"
           className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
         >

@@ -61,7 +61,7 @@ export function AudioCard({
       <div className="p-5">
 
         {/* Title - Links to detail page */}
-        <Link href={`/audio/${slug}`} className="block">
+        <Link href={`/audio/${slug}`} prefetch={false} className="block">
           <h3 className="mb-3 text-lg font-semibold leading-tight text-foreground transition-colors group-hover:text-primary hover:underline">
             {title}
           </h3>
@@ -108,7 +108,7 @@ export function AudioCard({
           <Download className="h-4 w-4" />
           <span className="text-xs font-bold tracking-wider">Download</span>
         </a>
-        <Link href={whatsAppLink || "#"} className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors" title="Share on WhatsApp">
+        <Link prefetch={false} href={whatsAppLink || "#"} className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors" title="Share on WhatsApp">
           <WhatsApp />
           <span className="text-xs font-bold tracking-wider">Share</span>
         </Link>
