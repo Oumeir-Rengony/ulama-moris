@@ -10,7 +10,8 @@ export async function GET(req: NextRequest) {
 
    const urlObj = new URL(fileUrl);
 
-   if (urlObj.hostname !== "assets.ctfassets.net") {
+
+   if (urlObj.hostname !== "assets.ctfassets.net" && urlObj.hostname !== "downloads.ctfassets.net") {
       return new Response("Unauthorized", { status: 403 });
    }
 
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
             "Content-Disposition": `attachment; filename="${fileName}"`,
          },
       });
-      
+
    } catch (error) {
       return new Response("Error downloading file", { status: 500 });
    }

@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link";
 import { AudioPlayer } from "./audio-player"
 import { Download, Disc3 } from "lucide-react"
 
@@ -79,14 +80,15 @@ export function AudioDetailPlayer({ id, audioSrc, duration }: AudioDetailPlayerP
         </AudioPlayer.Controls>
 
         {/* Download Link */}
-        <a 
+        <Link
+          prefetch={false} 
           href={`/api/download?url=${audioSrc}`} 
           download 
           className="mt-8 flex items-center justify-center gap-2 text-white/70 hover:text-white transition-colors"
         >
           <Download className="h-4 w-4" />
           <span className="text-xs font-medium">Download Audio</span>
-        </a>
+        </Link>
       </div>
     </AudioPlayer.Root>
   )
