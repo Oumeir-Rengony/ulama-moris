@@ -80,15 +80,14 @@ export function AudioDetailPlayer({ id, audioSrc, duration }: AudioDetailPlayerP
         </AudioPlayer.Controls>
 
         {/* Download Link */}
-        <Link
-          prefetch={false} 
+        <a
           href={`/api/download?url=${audioSrc}`} 
           download 
           className="mt-8 flex items-center justify-center gap-2 text-white/70 hover:text-white transition-colors"
         >
           <Download className="h-4 w-4" />
           <span className="text-xs font-medium">Download Audio</span>
-        </Link>
+        </a>
       </div>
     </AudioPlayer.Root>
   )

@@ -99,15 +99,14 @@ export function AudioCard({
 
 
       <div className="flex justify-end gap-2 border-t border-border bg-secondary/30 px-5 py-2.5">
-        <Link
-          prefetch={false}
+        <a
           href={`/api/download?url=${audioSrc}`} 
           className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors" 
           title="Download Audio"
         >
           <Download className="h-4 w-4" />
           <span className="text-xs font-bold tracking-wider">Download</span>
-        </Link>
+        </a>
         <Link prefetch={false} href={whatsAppLink || "#"} className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors" title="Share on WhatsApp">
           <WhatsApp />
           <span className="text-xs font-bold tracking-wider">Share</span>
