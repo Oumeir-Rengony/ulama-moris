@@ -1,4 +1,4 @@
-import { getBayaanSlug } from '@services/bayaans/bayaan.service';
+import { getBayaanSlug } from '@/services/bayaans/bayaan.service';
 import type { MetadataRoute } from 'next';
 
 export const dynamic = 'force-dynamic';

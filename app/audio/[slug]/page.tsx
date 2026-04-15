@@ -1,356 +1,257 @@
-import { createAudioJsonLd, getBayaanBySlug, getBayaanSlug } from "@services/bayaans/bayaan.service";
-import Tag from "@components/tag";
-import { styled } from "styled-system/jsx";
-import IconLabel from "@components/icon-label";
-import { ArrowLeft, CalendarDays, Clock, MapPin, UserRound } from "lucide-react";
-import dayjs from "dayjs";
-import { arrayify, toTitleCase } from "@services/utils/utils.service";
-import { AudioManager } from "@components/audio-player/audio-context";
-import AudioPlayer from "@components/audio-player/audio-player";
-import RelatedAudioList from "app/_components/related-audio-list";
-import { Suspense } from "react";
-import { Metadata, ResolvingMetadata } from "next";
-import Link from "next/link";
-// import { getRelatedFatwas } from "@services/fatwas/fatwas.service"
-// import RelatedFatwasList from "app/_components/related-fatwas-list";
-import { getRelatedBayaans } from "@services/bayaans/bayaan.service";
-import Config from "@config/config.json";
-import Image from "next/image";
-import Footer from "@components/footer";
-// import AudioPlayerVisualizer from "app/_components/audio-player-visualizer";
-
+import Link from "next/link"
+import { Header } from "@/components/header"
+import { AudioDetailPlayer } from "@/components/audio-player"
+import {
+  User,
+  MapPin,
+  Calendar,
+  ArrowLeft,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { arrayify, cleanDescription, toTitleCase } from "@/lib/utils"
+import { getBayaanBySlug, getBayaanSlug, getRelatedBayaans } from "@/services/bayaans/bayaan.service"
+import dayjs from "dayjs"
+import CONFIG from "@/config/config.json";
+import { Suspense } from "react"
+import type { Metadata, ResolvingMetadata } from "next"
+import { AudioProvider } from "@/contexts/audio-context"
 
 export const dynamicParams = true;
 
 // Return a list of `params` to populate the [slug] dynamic segment
 export async function generateStaticParams() {
-   const audioList = await getBayaanSlug();
+  const audioList = await getBayaanSlug();
 
-   return audioList?.map((audio) => ({
-      slug: audio?.slug,
-   }))
+  return audioList?.items?.map((audio:any) => ({
+    slug: audio?.slug,
+  }))
 }
 
 export async function generateMetadata(
-   { params }: { params: Promise<{ slug: string }> },
-   parent: ResolvingMetadata
+  { params }: { params: Promise<{ slug: string }> },
+  parent: ResolvingMetadata
 ): Promise<Metadata> {
 
-   const { slug } = await params;
+  const { slug } = await params;
 
-   const { bayaan } = await getBayaanBySlug({ slug });
+  const { data } = await getBayaanBySlug({ slug });
 
-   const openGraph = (await parent).openGraph || {};
+  const openGraph = (await parent).openGraph || {};
 
-   return {
-      title: bayaan?.metaTitle || '',
-      description: bayaan?.metaDescription || '',
-      authors: bayaan?.author || '',
-      openGraph: {
-         ...openGraph,
-         title: bayaan?.metaTitle || '',
-         description: bayaan?.metaDescription || '',
-         url: `https://ulama-moris.org/audio/${slug}`,
-         audio: {
-            url: bayaan?.audio?.url || ''
-         },   
+  return {
+    title: data?.metaTitle || '',
+    description: data?.metaDescription || '',
+    authors: data?.author || '',
+    openGraph: {
+      ...openGraph,
+      title: data?.metaTitle || '',
+      description: data?.metaDescription || '',
+      url: `https://ulama-moris.org/audio/${slug}`,
+      audio: {
+        url: data?.audio?.url || ''
       },
-      alternates: {
-         canonical: `https://ulama-moris.org/audio/${slug}`
-      }
-   }
+    },
+    alternates: {
+      canonical: `https://ulama-moris.org/audio/${slug}`
+    }
+  }
 }
 
-// Multiple versions of this page will be statically generated
-// using the `params` returned by `generateStaticParams`
-export default async function Page({
-   params,
+
+async function RelatedLectureSection({
+  relatedLecturesPromise
 }: {
-   params: Promise<{ slug: string }>
+  relatedLecturesPromise: Promise<any[]>
+}) {
+  const relatedLectures = await relatedLecturesPromise;
+
+  return (
+    <>
+      {relatedLectures.map((item: any) => (
+        <RelatedLectureCard key={item?.sys?.id} item={item} slug={item?.slug} />
+      ))}
+    </>
+  )
+}
+
+function RelatedLectureCard({
+  item,
+  slug
+}: {
+  item: any;
+  slug: string
 }) {
 
-   const { slug } = await params;
-
-   const { bayaan, total } = await getBayaanBySlug({ slug });
-
-   const jsonLd = createAudioJsonLd(bayaan);
-
-   const {
-      audio,
-      author,
-      date,
-      description,
-      masjid,
-      title,
-      event,
-      category
-   } = bayaan;
-
-    const relatedAudioPromise = getRelatedBayaans({
-      currentSlug: slug,
-      event, 
-      date, 
-      category, 
-      totalBayaans: total,
-   });
-
-   // const relatedFatwasPromise = getRelatedFatwas(category);
-
-
-
-   const sanitizeDesc = description === "<p><br></p>" ? "" : description;
-
-
-   return (
-      <StyledWrapper>
-
-         <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-               __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
-            }}
-         />
-
-         <div className="header">
-            <div style={{ maxWidth: "720px", margin: '0 auto' }}>
-               <Link href="/" className="home-link">
-                  <ArrowLeft size={20} className="arrow" />
-                  <button>Back to Lectures</button>
-               </Link>
+  return (
+    <Link href={`/audio/${slug}`}>
+      <article className="h-full group rounded-xl border border-border bg-card p-4 transition-all duration-300 hover:border-primary/40 hover:shadow-lg">
+        <h4 className="mb-2 font-semibold text-foreground transition-colors group-hover:text-primary line-clamp-2">
+          {item.title}
+        </h4>
+        <div className="mt-auto space-y-1.5 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <User className="h-3.5 w-3.5 text-primary" />
+            <span>{item.author}</span>
+          </div>
+          {/* {item.masjid?.title && (
+              <a href={item?.masjid?.geoLink || "#"} className="flex items-center gap-2 text-sm text-muted-foreground pointer-events-none">
+                <MapPin className="h-4 w-4 shrink-0 text-primary" />
+                <span>{toTitleCase(item?.masjid?.title)}</span>
+              </a>
+            )} */}
+          {item.masjid?.title && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="h-4 w-4 shrink-0 text-primary" />
+              <span>{toTitleCase(item?.masjid?.title)}</span>
             </div>
-         </div>
+          )}
+          <div className="flex items-center gap-2">
+            <Calendar className="h-3.5 w-3.5 text-primary" />
+            <span>{dayjs(item?.date).format(CONFIG.bayaan.displayFormat)}</span>
+          </div>
+        </div>
+      </article>
+    </Link>
+  )
+}
+
+export default async function AudioDetailPage({
+  params
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const slug = (await params).slug;
+
+  const { data, total } = await getBayaanBySlug({
+    slug: slug
+  });
+
+  const relatedLecturesPromise = getRelatedBayaans({
+    currentSlug: slug,
+    event: data?.event,
+    date: data?.date,
+    category: data?.category,
+    totalBayaans: total
+  })
+
+  const audioDescription = cleanDescription(data?.description);
 
 
-         <div className="container" style={{ maxWidth: "720px", minHeight: '100vh', padding: '24px' }}>
-            <div className="row">
-               <div className="col">
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="mx-auto max-w-4xl px-4 py-16 text-center">
+          <h1 className="mb-4 text-2xl font-bold text-foreground">Audio Not Found</h1>
+          <p className="mb-8 text-muted-foreground">
+            The audio lecture you&apos;re looking for could not be found.
+          </p>
+          <Link href="/">
+            <Button>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+          </Link>
+        </main>
+      </div>
+    )
+  }
 
 
-                  <div className="tag-list">
-                     {
-                        category &&
-                        arrayify(category).map((cat, idx) => (
-                           <Tag key={idx} title={cat} />
-                        ))
-                     }
-                  </div>
+  return (
+    <div className="min-h-screen bg-background">
+      <main className="mx-auto max-w-4xl px-4 py-8">
+        {/* Back Button */}
+        <Link
+          href="/"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to all lectures
+        </Link>
 
-                  <h1 className="heading">{title}</h1>
+        {/* Header Section */}
+        <header className="mb-8">
 
-                  <div className="details">
-
-                     <IconLabel
-                        icon={<CalendarDays size={16} color="#71717a" aria-hidden="true" />}
-                        label={dayjs(date).format("MMM DD, YYYY")}
-                        ariaDescription="Date"
-                     />
-
-                     <IconLabel
-                        icon={<UserRound size={16} color="#71717a" aria-hidden="true" />}
-                        label={toTitleCase(author)}
-                        ariaDescription="Speaker"
-                     />
-
-                     {
-                        masjid &&
-                        <a href={masjid?.geoLink || "#"} target="_blank" className="figure__info-masjid" rel="noopener noreferrer">
-                           <IconLabel
-                              icon={<MapPin size={16} color="#71717a" aria-hidden="true" />}
-                              label={toTitleCase(masjid?.title)}
-                              ariaDescription="Masjid"
-                           />
-                        </a>
-                     }
-
-                  </div>
-
-                  <div className="player">
-                     <div className="image-wrapper">
-                        <Image
-                           src="https://images.ctfassets.net/n7lbwg9xm90s/7CDEWt7qQ4mJuVNTyhrcsG/bceace8b3d44c7ea4fb47b1244d26529/ulama-moris-logo.webp"
-                           alt={title || "Audio Image"}
-                           className="image"
-                           width={400}
-                           height={400}
-                           fetchPriority="high"
-                        />
-                     </div>
-
-                     <AudioManager>
-                        <AudioPlayer id={bayaan?.sys?.id} src={audio?.url} />
-                        {/* <AudioPlayerVisualizer id={bayaan?.sys?.id} src={audio?.url} /> */}
-                     </AudioManager>
-                  </div>
-
-                  {
-                     sanitizeDesc &&
-
-                     <div className="desc">
-                        <h2 className="desc__subtitle"> About this episode </h2>
-                        <div className="desc__para" dangerouslySetInnerHTML={{ __html: sanitizeDesc }} />
-                     </div>
-                  }
-
-                  <section className="lecture">
-                     <h2 className="lecture__subtitle"> More Lectures </h2>
-
-                     <Suspense>
-                        <RelatedAudioList relatedAudioPromise={relatedAudioPromise}/>
-                     </Suspense>
-                  </section>
-
-                  <section className="fatwas">
-                     <h2 className="fatwas__subtitle"> Related Fatwas </h2>
-                     <p className="fatwas__para">You can find more fatwas on <a className="mufti-link" target="_blank" href={Config.fatwas.domain}>mufti.mu</a> (Darul Iftaa Nu&apos;maniyyah)</p>
-
-                     {/* <Suspense>
-                        <RelatedFatwasList relatedFatwasPromise={relatedFatwasPromise}/>
-                     </Suspense> */}
-                  </section>
-
-               </div>
+          {data?.category?.length &&
+            <div className="flex justify-between py-3">
+              <div className="flex items-center gap-2">
+                {
+                  arrayify(data?.category)?.map((cat, idx) => (
+                    <span key={idx} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground border-border`}>
+                      {cat}
+                    </span>
+                  ))
+                }
+              </div>
             </div>
-         </div>
+          }
 
-         <Footer />
+          <h1 className="mb-6 text-3xl font-bold leading-tight text-foreground md:text-4xl text-balance">
+            {data?.title}
+          </h1>
 
-      </StyledWrapper>
-   )
+          {/* Meta Information */}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-primary" />
+              <time>{dayjs(data?.date).format(CONFIG.bayaan.displayFormat)}</time>
+            </div>
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-primary" />
+              <span className="font-medium text-foreground">{data?.author}</span>
+            </div>
+            {data?.masjid?.title && (
+              <a href={data?.masjid?.geoLink || "#"} className="flex items-center gap-2 text-sm text-muted-foreground pointer-events-none">
+                <MapPin className="h-4 w-4 shrink-0 text-primary" />
+                <span>{toTitleCase(data?.masjid?.title)}</span>
+              </a>
+            )}
+          </div>
+        </header>
+
+        <div className="mb-10">
+          <AudioProvider>
+            <AudioDetailPlayer id={data?.sys?.id} audioSrc={data?.audio?.url} duration={data?.duration}/>
+          </AudioProvider>
+        </div>
+
+        {/* About Section */}
+        {
+          audioDescription &&
+          <section className="mb-10">
+            <h2 className="mb-4 text-xl font-semibold text-foreground">About this episode</h2>
+            <div className="leading-relaxed text-muted-foreground" dangerouslySetInnerHTML={{ __html: audioDescription }} />
+          </section>
+        }
+
+        {/* More Lectures Section */}
+        <Suspense>
+          <section className="mb-10">
+            <h2 className="mb-6 text-xl font-semibold text-foreground">More Lectures</h2>
+            <div className="grid gap-4 sm:grid-cols-2 auto-rows-fr">
+              <RelatedLectureSection relatedLecturesPromise={relatedLecturesPromise} />
+            </div>
+          </section>
+        </Suspense>
+
+        {/* Related Fatwas Section */}
+        {/* <section className="rounded-xl border border-border bg-secondary/30 p-6">
+          <h2 className="mb-3 text-xl font-semibold text-foreground">Related Fatwas</h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            You can find more fatwas on mufti.mu (Darul Iftaa Nu&apos;maniyyah)
+          </p>
+          <a 
+            href="https://mufti.mu" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+          >
+            Visit mufti.mu
+            <ExternalLink className="h-4 w-4" />
+          </a>
+        </section> */}
+      </main>
+    </div>
+  )
 }
-
-
-const StyledWrapper = styled.div`
-
-& .header {
-   width:  100%;
-   background: oklab(1 0 0 / 0.5);
-   backdrop-filter: blur(8px);
-   border: solid oklab(0.9 -0.005 0.00866025 / 0.5) 1px;
-   padding: 16px;
-
-   & .home-link {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: transform 0.3s ease;
-
-      &:hover {
-         transform: translateX(-3px);
-      }
-   }
-}
-
-& .container {
-
-   & .tag-list {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-
-      & .tag {
-         font-size: 14px;
-         border-radius: 12px;
-         padding: 4px 16px;
-      }
-
-   }
-
-   & .heading {
-      font-size: 24px;
-      line-height: 1.25;
-      font-weight: 700;
-      color: #202318;
-      margin-bottom: 16px;
-   }  
-
-
-   & .details {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 40px;
-
-      & .icon__label-text {
-         font-size: 14px;
-      }
-
-   }
-
-   & .player {
-      padding-bottom: 12px;
-
-      & .image-wrapper {
-         max-width: 400px;
-         margin-right: auto;
-         margin-left: auto;
-         margin-bottom: 40px;
-
-         & .image {
-            width: 100%;
-            border-radius: 20px;
-            z-index: 2;
-         }
-
-      }
-
-   }
-
-   & .desc {
-      margin-bottom: 24px;
-
-      & .desc__subtitle {
-         margin-bottom: 16px;
-         font-size: 20px;
-         font-weight: 600;
-      }
-
-      & .desc__para {
-         color: #71717a;
-         line-height: 26px;
-      }
-   }
-
-   & .lecture {
-
-      & .lecture__subtitle {
-         margin-bottom: 24px;
-         font-size: 20px;
-         font-weight: 600;
-      }
-
-      margin-bottom: 24px;
-
-   }
-
-   & .fatwas {
-
-      & .fatwas__subtitle {
-         margin-bottom: 16px;
-         font-size: 20px;
-         font-weight: 600;
-      }
-
-      & .fatwas__para {
-         color: #71717a;
-         line-height: 26px;
-         margin-bottom: 24px;
-
-         & .mufti-link {
-            color: #7abd3b;
-            transition: color 0.1s ease;
-
-            &:hover {
-               color: #059669;
-            }
-         }
-
-      }
-
-      & .tag-list {
-         margin-bottom: 12px;
-      }
-
-   }
-}
-
-`

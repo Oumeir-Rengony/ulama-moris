@@ -1,0 +1,1 @@
+export { default as AssetsFragment } from "./assets.fragment"

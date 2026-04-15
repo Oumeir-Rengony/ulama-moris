@@ -1,20 +1,25 @@
 import { cache } from 'react';
 import { gql } from '@apollo/client'; 
-import { ExecuteQuery } from '@services/apollo/apollo.service';
-import BayaanQuery from './query/bayaan.gql';
-import BayaanByIDQuery from "./query/bayaanByID.gql";
-import AssetsFragment from '@services/graphql/assets.fragment.gql';
-import BayaanSlug from './query/bayaanSlug.gql';
-import BayaanFields from './query/bayaan.fragment.gql';
-import BayaanBySlug from './query/bayaanBySlug.gql';
-import RelatedBayaanQuery from "./query/relatedBayaans.gql";
-import BayaanTotalQuery from "./query/bayaanTotal.gql";
-import dayjs from 'dayjs';
-import Config from "@config/config.json";
-import { WithContext,  AudioObject, Event, ItemList, Person, Place, PostalAddress } from 'schema-dts';
-import { toISODuration } from '@services/utils/utils.service';
+import { ExecuteQuery } from '@/services/apollo/apollo.service';
 
-type Local = "local" | "international";
+import dayjs from 'dayjs';
+import Config from "@/config/config.json";
+import { WithContext,  AudioObject, Event, ItemList, Person, Place, PostalAddress } from 'schema-dts';
+import { toISODuration } from '@/lib/utils';
+
+import {
+  BayaanFragment,
+  BayaanQuery,
+  bayaanSlugQuery,
+  BayaanBySlugQuery,
+  BayaanByIDQuery,
+  BayaanTotalQuery,
+  RelatedBayaanQuery
+} from "./query"
+
+import { AssetsFragment } from '@/services/query';
+
+export type Local = "local" | "international";
 
 export const getBayaansBase = cache(async ({
     startDate = "", 
@@ -32,11 +37,11 @@ export const getBayaansBase = cache(async ({
     search?: string;
     type?: Local,
     isPreview?: boolean; 
-}) => {
+}): Promise<{bayaanCollection: any}> => {
 
   const QUERY = gql`
     ${AssetsFragment}
-    ${BayaanFields}
+    ${BayaanFragment}
     ${BayaanQuery}
   `;
 
@@ -128,10 +133,10 @@ export const getAllBayaans = cache(async ({
   return result?.bayaanCollection;
 });
 
-export const getBayaanSlug = cache(async (isPreview: boolean = false, type?: Local): Promise<any[]> => {
+export const getBayaanSlug = cache(async (isPreview: boolean = false, type?: Local): Promise<any> => {
 
   const QUERY = gql`
-    ${BayaanSlug}
+    ${bayaanSlugQuery}
   `;
 
   const result = await ExecuteQuery(QUERY, {
@@ -141,7 +146,7 @@ export const getBayaanSlug = cache(async (isPreview: boolean = false, type?: Loc
     }
   });
 
-  return result?.bayaanCollection?.items;
+  return result?.bayaanCollection;
 })
 
 export const getBayaanBySlug = cache(async ({
@@ -154,8 +159,8 @@ export const getBayaanBySlug = cache(async ({
 
   const QUERY = gql`
     ${AssetsFragment}
-    ${BayaanFields}
-    ${BayaanBySlug}
+    ${BayaanFragment}
+    ${BayaanBySlugQuery}
   `;
 
   const result = await ExecuteQuery(QUERY, {
@@ -163,8 +168,9 @@ export const getBayaanBySlug = cache(async ({
     preview: isPreview,
   });
 
+
   return {
-    bayaan: result?.bayaanCollection?.items?.[0],
+    data: result?.bayaanCollection?.items?.[0],
     total: result?.bayaanCollection?.total
   }
 })
@@ -177,7 +183,7 @@ export const GetBayaanById = cache(async (
 
   const QUERY = gql`
     ${AssetsFragment}
-    ${BayaanFields}
+    ${BayaanFragment}
     ${BayaanByIDQuery}
   `;
 
@@ -200,7 +206,7 @@ const getTotalBayaan = cache(async (isPreview?: boolean):Promise<number> => {
   `;
 
   const result = await ExecuteQuery(QUERY, {
-    preview: isPreview
+    preview: isPreview || false
   })
 
   return result?.bayaanCollection?.total;
@@ -250,7 +256,7 @@ export const getRelatedBayaans = cache(async ({
 
   const RELATED_QUERY = gql`
     ${AssetsFragment}
-    ${BayaanFields}
+    ${BayaanFragment}
     ${RelatedBayaanQuery}
   `;
 

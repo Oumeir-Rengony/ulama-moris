@@ -1,0 +1,25 @@
+import { gql} from "@apollo/client";
+
+export default gql`fragment BayaanFields on Bayaan {
+         sys {
+            id
+         }
+         title
+         slug
+         description
+         metaTitle
+         metaDescription
+         local
+         event
+         date
+         author
+         duration
+         category
+         masjid {
+            title
+            geoLink
+         }
+         audio {
+            ...AssetsFields
+         }
+      }`

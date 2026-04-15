@@ -1,62 +1,34 @@
-import { Metadata, Viewport } from "next";
-import localFont from 'next/font/local';
-import { HeroProvider } from "./_components/hero-provider";
-import config from "@config/config.json";
-import "public/styles/bootstrap-grid/bootstrap-grid.min.css";
-import "public/styles/global.css";
+import type { Metadata, Viewport } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
+import './globals.css'
+import { Header } from '@/components/header';
+import Footer from '@/components/footer';
 
-const Objektiv = localFont({
-  src: [
-    {
-      path: '../public/fonts/objektivmk3_regular.woff2',
-      weight: '400',
-      style: 'normal',
-      
-    },
-    {
-      path: '../public/fonts/objektivmk3_regular.woff',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: '../public/fonts/objektivmk3_bold.woff2',
-      weight: '600',
-      style: 'normal',
-    },
-    {
-      path: '../public/fonts/objektivmk3_bold.woff',
-      weight: '600',
-      style: 'normal',
-    }
-  ],
-  preload: true,
-  display: 'swap'
-});
-
-
+const _geist = Geist({ subsets: ["latin"] });
+const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: config.meta.title,
-    description: config.meta.description,
-    icons: "/favicon.ico",
-    alternates: {
-      canonical: "https://www.ulama-moris.org/"
-    },
-    // keywords: [],
-    // author: "",
-    openGraph: {
-        title: config.meta.title,
-        description: config.meta.description,
-        siteName: "Ulama Moris",
-        type: 'website',
-        url: 'https://ulama-moris.org',
-        images: {
-          width: 900,
-          height: 600,
-          url: 'https://images.ctfassets.net/n7lbwg9xm90s/3piSujtUCq7IuclAQAeqtl/a3d014dd9277e17f73d07b31bb661724/open-graph-image.png'
-        }
+  title: 'Ulama Moris - Listen to Quran, Hadith & Islamic Lectures',
+  description: 'Learn Islam through Audio from Our Ulama. Listen to Quran, Hadith, and Islamic Lectures from respected scholars of Mauritius.',
+  icons: "/logo-32.png",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://ulama-moris.org"),
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_SITE_URL
+  },
+  openGraph: {
+    title: 'Ulama Moris - Listen to Quran, Hadith & Islamic Lectures',
+    description: 'Learn Islam through Audio from Our Ulama. Listen to Quran, Hadith, and Islamic Lectures from respected scholars of Mauritius.',
+    siteName: "Ulama Moris",
+    type: 'website',
+    url: process.env.NEXT_PUBLIC_SITE_URL,
+    images: {
+      url: "/logo.webp",
+      alt: "Ulama Moris",
+      width: 541,
+      height: 541
     }
-      
+  }
 }
 
 
@@ -71,22 +43,17 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
-    <html suppressHydrationWarning lang="en">
-      <head>
-        <meta name="google-site-verification" content="dCyBqbQv8GnhAaPoaGezXNYA5VZ-NrXi-AR4FoxHUuk" />
-      </head>
-      <body className={`${Objektiv.className} antialiased`} >
-        <HeroProvider themeProps={{ attribute: "class", defaultTheme: "light" }}>
-            <main>              
-                {children}
-                {/* <Analytics mode="production" /> */}
-            </main>
-        </HeroProvider>
+    <html lang="en">
+      <body className="font-sans antialiased">
+          <Header/>
+          {children}
+          <Footer/>
+        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
-  );
+  )
 }
