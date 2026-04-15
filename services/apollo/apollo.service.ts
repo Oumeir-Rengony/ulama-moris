@@ -63,7 +63,7 @@ const Retry = new RetryLink({
       jitter: true,
    },
    attempts: {
-      max: 5,
+      max: 3,
       retryIf: (error, operation) => {
          if (error) {
             console.log("Retry condition triggered:", JSON.stringify(error));

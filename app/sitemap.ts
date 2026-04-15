@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
    const audioList = await getBayaanSlug();
 
-   const audioSitemap: MetadataRoute.Sitemap  = audioList?.map((audio) => ({
+   const audioSitemap: MetadataRoute.Sitemap  = audioList?.items?.map((audio: any) => ({
       url: `${domain}/audio/${audio?.slug}`,
       lastModified: audio?.sys?.publishedAt,
       changeFrequency: 'yearly',
