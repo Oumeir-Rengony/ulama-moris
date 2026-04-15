@@ -30,7 +30,7 @@ export function Header() {
             Home
           </a>
           {/* <a
-            href="#"
+            href="/"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             Lectures
@@ -75,7 +75,7 @@ export function Header() {
       {mobileMenuOpen && (
         <div className="border-t border-border bg-background px-4 py-4 md:hidden">
           <nav className="flex flex-col gap-3">
-            <a href="#" className="rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
+            <a href="/" className="rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
               Home
             </a>
             {/* <a href="#" className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
@@ -84,7 +84,7 @@ export function Header() {
             <a href="#" className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
               Scholars
             </a> */}
-            <a href="#" className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+            <a href="/about" className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
               About
             </a>
             <a 
