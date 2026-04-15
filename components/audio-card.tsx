@@ -100,8 +100,7 @@ export function AudioCard({
 
       <div className="flex justify-end gap-2 border-t border-border bg-secondary/30 px-5 py-2.5">
         <a 
-          href={audioSrc} 
-          download 
+          href={`/api/download?url=${audioSrc}`} 
           className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors" 
           title="Download Audio"
         >
