@@ -4,14 +4,15 @@ import { NextRequest } from "next/server";
 export async function GET(req: NextRequest) {
    const fileUrl = req.nextUrl.searchParams.get("url");
 
+
    if (!fileUrl) {
       return new Response("Missing file URL", { status: 400 });
    }
 
    const urlObj = new URL(fileUrl);
 
-
-   if (urlObj.hostname !== "assets.ctfassets.net" && urlObj.hostname !== "downloads.ctfassets.net") {
+   
+   if ( urlObj.hostname !== "ctfassets.net" && !urlObj.hostname.endsWith(".ctfassets.net")) {
       return new Response("Unauthorized", { status: 403 });
    }
 
