@@ -43,7 +43,7 @@ export default async function Page({
                fontWeight: "bold"
 
             }}>
-            <img src={`${process.env.NEXT_PUBLIC_SITE_URL}/bg1.jpg`} width={1200} height={600} />
+            <img src={`${process.env.NEXT_PUBLIC_SITE_URL}/og.jpg`} width={1200} height={800} />
 
             <div
                style={{
@@ -94,7 +94,7 @@ export default async function Page({
                      color: '#fff'
                   }}
                >
-                  Speaker
+                  Mufti Houzeifa Mamoojee
                </p>
             </div>
          </div>
