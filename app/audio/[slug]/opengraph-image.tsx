@@ -1,3 +1,4 @@
+import { getBayaanBySlug } from "@/services/bayaans/bayaan.service"
 import { ImageResponse } from "next/og"
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -7,7 +8,7 @@ import { join } from 'node:path'
 export const alt = 'Ulama Moris'
 export const size = {
   width: 1200,
-  height: 800,
+  height: 630,
 }
 
 export const contentType = 'image/jpeg';
@@ -20,10 +21,11 @@ export default async function Image({
 }) {
   const { slug } = await params;
 
-  // Font loading, process.cwd() is Next.js project directory
-  const ElMessiri = await readFile(
-    join(process.cwd(), 'public/font/ElMessiri-SemiBold.ttf')
-  )
+  const [ElMessiri, { data }] = await Promise.all([
+    readFile(join(process.cwd(), 'public/font/ElMessiri-SemiBold.ttf')),
+    getBayaanBySlug({ slug }),
+  ]);
+
 
   return new ImageResponse(
     (
@@ -39,7 +41,7 @@ export default async function Image({
 
 
 
-        <img src={`${process.env.NEXT_PUBLIC_SITE_URL}/og.jpg`} width={1200} height={800} />
+        <img src={`${process.env.NEXT_PUBLIC_SITE_URL}/og.jpg`} width={1200} height={630} />
 
         <div
           style={{
@@ -47,7 +49,7 @@ export default async function Image({
             flexDirection: 'column',
             maxWidth: '768px',
             position: 'absolute',
-            top: '25%',
+            top: '20%',
             transform: 'translateY(-50%)',
             color: '#fff',
             textAlign: 'center'
@@ -61,7 +63,7 @@ export default async function Image({
               lineHeight: 1
             }}
           >
-            {slug.replace(/-/g, " ")}
+            {data?.metaTitle}
           </h1>
 
 
@@ -71,16 +73,16 @@ export default async function Image({
           style={{
             display: 'flex',
             position: 'absolute',
-            bottom: '12.5%'
+            bottom: '8%'
           }}
         >
           <p
             style={{
-              fontSize: '30px',
+              fontSize: '36px',
               color: '#fff'
             }}
           >
-            Mufti Houzeifa Mamoojee
+            By { data?.author }
           </p>
         </div>
 

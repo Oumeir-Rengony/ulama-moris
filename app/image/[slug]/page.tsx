@@ -33,71 +33,76 @@ export default async function Page({
    const { slug } = await params;
 
    return (
-      <div className="flex justify-center relative" style={{ fontFamily: "El Messiri, sans-serif", fontWeight: "bold" }}>
-         <div
+       <div
+        style={{
+          display: 'flex',
+          justifyContent: "center",
+          position: 'relative',
+          fontFamily: "El Messiri, sans-serif",
+          fontWeight: "bold"
+
+        }}>
+
+        <img src={`${process.env.NEXT_PUBLIC_SITE_URL}/og.jpg`} width={1200} height={800} />
+
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            maxWidth: '768px',
+            position: 'absolute',
+            top: '40%',
+            transform: 'translateY(-50%)',
+            color: '#fff',
+            textAlign: 'center'
+          }}>
+
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <g transform="scale(-1, 1) translate(-24, 0)">
+              <path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" />
+              <path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" />
+            </g>
+          </svg>
+
+          <h1
             style={{
-               display: 'flex',
-               justifyContent: "center",
-               position: 'relative',
-               fontFamily: "El Messiri, sans-serif",
-               fontWeight: "bold"
+              fontSize: '72px',
+              color: '#fff',
+              padding: '0 4px',
+              lineHeight: 1
+            }}
+          >
+            {slug.replace(/-/g, " ")}
+          </h1>
 
-            }}>
-            <img src={`${process.env.NEXT_PUBLIC_SITE_URL}/og.jpg`} width={1200} height={800} />
+          <div style={{ display: 'flex', flexDirection: 'row-reverse' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <g transform="scale(1, 1)">
+                <path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" />
+                <path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" />
+              </g>
+            </svg>
+          </div>
 
-            <div
-               style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  maxWidth: '768px',
-                  position: 'absolute',
-                  top: '40%',
-                  transform: 'translateY(-50%)',
-                  color: '#fff',
-                  textAlign: 'center'
-               }}>
-               <Quote
-                  style={{
-                     transform: 'rotateY(180deg)',
-                     // verticalAlign: 'top'
-                  }}
-                  size={32}
-               />
-               <h1
-                  style={{
-                     fontSize: '72px',
-                     color: '#fff',
-                     padding: '0 4px'
+        </div>
 
-                  }}
-               >
-                  {slug.replace(/-/g, " ")}
-               </h1>
-               <Quote
-                  style={{
-                     alignSelf: 'flex-end'
-                  }}
-                  size={32}
-               />
-            </div>
+        <div
+          style={{
+            display: 'flex',
+            position: 'absolute',
+            bottom: '12.5%'
+          }}
+        >
+          <p
+            style={{
+              fontSize: '30px',
+              color: '#fff'
+            }}
+          >
+            Mufti Houzeifa Mamoojee
+          </p>
+        </div>
 
-            <div
-               style={{
-                  display: 'flex',
-                  position: 'absolute',
-                  bottom: '12.5%'
-               }}
-            >
-               <p
-                  style={{
-                     fontSize: '30px',
-                     color: '#fff'
-                  }}
-               >
-                  Mufti Houzeifa Mamoojee
-               </p>
-            </div>
-         </div>
       </div>
    )
 
