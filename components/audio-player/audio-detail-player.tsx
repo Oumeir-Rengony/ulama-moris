@@ -3,14 +3,31 @@
 import Link from "next/link";
 import { AudioPlayer } from "./audio-player"
 import { Download, Disc3 } from "lucide-react"
+import { toast } from "sonner";
 
 interface AudioDetailPlayerProps {
   id: string;
   duration: string;
-  audioSrc: string
+  audioSrc: string;
+  title: string;
 }
 
-export function AudioDetailPlayer({ id, audioSrc, duration }: AudioDetailPlayerProps) {  
+export function AudioDetailPlayer({ id, audioSrc, duration, title }: AudioDetailPlayerProps) {  
+
+  const showToast = () => {
+    toast(title, {
+      description: "Download started. Check your download folder",
+      position: 'bottom-center',
+      actionButtonStyle: {
+        background: 'var(--primary)',
+      },
+      action: {
+        label: "OK",
+        onClick: () => { },
+      },
+    })
+  }
+  
   return (
     <AudioPlayer.Root
       id={id}
@@ -84,7 +101,7 @@ export function AudioDetailPlayer({ id, audioSrc, duration }: AudioDetailPlayerP
           href={`/api/download?url=${audioSrc}`} 
           download 
           className="mt-8 flex items-center justify-center gap-2 text-white/70 hover:text-white transition-colors"
-          target="_blank"
+          onClick={showToast}
         >
           <Download className="h-4 w-4" />
           <span className="text-xs font-medium">Download Audio</span>

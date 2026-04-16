@@ -8,6 +8,7 @@ import dayjs from "dayjs"
 import { arrayify, cleanDescription, cn, toTitleCase } from "@/lib/utils"
 import CONFIG from "@/config/config.json"
 import { WhatsApp } from "@/components/icons"
+import { toast } from "sonner"
 
 interface AudioCardProps {
   id: string;
@@ -39,11 +40,25 @@ export function AudioCard({
   whatsAppLink
 }: AudioCardProps) {
 
+  const showToast = () => {
+    toast(title, {
+      description: "Download started. Check your download folder",
+      position: 'bottom-center',
+      actionButtonStyle: {
+        background: 'var(--primary)',
+      },
+      action: {
+        label: "OK",
+        onClick: () => { },
+      },
+    })
+  }
+
   return (
     <article className="group relative overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5">
-      
+
       {/* Category Badge & Play Button Header */}
-      { category?.length &&
+      {category?.length &&
         <div className="flex justify-between border-b border-border bg-secondary/30 px-5 py-2.5 md:py-3">
           <div className="flex items-center gap-2">
             {
@@ -69,7 +84,7 @@ export function AudioCard({
 
         {/* Description */}
         {
-          description && <div className="mb-4 line-clamp-2 text-sm leading-relaxed text-muted-foreground" dangerouslySetInnerHTML={{__html: cleanDescription(description) as string }}/>
+          description && <div className="mb-4 line-clamp-2 text-sm leading-relaxed text-muted-foreground" dangerouslySetInnerHTML={{ __html: cleanDescription(description) as string }} />
         }
 
         {/* Metadata */}
@@ -90,21 +105,21 @@ export function AudioCard({
           </div>
 
         </div>
-       
+
 
         {/* Audio Player */}
-        <AudioCardPlayer id={id} audioSrc={audioSrc} duration={duration}/>
+        <AudioCardPlayer id={id} audioSrc={audioSrc} duration={duration} />
 
       </div>
 
 
       <div className="flex justify-end gap-2 border-t border-border bg-secondary/30 px-5 py-2.5">
         <a
-          href={`/api/download?url=${audioSrc}`} 
-          className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors" 
+          href={`/api/download?url=${audioSrc}`}
+          className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors"
           title="Download Audio"
           download
-          target="_blank"
+          onClick={showToast}
         >
           <Download className="h-4 w-4" />
           <span className="text-xs font-bold tracking-wider">Download</span>
