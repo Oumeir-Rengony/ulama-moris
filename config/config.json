@@ -11,6 +11,13 @@
       "dateFilterFormat": "YYYY-MM-DD",
       "displayFormat": "DD MMMM YYYY"
    },
+   "article": {
+      "pageSize": {
+         "mobile": 6,
+         "desktop": 9
+      },
+      "displayFormat": "DD MMMM YYYY"
+   },
    "filter": {
       "calendarFormat": "YYYY-MM-DD"
    },
