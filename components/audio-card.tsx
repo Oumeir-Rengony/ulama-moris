@@ -60,7 +60,7 @@ export function AudioCard({
       {/* Category Badge & Play Button Header */}
       {category?.length &&
         <div className="flex justify-between border-b border-border bg-secondary/30 px-5 py-2.5 md:py-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {
               arrayify(category).map((cat, idx) => (
                 <span key={idx} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground border-border`}>
@@ -122,11 +122,11 @@ export function AudioCard({
           onClick={showToast}
         >
           <Download className="h-4 w-4" />
-          <span className="text-xs font-bold tracking-wider">Download</span>
+          <p className="text-xs font-bold tracking-wider">Download <span className="sr-only">{title}</span></p>
         </a>
         <Link prefetch={false} href={whatsAppLink || "#"} className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors" title="Share on WhatsApp">
           <WhatsApp />
-          <span className="text-xs font-bold tracking-wider">Share</span>
+          <p className="text-xs font-bold tracking-wider">Share <span className="sr-only">{title}</span></p>
         </Link>
       </div>
 

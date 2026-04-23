@@ -104,7 +104,7 @@ export function AudioDetailPlayer({ id, audioSrc, duration, title }: AudioDetail
           onClick={showToast}
         >
           <Download className="h-4 w-4" />
-          <span className="text-xs font-medium">Download Audio</span>
+          <p className="text-xs font-medium">Download Audio <span className="sr-only">{title}</span></p>
         </a>
       </div>
     </AudioPlayer.Root>
