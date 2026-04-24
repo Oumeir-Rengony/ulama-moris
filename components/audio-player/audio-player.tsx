@@ -109,7 +109,7 @@ function PlayPause({ className, size = "md", variant = "primary" }: PlayPausePro
 
   return (
     <button
-      onClick={handleClick}
+      onClick={!showBuffering ? handleClick : undefined}
       className={cn(
         "flex shrink-0 items-center justify-center rounded-full transition-all duration-200",
         sizeStyles[size],
@@ -123,7 +123,7 @@ function PlayPause({ className, size = "md", variant = "primary" }: PlayPausePro
       ) : isPlayingThisTrack ? (
         <Pause className={iconSizes[size]} fill="currentColor" />
       ) : (
-        <Play className={cn(iconSizes[size], "translate-x-0.5")} fill="currentColor" />
+        <Play className={cn(iconSizes[size], "")} fill="currentColor" />
       )}
     </button>
   )
