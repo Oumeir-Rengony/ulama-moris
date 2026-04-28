@@ -5,6 +5,7 @@ import { useAudio, type AudioTrack } from "@/contexts/audio-context"
 import { Play, Pause, RotateCcw, RotateCw, Loader2 } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
 import { cn, formatTime } from "@/lib/utils"
+import posthog from "posthog-js"
 
 // ============================================================================
 // Root Component - Now just provides track context to children
@@ -83,8 +84,14 @@ function PlayPause({ className, size = "md", variant = "primary" }: PlayPausePro
   const { playTrack, isBuffering } = useAudio()
 
   const handleClick = useCallback(() => {
+    const willPlay = !isPlayingThisTrack
     playTrack(track)
-  }, [playTrack, track])
+    posthog.capture(willPlay ? 'audio_played' : 'audio_paused', {
+      audio_id: track.id,
+      audio_title: track.title,
+      audio_author: track.author,
+    })
+  }, [playTrack, track, isPlayingThisTrack])
 
   // Show buffering state only for the current track
   const showBuffering = isCurrentTrack && isBuffering
@@ -190,6 +197,11 @@ function Progress({ className, thumbSize = "md", trackHeight = "md" }: ProgressP
       if (!isCurrentTrack) {
         playTrack(track)
       }
+      posthog.capture('audio_seeked', {
+        audio_id: track.id,
+        audio_title: track.title,
+        seek_position_seconds: value[0],
+      })
     },
     [isCurrentTrack, playTrack, track]
   )

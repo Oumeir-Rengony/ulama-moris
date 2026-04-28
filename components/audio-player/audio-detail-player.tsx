@@ -1,30 +1,61 @@
 "use client"
 
-import Link from "next/link";
+import type { MouseEvent } from "react"
 import { AudioPlayer } from "./audio-player"
 import { Download, Disc3 } from "lucide-react"
-import { toast } from "sonner";
+import { toast } from "sonner"
+import posthog from "posthog-js"
 
 interface AudioDetailPlayerProps {
-  id: string;
-  duration: string;
-  audioSrc: string;
-  title: string;
+  id: string
+  duration: string
+  audioSrc: string
+  title: string
+  author?: string
+  slug?: string
 }
 
-export function AudioDetailPlayer({ id, audioSrc, duration, title }: AudioDetailPlayerProps) {  
+export function AudioDetailPlayer({
+  id,
+  audioSrc,
+  duration,
+  title,
+  author,
+  slug,
+}: AudioDetailPlayerProps) {
+  const buildDownloadHref = (distinctId?: string) =>
+    `/api/download?${new URLSearchParams({
+      url: audioSrc,
+      audioId: id,
+      audioTitle: title,
+      audioAuthor: author || "",
+      audioSlug: slug || "",
+      source: "detail",
+      ...(distinctId ? { distinct_id: distinctId } : {}),
+    }).toString()}`
 
   const showToast = () => {
     toast(title, {
       description: "Download started. Check your download folder",
-      position: 'bottom-center',
+      position: "bottom-center",
       actionButtonStyle: {
-        background: 'var(--primary)',
+        background: "var(--primary)",
       },
       action: {
         label: "OK",
-        onClick: () => { },
+        onClick: () => {},
       },
+    })
+  }
+
+  const handleDownload = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.currentTarget.href = buildDownloadHref(posthog.get_distinct_id())
+    showToast()
+    posthog.capture("audio_downloaded_detail", {
+      audio_id: id,
+      audio_title: title,
+      audio_author: author,
+      audio_slug: slug,
     })
   }
   
@@ -98,10 +129,10 @@ export function AudioDetailPlayer({ id, audioSrc, duration, title }: AudioDetail
 
         {/* Download Link */}
         <a
-          href={`/api/download?url=${audioSrc}`} 
-          download 
+          href={buildDownloadHref()}
+          download
           className="mt-8 flex items-center justify-center gap-2 text-white/70 hover:text-white transition-colors"
-          onClick={showToast}
+          onClick={handleDownload}
         >
           <Download className="h-4 w-4" />
           <p className="text-xs font-medium">Download Audio <span className="sr-only">{title}</span></p>

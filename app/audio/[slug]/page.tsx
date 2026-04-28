@@ -213,7 +213,14 @@ export default async function AudioDetailPage({
 
         <div className="mb-10">
           <AudioProvider>
-            <AudioDetailPlayer id={data?.sys?.id} audioSrc={data?.audio?.url} duration={data?.duration} title={data?.title}/>
+            <AudioDetailPlayer
+              id={data?.sys?.id}
+              audioSrc={data?.audio?.url}
+              duration={data?.duration}
+              title={data?.title}
+              author={data?.author}
+              slug={data?.slug}
+            />
           </AudioProvider>
         </div>
 

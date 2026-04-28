@@ -7,6 +7,7 @@ import CONFIG from "@/config/config.json"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { createQueryString } from "@/lib/utils"
 import { useDebouncedCallback } from "@/hooks/use-debounce"
+import posthog from "posthog-js"
 
 export function ArticleList({
   articleListPromise,
@@ -45,6 +46,11 @@ export function ArticleList({
       page: "1"
     })
     router.push(`${pathname}?${params}`, { scroll: false })
+    if (query.length > 0) {
+      posthog.capture('article_searched', {
+        search_query: query,
+      })
+    }
   }
 
   const debouncedUpdate = useDebouncedCallback(

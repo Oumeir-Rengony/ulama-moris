@@ -1,14 +1,15 @@
 "use client"
 
-
+import type { MouseEvent } from "react"
 import { MapPin, Calendar, User, Download } from "lucide-react"
 import { AudioCardPlayer } from "./audio-player"
 import Link from "next/link"
 import dayjs from "dayjs"
-import { arrayify, cleanDescription, cn, toTitleCase } from "@/lib/utils"
+import { arrayify, cleanDescription, toTitleCase } from "@/lib/utils"
 import CONFIG from "@/config/config.json"
 import { WhatsApp } from "@/components/icons"
 import { toast } from "sonner"
+import posthog from "posthog-js"
 
 interface AudioCardProps {
   id: string;
@@ -39,6 +40,17 @@ export function AudioCard({
   category,
   whatsAppLink
 }: AudioCardProps) {
+  const buildDownloadHref = (distinctId?: string) =>
+    `/api/download?${new URLSearchParams({
+      url: audioSrc,
+      audioId: id,
+      audioTitle: title,
+      audioAuthor: author,
+      audioSlug: slug,
+      audioCategory: category,
+      source: "card",
+      ...(distinctId ? { distinct_id: distinctId } : {}),
+    }).toString()}`
 
   const showToast = () => {
     toast(title, {
@@ -51,6 +63,27 @@ export function AudioCard({
         label: "OK",
         onClick: () => { },
       },
+    })
+  }
+
+  const handleDownload = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.currentTarget.href = buildDownloadHref(posthog.get_distinct_id())
+    showToast()
+    posthog.capture("audio_downloaded", {
+      audio_id: id,
+      audio_title: title,
+      audio_author: author,
+      audio_slug: slug,
+      audio_category: category,
+    })
+  }
+
+  const handleWhatsAppShare = () => {
+    posthog.capture("audio_shared_whatsapp", {
+      audio_id: id,
+      audio_title: title,
+      audio_author: author,
+      audio_slug: slug,
     })
   }
 
@@ -115,16 +148,16 @@ export function AudioCard({
 
       <div className="flex justify-end gap-2 border-t border-border bg-secondary/30 px-5 py-2.5">
         <a
-          href={`/api/download?url=${audioSrc}`}
+          href={buildDownloadHref()}
           className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors"
           title="Download Audio"
           download
-          onClick={showToast}
+          onClick={handleDownload}
         >
           <Download className="h-4 w-4" />
           <p className="text-xs font-bold tracking-wider">Download <span className="sr-only">{title}</span></p>
         </a>
-        <Link prefetch={false} href={whatsAppLink || "#"} className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors" title="Share on WhatsApp">
+        <Link prefetch={false} href={whatsAppLink || "#"} className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors" title="Share on WhatsApp" onClick={handleWhatsAppShare}>
           <WhatsApp />
           <p className="text-xs font-bold tracking-wider">Share <span className="sr-only">{title}</span></p>
         </Link>
