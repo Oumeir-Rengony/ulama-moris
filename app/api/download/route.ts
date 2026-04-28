@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 
 export async function GET(req: NextRequest) {
@@ -28,6 +29,17 @@ export async function GET(req: NextRequest) {
 
       // Extract filename from URL
       const fileName = fileUrl.split("/").pop() || "download";
+
+      const posthog = getPostHogClient()
+      posthog.capture({
+        distinctId: "anonymous",
+        event: "audio_download_requested",
+        properties: {
+          file_name: fileName,
+          file_url: fileUrl,
+        },
+      })
+      await posthog.shutdown()
 
       return new Response(response.body, {
          headers: {

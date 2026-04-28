@@ -1,0 +1,42 @@
+[
+  {
+    "event": "audio_played",
+    "description": "Fired when a user clicks play on an audio track (or resumes after pause). Captures the track id, title, and author.",
+    "file": "components/audio-player/audio-player.tsx"
+  },
+  {
+    "event": "audio_downloaded",
+    "description": "Fired when a user clicks the download button on an audio card. Captures the track id, title, and author.",
+    "file": "components/audio-card.tsx"
+  },
+  {
+    "event": "audio_shared",
+    "description": "Fired when a user clicks the WhatsApp share button on an audio card. Captures the track id, title, and author.",
+    "file": "components/audio-card.tsx"
+  },
+  {
+    "event": "lecture_searched",
+    "description": "Fired when a user performs a search in the lecture list. Captures the search query.",
+    "file": "components/audio-list.tsx"
+  },
+  {
+    "event": "lecture_filter_changed",
+    "description": "Fired when a user switches between local/international region filters. Captures the selected region.",
+    "file": "components/audio-list.tsx"
+  },
+  {
+    "event": "audio_detail_viewed",
+    "description": "Fired when a user views an audio detail page (top of conversion funnel). Captures the slug, title, and author.",
+    "file": "app/audio/[slug]/page.tsx"
+  },
+  {
+    "event": "article_detail_viewed",
+    "description": "Fired when a user views an article detail page (top of conversion funnel). Captures the slug and title.",
+    "file": "app/articles/[slug]/page.tsx"
+  },
+  {
+    "event": "audio_download_requested",
+    "description": "Server-side event fired when a download request is processed via the API route. Captures the file URL.",
+    "file": "app/api/download/route.ts"
+  }
+]

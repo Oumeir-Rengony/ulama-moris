@@ -15,6 +15,7 @@ import CONFIG from "@/config/config.json";
 import { Suspense } from "react"
 import type { Metadata, ResolvingMetadata } from "next"
 import { AudioProvider } from "@/contexts/audio-context"
+import { getPostHogClient } from "@/lib/posthog-server"
 
 export const dynamicParams = true;
 
@@ -136,6 +137,19 @@ export default async function AudioDetailPage({
 
   const audioDescription = cleanDescription(data?.description);
 
+  if (data) {
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: "anonymous",
+      event: "audio_detail_viewed",
+      properties: {
+        audio_slug: slug,
+        audio_title: data?.title,
+        audio_author: data?.author,
+      },
+    })
+    await posthog.shutdown()
+  }
 
   if (!data) {
     return (

@@ -8,6 +8,7 @@ import { Local } from "@/services/bayaans/bayaan.service"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { cn, createQueryString } from "@/lib/utils"
 import { useDebouncedCallback } from "@/hooks/use-debounce";
+import posthog from "posthog-js"
 
 export function AudioList({
   audioListPromise,
@@ -47,6 +48,9 @@ export function AudioList({
   }),[]);
 
   const onSearch = (query: string) => {
+    if (query) {
+      posthog.capture("lecture_searched", { search_query: query })
+    }
     const params = createQueryString(searchParams, {
       search: query
     })
@@ -71,6 +75,7 @@ export function AudioList({
 
   
   const handleRegionChange = (region: Local) => {
+    posthog.capture("lecture_filter_changed", { region })
     startTransition(() => {
       const params = createQueryString(searchParams, {
         type: region

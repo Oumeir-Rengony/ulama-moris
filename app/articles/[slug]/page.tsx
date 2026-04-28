@@ -14,6 +14,7 @@ import dayjs from "dayjs"
 import CONFIG from "@/config/config.json"
 import { Suspense } from "react"
 import type { Metadata, ResolvingMetadata } from "next"
+import { getPostHogClient } from "@/lib/posthog-server"
 
 export const dynamicParams = true
 
@@ -131,6 +132,20 @@ export default async function ArticleDetailPage({
   })
 
   const jsonLd = createArticleJsonLd(data)
+
+  if (data) {
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: "anonymous",
+      event: "article_detail_viewed",
+      properties: {
+        article_slug: slug,
+        article_title: data?.title,
+        article_author: data?.author,
+      },
+    })
+    await posthog.shutdown()
+  }
 
   if (!data) {
     return (

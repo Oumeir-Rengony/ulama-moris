@@ -9,6 +9,7 @@ import { arrayify, cleanDescription, cn, toTitleCase } from "@/lib/utils"
 import CONFIG from "@/config/config.json"
 import { WhatsApp } from "@/components/icons"
 import { toast } from "sonner"
+import posthog from "posthog-js"
 
 interface AudioCardProps {
   id: string;
@@ -41,6 +42,11 @@ export function AudioCard({
 }: AudioCardProps) {
 
   const showToast = () => {
+    posthog.capture("audio_downloaded", {
+      audio_id: id,
+      audio_title: title,
+      audio_author: author,
+    })
     toast(title, {
       description: "Download started. Check your download folder",
       position: 'bottom-center',
@@ -51,6 +57,15 @@ export function AudioCard({
         label: "OK",
         onClick: () => { },
       },
+    })
+  }
+
+  const handleShare = () => {
+    posthog.capture("audio_shared", {
+      audio_id: id,
+      audio_title: title,
+      audio_author: author,
+      share_channel: "whatsapp",
     })
   }
 
@@ -124,7 +139,7 @@ export function AudioCard({
           <Download className="h-4 w-4" />
           <p className="text-xs font-bold tracking-wider">Download <span className="sr-only">{title}</span></p>
         </a>
-        <Link prefetch={false} href={whatsAppLink || "#"} className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors" title="Share on WhatsApp">
+        <Link prefetch={false} href={whatsAppLink || "#"} onClick={handleShare} className="flex items-center gap-1.5 text-green-700 bg-green-50 p-1.5 rounded-lg hover:bg-green-100 transition-colors" title="Share on WhatsApp">
           <WhatsApp />
           <p className="text-xs font-bold tracking-wider">Share <span className="sr-only">{title}</span></p>
         </Link>
