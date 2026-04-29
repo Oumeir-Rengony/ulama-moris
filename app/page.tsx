@@ -1,10 +1,15 @@
 import { Hero } from "@/components/hero"
 import { AudioList } from "@/components/audio-list"
 import { getBayaansWithPagination, type Local } from "@/services/bayaans/bayaan.service";
-import { headers } from "next/headers";
-import { getSelectorsByUserAgent } from "react-device-detect";
+// import { headers } from "next/headers";
+// import { getSelectorsByUserAgent } from "react-device-detect";
 import { AudioProvider } from '@/contexts/audio-context';
 import dayjs from "dayjs";
+
+export const dynamic = 'force-static';
+
+
+export const dynamicParams = true;
 
 export default async function Home({
   searchParams
@@ -25,8 +30,11 @@ export default async function Home({
   const validStartDate = dayjs(startDate).isValid() ? startDate : "";
   const validEndDate = dayjs(endDate).isValid() ? endDate : "";
 
-  const userAgent = (await headers()).get('user-agent');
-  const { isMobile } =  getSelectorsByUserAgent(userAgent || "");
+  //headers undefine din force-static
+  // const userAgent = (await headers()).get('user-agent');
+  // const { isMobile } =  getSelectorsByUserAgent(userAgent || "");
+
+  const isMobile = true; // Assuming mobile for now since headers are not available in force-static mode
 
   const audioListPromise = getBayaansWithPagination({ 
     page: +page,
@@ -34,7 +42,8 @@ export default async function Home({
     endDate: endDate,
     type: region,
     search: search,
-    isMobile: isMobile
+    isMobile: true
+    // isMobile: isMobile
   });
 
   
