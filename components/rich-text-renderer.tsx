@@ -128,7 +128,6 @@ export function RichTextRenderer({ content }: RichTextRendererProps) {
     },
   }
 
-  console.log(content.json);
 
   return (
     <div className="prose prose-lg max-w-none">

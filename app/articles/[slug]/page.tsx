@@ -15,16 +15,19 @@ import CONFIG from "@/config/config.json"
 import { Suspense } from "react"
 import type { Metadata, ResolvingMetadata } from "next"
 
-export const dynamicParams = true
+export const dynamic = 'force-static';
+
+
+export const dynamicParams = true;
 
 // Return a list of `params` to populate the [slug] dynamic segment
-export async function generateStaticParams() {
-  const articleList = await getArticleSlugs()
+// export async function generateStaticParams() {
+//   const articleList = await getArticleSlugs()
 
-  return articleList?.items?.map((article: any) => ({
-    slug: article?.slug,
-  })) || []
-}
+//   return articleList?.items?.map((article: any) => ({
+//     slug: article?.slug,
+//   })) || []
+// }
 
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> },

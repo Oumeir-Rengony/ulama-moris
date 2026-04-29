@@ -4,6 +4,9 @@ import type { Metadata } from "next"
 import { ArticleList } from "@/components/article-list"
 import { getArticlesWithPagination, createArticleListJsonLd } from "@/services/articles/article.service"
 
+export const dynamic = 'force-static';
+
+
 export const metadata: Metadata = {
   title: "Islamic Articles | Ulama Moris",
   description: "Read Islamic articles on various topics including Qur'an, Hadith, Fiqh, and Islamic spirituality from respected scholars.",

@@ -16,16 +16,19 @@ import { Suspense } from "react"
 import type { Metadata, ResolvingMetadata } from "next"
 import { AudioProvider } from "@/contexts/audio-context"
 
+export const dynamic = 'force-static';
+
+
 export const dynamicParams = true;
 
 // Return a list of `params` to populate the [slug] dynamic segment
-export async function generateStaticParams() {
-  const audioList = await getBayaanSlug();
+// export async function generateStaticParams() {
+//   const audioList = await getBayaanSlug();
 
-  return audioList?.items?.map((audio:any) => ({
-    slug: audio?.slug,
-  }))
-}
+//   return audioList?.items?.map((audio:any) => ({
+//     slug: audio?.slug,
+//   }))
+// }
 
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> },
