@@ -1,13 +1,10 @@
 import { clsx, type ClassValue } from 'clsx'
+import { HTTP_METHOD } from 'next/dist/server/web/http';
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-
-
-import { ReadonlyURLSearchParams } from "next/navigation";
-import { useCallback } from 'react';
 
 export const toISODuration = (timeStr: string) => {
   if (!timeStr) return;
@@ -122,9 +119,11 @@ export const arrayify = (input: string | string[] | undefined): string[] => {
 }
 
 
-// export function formatTime(time: number) {
-//   if (isNaN(time) || !isFinite(time)) return "0:00"
-//   const minutes = Math.floor(time / 60)
-//   const seconds = Math.floor(time % 60)
-//   return `${minutes}:${seconds.toString().padStart(2, "0")}`
-// }
+export async function getCanonicalRequest(req: Request, body: string){
+  return {
+    path: new URL(req.url).pathname,
+    method: req.method as HTTP_METHOD,
+    headers: Object.fromEntries(req.headers),
+    body,
+  };
+}

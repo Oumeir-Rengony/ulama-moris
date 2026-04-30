@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@apollo/client": "^4.1.6",
+    "@contentful/node-apps-toolkit": "^3.16.1",
     "@contentful/rich-text-react-renderer": "^16.2.1",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "1.2.12",
