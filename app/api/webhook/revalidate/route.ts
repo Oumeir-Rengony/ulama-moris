@@ -41,7 +41,8 @@ export async function POST(req: NextRequest) {
     const slug = body?.fields?.slug?.["en-US"];
 
     if (slug) {
-      revalidatePath(`/audio/${slug}`);
+      // revalidatePath(`/audio/${slug}`);
+      revalidatePath(`/internal/${slug}`);
     }
 
     return NextResponse.json({ revalidated: true });
