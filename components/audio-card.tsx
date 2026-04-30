@@ -108,7 +108,11 @@ export function AudioCard({
 
 
         {/* Audio Player */}
-        <AudioCardPlayer id={id} audioSrc={audioSrc} duration={duration} />
+        <AudioCardPlayer
+          id={id} 
+          audioSrc={audioSrc} 
+          duration={duration} 
+        />
 
       </div>
 
