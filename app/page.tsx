@@ -7,8 +7,8 @@ import { AudioProvider } from '@/contexts/audio-context';
 import dayjs from "dayjs";
 import { Suspense } from "react";
 
-export const dynamic = 'force-static';
-
+// export const dynamic = 'force-static';
+export const revalidate = 3600
 
 export const dynamicParams = true;
 
