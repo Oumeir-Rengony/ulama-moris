@@ -5,6 +5,7 @@ import { getBayaansWithPagination, type Local } from "@/services/bayaans/bayaan.
 // import { getSelectorsByUserAgent } from "react-device-detect";
 import { AudioProvider } from '@/contexts/audio-context';
 import dayjs from "dayjs";
+import { Suspense } from "react";
 
 export const dynamic = 'force-static';
 
@@ -51,6 +52,7 @@ export default async function Home({
     <div className="min-h-screen bg-background">
       <main>
         <Hero />
+        <Suspense>
         <AudioProvider>
           <AudioList 
             audioListPromise={audioListPromise}
@@ -60,6 +62,7 @@ export default async function Home({
             isMobile={isMobile}
           />
         </AudioProvider>
+        </Suspense>
       </main>
     </div>
   )
