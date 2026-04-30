@@ -218,7 +218,8 @@ export default async function AudioDetailPage({
           <AudioProvider>
             <AudioDetailPlayer 
               id={data?.sys?.id} 
-              audioSrc={`/api/audio?url=${data?.audio?.url}?v=${data?.audio?.sys?.publishedAt}`}
+              // audioSrc={`/api/audio?url=${data?.audio?.url}?v=${data?.audio?.sys?.publishedAt}`}
+              audioSrc={data?.audio?.url}
               duration={data?.duration} 
               title={data?.title}
             />
