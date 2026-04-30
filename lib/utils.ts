@@ -129,8 +129,3 @@ export async function getCanonicalRequest(req: Request, body: string){
     body,
   };
 }
-
-
-export function getAudioTag(url: string) {
-  return "audio:" + crypto.createHash("sha1").update(url).digest("hex");
-}

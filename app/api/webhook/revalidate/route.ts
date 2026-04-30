@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyRequest } from "@contentful/node-apps-toolkit";
-import { getAudioTag, getCanonicalRequest } from '@/lib/utils';
+import { getCanonicalRequest } from '@/lib/utils';
 import { revalidatePath, revalidateTag } from "next/cache";
 
-const SECRET = process.env.CONTENTFUL_WEBHOOK_SECRET!;
+const SECRET = process.env.CF_WEBHOOK_SECRET!;
 
 export async function POST(req: NextRequest) {
    const rawBody = await req.text();
@@ -18,7 +18,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-   const body = JSON.parse(rawBody);
+  
+  const { searchParams } = new URL(req.url);
+  
+  const tag = searchParams.get("tag") || "";
+  
+  const body = JSON.parse(rawBody);
 
   try {
    
@@ -29,9 +34,8 @@ export async function POST(req: NextRequest) {
    //    return NextResponse.json({ skipped: true });
    //  }
 
-    // Always revalidate homepage
     revalidatePath("/");
-    revalidateTag("audio", { expire: 0 });
+    revalidateTag(tag, { expire: 0 });
 
     // Extract slug safely
     const slug = body?.fields?.slug?.["en-US"];

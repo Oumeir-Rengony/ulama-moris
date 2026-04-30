@@ -1,9 +1,12 @@
 import { NextRequest } from "next/server";
-import { getAudioTag } from "@/lib/utils";
 
 
 export async function GET(req: NextRequest) {
-   const fileUrl = req.nextUrl.searchParams.get("url");
+   const { searchParams } = new URL(req.url);
+
+   const fileUrl = searchParams.get("url");
+   const tag = searchParams.get("tag") || "";
+
 
 
    if (!fileUrl) {
@@ -18,7 +21,6 @@ export async function GET(req: NextRequest) {
    }
 
    try {
-      const tag = getAudioTag(fileUrl)
       const response = await fetch(fileUrl, {
          next: {
             revalidate: 2592000, // cache upstream fetch (1 month)

@@ -1,8 +1,8 @@
-import { getAudioTag } from "@/lib/utils";
-
 export async function GET(req: Request) {
    const { searchParams } = new URL(req.url);
    const url = searchParams.get("url");
+   const tag = searchParams.get("tag") || "";
+
 
    if (!url) {
       return new Response("Missing url", { status: 400 });
@@ -11,7 +11,6 @@ export async function GET(req: Request) {
    // Forward range header (CRITICAL for audio/video)
    const range = req.headers.get("range");
 
-   const tag = getAudioTag(url);
 
    const res = await fetch(url, {
       headers: range ? { Range: range } : {},
