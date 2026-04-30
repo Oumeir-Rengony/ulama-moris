@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { getAudioTag } from "@/lib/utils";
 
 
 export async function GET(req: NextRequest) {
@@ -17,7 +18,13 @@ export async function GET(req: NextRequest) {
    }
 
    try {
-      const response = await fetch(fileUrl);
+      const tag = getAudioTag(fileUrl)
+      const response = await fetch(fileUrl, {
+         next: {
+            revalidate: 2592000, // cache upstream fetch (1 month)
+            tags: [tag]
+         }
+      });
 
       if (!response.ok) {
          return new Response("Failed to fetch file", { status: 500 });

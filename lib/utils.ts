@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from 'clsx'
 import { HTTP_METHOD } from 'next/dist/server/web/http';
 import { twMerge } from 'tailwind-merge'
+import crypto from "crypto";
+
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -126,4 +128,9 @@ export async function getCanonicalRequest(req: Request, body: string){
     headers: Object.fromEntries(req.headers),
     body,
   };
+}
+
+
+export function getAudioTag(url: string) {
+  return "audio:" + crypto.createHash("sha1").update(url).digest("hex");
 }

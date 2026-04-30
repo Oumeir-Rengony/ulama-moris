@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyRequest } from "@contentful/node-apps-toolkit";
-import { getCanonicalRequest } from '@/lib/utils';
-import { revalidatePath } from "next/cache";
+import { getAudioTag, getCanonicalRequest } from '@/lib/utils';
+import { revalidatePath, revalidateTag } from "next/cache";
 
 const SECRET = process.env.CONTENTFUL_WEBHOOK_SECRET!;
 
@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
 
     // Always revalidate homepage
     revalidatePath("/");
+    revalidateTag("audio", { expire: 0 });
 
     // Extract slug safely
     const slug = body?.fields?.slug?.["en-US"];

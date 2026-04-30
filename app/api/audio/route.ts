@@ -1,3 +1,5 @@
+import { getAudioTag } from "@/lib/utils";
+
 export async function GET(req: Request) {
    const { searchParams } = new URL(req.url);
    const url = searchParams.get("url");
@@ -9,9 +11,14 @@ export async function GET(req: Request) {
    // Forward range header (CRITICAL for audio/video)
    const range = req.headers.get("range");
 
+   const tag = getAudioTag(url);
+
    const res = await fetch(url, {
       headers: range ? { Range: range } : {},
-      next: { revalidate: 2592000 }, // cache upstream fetch (1 month)
+      next: { 
+         revalidate: 2592000, // cache upstream fetch (1 month)
+         tags: [tag]
+      }, 
    });
 
    if (!res.ok) {
@@ -38,10 +45,10 @@ export async function GET(req: Request) {
    if (contentLength) headers.set("Content-Length", contentLength);
 
    // cache api response so that user does not hit vercel server
-   headers.set(
-      "Cache-Control",
-      "public, s-maxage=2592000"
-   );
+   // headers.set(
+   //    "Cache-Control",
+   //    "public, max-age=2592000"
+   // );
 
    return new Response(res.body, {
       status: res.status, // 200 or 206 (partial content)
