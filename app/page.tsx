@@ -1,4 +1,5 @@
 import { Hero } from "@/components/hero"
+import { EventBanner } from "@/components/event-banner"
 import { AudioList } from "@/components/audio-list"
 import { getBayaansWithPagination, type Local } from "@/services/bayaans/bayaan.service";
 // import { headers } from "next/headers";
@@ -52,6 +53,7 @@ export default async function Home({
     <div className="min-h-screen bg-background">
       <main>
         <Hero />
+        <EventBanner />
         <Suspense>
         <AudioProvider>
           <AudioList 
