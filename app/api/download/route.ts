@@ -41,7 +41,6 @@ export async function GET(req: NextRequest) {
       return new Response(response.body, {
          headers: {
             "Content-Type": contentType,
-            "Cache-Control": "public, s-maxage=2592000",
             "Content-Disposition": `attachment; filename="${fileName}"`,
          },
       });

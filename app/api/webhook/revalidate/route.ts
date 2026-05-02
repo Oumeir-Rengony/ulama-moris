@@ -3,6 +3,7 @@ import { verifyRequest } from "@contentful/node-apps-toolkit";
 import { getCanonicalRequest } from '@/lib/utils';
 import { revalidatePath, revalidateTag } from "next/cache";
 
+
 const SECRET = process.env.CF_WEBHOOK_SECRET!;
 
 export async function POST(req: NextRequest) {
@@ -17,12 +18,9 @@ export async function POST(req: NextRequest) {
   if (!isVerifiedRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
-
   
   const { searchParams } = new URL(req.url);
-  
-  const tag = searchParams.get("tag") || "";
-  
+    
   const body = JSON.parse(rawBody);
 
   try {
@@ -34,14 +32,18 @@ export async function POST(req: NextRequest) {
    //    return NextResponse.json({ skipped: true });
    //  }
 
-    revalidatePath("/");
-    revalidateTag(tag, { expire: 0 });
+   revalidatePath("/");
+
+    const id = body?.fields?.sys?.id;
+
+    if(!id){
+      revalidateTag(`audio:${id}`, { expire: 0 });
+    }
 
     // Extract slug safely
     const slug = body?.fields?.slug?.["en-US"];
 
     if (slug) {
-      // revalidatePath(`/audio/${slug}`);
       revalidatePath(`/internal/${slug}`);
     }
 
