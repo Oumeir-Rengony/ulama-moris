@@ -193,7 +193,7 @@ export function AudioList({
                 masjidLocation={item?.masjid?.geoLink}
                 duration={item?.duration}
                 date={item.date}
-                audioSrc={`${item?.audio?.url}`}
+                audioSrc={`${item?.audio?.url}?t=${item?.audio?.sys?.publishedAt}&tag=audio:${item.audio?.sys?.id}`}
                 downloadSrc={`/api/download?url=${item.audio?.url}?t=${item?.audio?.sys?.publishedAt}&tag=audio:${item.audio?.sys?.id}`}
                 category={item.category}
                 whatsAppLink={`whatsapp://send?text=${process.env.NEXT_PUBLIC_SITE_URL}/audio/${item?.slug}`}
