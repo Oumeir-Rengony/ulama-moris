@@ -9,10 +9,11 @@ interface AudioDetailPlayerProps {
   id: string;
   duration: string;
   audioSrc: string;
+  downloadSrc?: string;
   title: string;
 }
 
-export function AudioDetailPlayer({ id, audioSrc, duration, title }: AudioDetailPlayerProps) {  
+export function AudioDetailPlayer({ id, audioSrc, downloadSrc, duration, title }: AudioDetailPlayerProps) {  
 
   const showToast = () => {
     toast(title, {
@@ -98,7 +99,7 @@ export function AudioDetailPlayer({ id, audioSrc, duration, title }: AudioDetail
 
         {/* Download Link */}
         <a
-          href={`/api/download?url=${audioSrc}`} 
+          href={downloadSrc}
           download 
           className="mt-8 flex items-center justify-center gap-2 text-white/70 hover:text-white transition-colors"
           onClick={showToast}
