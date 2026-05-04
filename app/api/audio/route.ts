@@ -13,10 +13,10 @@ export async function GET(req: Request) {
 
    const res = await fetch(url, {
       headers: range ? { Range: range } : {},
-      next: { 
-         revalidate: 2592000, // cache upstream fetch (1 month)
-         tags: [tag]
-      }, 
+      // next: { 
+      //    revalidate: 2592000, // cache upstream fetch (1 month)
+      //    tags: [tag]
+      // }, 
    });
 
    if (!res.ok) {
@@ -37,16 +37,17 @@ export async function GET(req: Request) {
    if (contentRange) headers.set("Content-Range", contentRange);
 
    const acceptRanges = res.headers.get("accept-ranges");
+   
    if (acceptRanges) headers.set("Accept-Ranges", acceptRanges);
 
    const contentLength = res.headers.get("content-length");
    if (contentLength) headers.set("Content-Length", contentLength);
 
    // cache api response so that user does not hit vercel server
-   headers.set(
-      "Cache-Control",
-      "public, max-age=2592000"
-   );
+   // headers.set(
+   //    "Cache-Control",
+   //    "public, max-age=2592000, immutable"
+   // );
 
    headers.set("X-Cache-Debug", "server-hit");
 

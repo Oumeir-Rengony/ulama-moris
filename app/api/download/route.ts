@@ -22,10 +22,10 @@ export async function GET(req: NextRequest) {
 
    try {
       const response = await fetch(fileUrl, {
-         next: {
-            revalidate: 2592000, // cache upstream fetch (1 month)
-            tags: [tag]
-         }
+         // next: {
+         //    revalidate: 2592000, // cache upstream fetch (1 month)
+         //    tags: [tag]
+         // }
       });
 
       if (!response.ok) {
