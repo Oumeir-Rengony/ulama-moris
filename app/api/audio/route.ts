@@ -3,7 +3,6 @@ export async function GET(req: Request) {
    const url = searchParams.get("url");
    const tag = searchParams.get("tag") || "";
 
-
    if (!url) {
       return new Response("Missing url", { status: 400 });
    }
@@ -48,6 +47,9 @@ export async function GET(req: Request) {
       "Cache-Control",
       "public, max-age=2592000"
    );
+
+   headers.set("X-Cache-Debug", "server-hit");
+
 
    return new Response(res.body, {
       status: res.status, // 200 or 206 (partial content)
