@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import { Suspense } from "react";
 
 // export const dynamic = 'force-static';
-export const revalidate = 3600
+export const revalidate = 86400; // 24 hours in seconds
 
 export const dynamicParams = true;
 
