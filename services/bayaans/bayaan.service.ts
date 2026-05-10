@@ -19,7 +19,7 @@ import {
 
 import { AssetsFragment } from '@/services/query';
 
-export type Local = "local" | "international";
+export type Local = "local" | "international" | "islahi majlis";
 
 export const getBayaansBase = cache(async ({
     startDate = "", 

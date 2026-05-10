@@ -37,8 +37,9 @@ export function AudioList({
   const totalAudio = audioList?.total || 1;
 
   const regions: { value: Local; label: string }[] = [
-    { value: "local", label: "Local Bayaan" },
-    { value: "international", label: "International" },
+    { value: "local", label: "Local" },
+    { value: "international", label: "Guest" },
+    { value: "islahi majlis", label: "Islāhi Majlis" }
   ]
 
   const debounceOptions = useMemo(() => ({
