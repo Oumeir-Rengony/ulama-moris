@@ -36,7 +36,9 @@ export async function GET(req: NextRequest) {
          response.headers.get("content-type") || "application/octet-stream";
 
       // Extract filename from URL
-      const fileName = fileUrl.split("/").pop() || "download";
+      // const fileName = fileUrl.split("/").pop() || "download";
+      const fileName = urlObj.pathname.split("/").pop() || "download";
+
 
       return new Response(response.body, {
          headers: {
