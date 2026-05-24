@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBayaansWithPagination, type Local } from "@/services/bayaans/bayaan.service";
 
+export const revalidate = 86400
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
