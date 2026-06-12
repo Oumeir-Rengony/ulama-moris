@@ -21,7 +21,7 @@ export function Hero() {
           {/* Heading */}
           <h1 className="text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
             Discover audio that{" "}
-            <span className="text-primary">inspires</span> your <span className="text-primary">spiritiual</span> journey
+            <span className="text-primary">inspires</span> your <span className="text-primary">spiritual</span> journey
           </h1>
 
           {/* Description */}
