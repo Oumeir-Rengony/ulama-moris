@@ -16,7 +16,18 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: "/events" },
-  openGraph: { title, description, url: "/events" },
+  openGraph: {
+    title,
+    description,
+    url: "/events",
+    // Setting openGraph here replaces the layout's, so the logo image has to be repeated.
+    images: {
+      url: "/logo.webp",
+      alt: "Ulama Moris",
+      width: 541,
+      height: 541,
+    },
+  },
 };
 
 type EventsPageProps = {
