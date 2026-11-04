@@ -10,6 +10,8 @@ import { getBayaansWithPagination } from "@/services/bayaans/bayaan.service";
 import { getEventBySlug, getEventSummary } from "@/services/bayaans/event.service";
 import { toTitleCase } from "@/lib/utils";
 
+export const revalidate = 86400; // 24 hours in seconds
+
 type EventPageProps = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ page?: string | string[] }>;
@@ -64,9 +66,9 @@ export default async function EventPage({ params, searchParams }: EventPageProps
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 sm:px-6">
-      <Link href="/" prefetch={false} className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
+      <Link href="/events" prefetch={false} className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
         <ArrowLeft className="size-4" aria-hidden="true" />
-        Back to all lectures
+        All events
       </Link>
 
       <header className="mb-10 rounded-3xl bg-primary p-6 text-primary-foreground sm:p-10">

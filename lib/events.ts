@@ -3,7 +3,7 @@ export function getEventSlug(event: string): string {
 }
 
 export function getEventPath(event: string): string {
-  return `/event/${encodeURIComponent(getEventSlug(event))}`;
+  return `/events/${encodeURIComponent(getEventSlug(event))}`;
 }
 
 export type EventRecording = {
@@ -99,8 +99,86 @@ export function summarizeEventRecordings(recordings: EventRecording[]) {
 
   return {
     date,
+    firstDate,
+    lastDate,
     total: recordings.length,
     duration,
     location: getSharedEventLocation(recordings),
   };
+}
+
+const MAURITIUS_TIME_ZONE = "Indian/Mauritius";
+
+export type EventDirectoryEntry = {
+  slug: string;
+  path: string;
+  title: string;
+  total: number;
+  duration: string | null;
+  location: string | null;
+  dateRange: string | null;
+  year: string | null;
+  day: string | null;
+  month: string | null;
+  latestTime: number;
+};
+
+function formatInMauritius(date: Date, options: Intl.DateTimeFormatOptions): string {
+  const formatter = new Intl.DateTimeFormat("en-GB", { ...options, timeZone: MAURITIUS_TIME_ZONE });
+  return formatter.format(date);
+}
+
+function formatEventDateRange(firstDate: Date, lastDate: Date): string {
+  const fullDate: Intl.DateTimeFormatOptions = { day: "numeric", month: "short", year: "numeric" };
+  const dayAndMonth: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" };
+
+  const start = formatInMauritius(firstDate, fullDate);
+  const end = formatInMauritius(lastDate, fullDate);
+  if (start === end) {
+    return start;
+  }
+
+  const startYear = formatInMauritius(firstDate, { year: "numeric" });
+  const endYear = formatInMauritius(lastDate, { year: "numeric" });
+  if (startYear === endYear) {
+    return `${formatInMauritius(firstDate, dayAndMonth)} – ${end}`;
+  }
+
+  return `${start} – ${end}`;
+}
+
+export function createEventDirectoryEntry(title: string, recordings: EventRecording[]): EventDirectoryEntry {
+  const summary = summarizeEventRecordings(recordings);
+  const entry: EventDirectoryEntry = {
+    slug: getEventSlug(title),
+    path: getEventPath(title),
+    title,
+    total: summary.total,
+    duration: summary.duration,
+    location: summary.location,
+    dateRange: null,
+    year: null,
+    day: null,
+    month: null,
+    latestTime: 0,
+  };
+
+  if (!summary.firstDate || !summary.lastDate) {
+    return entry;
+  }
+
+  // The directory is ordered and grouped by when an event last had a recording.
+  entry.dateRange = formatEventDateRange(summary.firstDate, summary.lastDate);
+  entry.year = formatInMauritius(summary.lastDate, { year: "numeric" });
+  // The badge shows when an event started, unless it ran across years: then the start
+  // date would contradict the year heading it is listed under, so show the latest date.
+  const startYear = formatInMauritius(summary.firstDate, { year: "numeric" });
+  let badgeDate = summary.firstDate;
+  if (startYear !== entry.year) {
+    badgeDate = summary.lastDate;
+  }
+  entry.day = formatInMauritius(badgeDate, { day: "numeric" });
+  entry.month = formatInMauritius(badgeDate, { month: "short" });
+  entry.latestTime = summary.lastDate.getTime();
+  return entry;
 }

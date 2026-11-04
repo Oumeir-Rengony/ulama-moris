@@ -33,6 +33,10 @@ export async function POST(req: NextRequest) {
    //  }
 
    revalidatePath("/");
+   revalidatePath("/events");
+   // The webhook only sends a bayaan's current event, not the one it was moved from,
+   // so refresh every event page (and its OG image) rather than guess which ones changed.
+   revalidatePath("/events/[slug]", "layout");
 
     const id = body?.fields?.sys?.id;
 
