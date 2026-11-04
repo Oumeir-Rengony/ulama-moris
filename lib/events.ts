@@ -91,8 +91,10 @@ export function summarizeEventRecordings(recordings: EventRecording[]) {
     });
     const start = formatter.format(firstDate);
     const end = formatter.format(lastDate);
-    date = start;
-    if (start !== end) date = `${start} – ${end}`;
+    // Events spanning multiple Mauritius calendar days have no single event date to display.
+    if (start === end) {
+      date = start;
+    }
   }
 
   return {

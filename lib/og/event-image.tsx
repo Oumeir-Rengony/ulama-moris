@@ -22,7 +22,10 @@ export async function createEventOgImage({ title: eventTitle, total, date: recor
   let date = recordingDate;
   if (dateMatch) {
     title = eventTitle.slice(0, dateMatch.index).trim();
-    date = dateMatch[1];
+    // A date in the title must not restore a date hidden for a multi-day event.
+    if (recordingDate) {
+      date = dateMatch[1];
+    }
   }
 
   let titleFontSize = 56;
@@ -60,7 +63,7 @@ export async function createEventOgImage({ title: eventTitle, total, date: recor
             display: "flex",
             position: "absolute",
             top: 100,
-            left: 60,
+            left: 100,
             width: 710,
             flexDirection: "column",
             alignItems: "flex-start",
@@ -104,7 +107,7 @@ export async function createEventOgImage({ title: eventTitle, total, date: recor
               style={{
                 marginTop: 20,
                 fontFamily: "Geist",
-                fontSize: 24,
+                fontSize: 18,
                 fontWeight: 700,
                 color: "#45634d",
               }}

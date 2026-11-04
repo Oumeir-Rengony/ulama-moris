@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import satori from "satori";
 
 const assets = Promise.all([
   readFile(join(process.cwd(), "public/og.jpg")),
@@ -9,13 +8,13 @@ const assets = Promise.all([
 ]);
 
 const contentWidth = 740;
-const contentHeight = 420;
 const titleLineHeight = 1.1;
-const maxTitleLines = 6;
+const maxTitleHeight = 240;
 
 type AudioImageProps = { title: string; author?: string | null };
 
-function renderText({ title, author }: AudioImageProps, fontSize: number, clampTitle: boolean) {
+function renderText({ title, author }: AudioImageProps, fontSize: number) {
+  const maxTitleLines = Math.floor(maxTitleHeight / (fontSize * titleLineHeight));
   return (
     <div
       id="audio-text"
@@ -42,7 +41,7 @@ function renderText({ title, author }: AudioImageProps, fontSize: number, clampT
           lineHeight: titleLineHeight,
           wordBreak: "break-word",
           display: "block",
-          ...(clampTitle ? { lineClamp: maxTitleLines } : {}),
+          lineClamp: maxTitleLines,
           overflow: "hidden",
           textOverflow: "ellipsis",
         }}
@@ -76,26 +75,18 @@ function renderText({ title, author }: AudioImageProps, fontSize: number, clampT
 export async function createAudioOgImage(props: AudioImageProps) {
   const [background, font] = await assets;
   const fonts = [{ name: "El Messiri", data: font, style: "normal" as const, weight: 600 as const }];
-  let titleFontSize = 36;
-
-  // Measure the actual wrapped text with the renderer's font and layout engine.
-  for (let candidateSize = 72; candidateSize >= 36; candidateSize -= 4) {
-    let titleHeight = 0;
-    let groupHeight = 0;
-    await satori(renderText(props, candidateSize, false), {
-      width: contentWidth,
-      fonts,
-      embedFont: false,
-      onNodeDetected(node) {
-        if (node.props.id === "audio-title") titleHeight = node.height;
-        if (node.props.id === "audio-text") groupHeight = node.height;
-      },
-    });
-    const titleFits = titleHeight <= candidateSize * titleLineHeight * maxTitleLines + 1;
-    if (titleFits && groupHeight <= contentHeight) {
-      titleFontSize = candidateSize;
-      break;
-    }
+  let titleFontSize = 72;
+  if (props.title.length > 60) {
+    titleFontSize = 60;
+  }
+  if (props.title.length > 100) {
+    titleFontSize = 48;
+  }
+  if (props.title.length > 160) {
+    titleFontSize = 40;
+  }
+  if (props.title.length > 240) {
+    titleFontSize = 36;
   }
 
   return new ImageResponse(
@@ -106,16 +97,14 @@ export async function createAudioOgImage(props: AudioImageProps) {
           style={{
             display: "flex",
             position: "absolute",
-            top: 80,
-            left: 224,
+            top: "30%",
+            left: (1200 - contentWidth) / 2,
             width: contentWidth,
-            height: contentHeight,
             flexDirection: "column",
-            justifyContent: "center",
             alignItems: "center",
           }}
         >
-          {renderText(props, titleFontSize, true)}
+          {renderText(props, titleFontSize)}
         </div>
         <div style={{ display: "flex", position: "absolute", bottom: 53, right: 60, color: "#738a78", fontFamily: "El Messiri", fontWeight: 600, fontSize: 16 }}>
           ulama-moris.org
