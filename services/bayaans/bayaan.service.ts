@@ -25,6 +25,7 @@ export const getBayaansBase = cache(async ({
     startDate = "", 
     endDate = "",  
     search = "", 
+    events,
     limit = 0,
     skip = 0,
     type,
@@ -35,6 +36,7 @@ export const getBayaansBase = cache(async ({
     startDate?: string; 
     endDate?: string; 
     search?: string;
+    events?: string[];
     type?: Local,
     isPreview?: boolean; 
 }): Promise<{bayaanCollection: any}> => {
@@ -58,6 +60,7 @@ export const getBayaansBase = cache(async ({
     ...(startDate && { startDate }),
     ...(endDate && { endDate }),
     ...(search && { search }),
+    ...(events && { events }),
     local: type
   };
 
@@ -75,6 +78,7 @@ export const getBayaansWithPagination = cache(async ({
   startDate = "",
   endDate = "",
   search = "",
+  events,
   type,
   isMobile = true,
   isPreview = false,
@@ -83,6 +87,7 @@ export const getBayaansWithPagination = cache(async ({
   startDate?: string;
   endDate?: string;
   search?: string;
+  events?: string[];
   type?: Local;
   isMobile?: boolean;
   isPreview?: boolean;
@@ -102,6 +107,7 @@ export const getBayaansWithPagination = cache(async ({
     endDate,
     type,
     search,
+    events,
     isPreview,
   });
 

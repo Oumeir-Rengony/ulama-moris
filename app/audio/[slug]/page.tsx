@@ -5,9 +5,13 @@ import {
   User,
   MapPin,
   Calendar,
+  CalendarDays,
   ArrowLeft,
+  ArrowRight,
+  Tags,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { arrayify, cleanDescription, toTitleCase } from "@/lib/utils"
 import { getBayaanBySlug, getBayaanSlug, getRelatedBayaans } from "@/services/bayaans/bayaan.service"
 import dayjs from "dayjs"
@@ -15,6 +19,7 @@ import CONFIG from "@/config/config.json";
 import { Suspense } from "react"
 import type { Metadata, ResolvingMetadata } from "next"
 import { AudioProvider } from "@/contexts/audio-context"
+import { getEventPath } from "@/lib/events"
 
 export const dynamic = 'force-static';
 
@@ -138,6 +143,7 @@ export default async function AudioDetailPage({
   })
 
   const audioDescription = cleanDescription(data?.description);
+  const categories = arrayify(data?.category);
 
 
   if (!data) {
@@ -176,22 +182,21 @@ export default async function AudioDetailPage({
 
         {/* Header Section */}
         <header className="mb-8">
+          {data.event?.trim() && (
+            <Link
+              href={getEventPath(data.event)}
+              prefetch={false}
+              className="group/event mb-5 inline-flex max-w-full items-center gap-2 rounded-full border border-primary/25 bg-secondary/60 px-3 py-2 text-sm font-medium text-primary transition-colors hover:border-primary/50 hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring sm:gap-2.5 sm:px-4"
+            >
+              <CalendarDays className="size-4 shrink-0" aria-hidden="true" />
+              <span className="min-w-0 break-words">
+                Part of event: <span className="font-semibold">{data.event}</span>
+              </span>
+              <ArrowRight className="size-4 shrink-0 motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out motion-safe:group-hover/event:translate-x-1 motion-safe:group-focus-visible/event:translate-x-1" aria-hidden="true" />
+            </Link>
+          )}
 
-          {data?.category?.length &&
-            <div className="flex justify-between py-3">
-              <div className="flex items-center gap-2">
-                {
-                  arrayify(data?.category)?.map((cat, idx) => (
-                    <span key={idx} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground border-border`}>
-                      {cat}
-                    </span>
-                  ))
-                }
-              </div>
-            </div>
-          }
-
-          <h1 className="mb-6 text-3xl font-bold leading-tight text-foreground md:text-4xl text-balance">
+          <h1 className="mb-4 text-3xl font-bold leading-tight text-foreground md:text-4xl text-balance">
             {data?.title}
           </h1>
 
@@ -214,7 +219,7 @@ export default async function AudioDetailPage({
           </div>
         </header>
 
-        <div className="mb-10">
+        <div className="mb-10 sm:mb-12">
           <AudioProvider>
             <AudioDetailPlayer 
               id={data?.sys?.id} 
@@ -225,6 +230,24 @@ export default async function AudioDetailPage({
             />
           </AudioProvider>
         </div>
+
+        {categories.length > 0 && (
+          <section aria-labelledby="relevant-topics" className="mb-12 border-y border-border py-3 sm:mb-16">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
+              <h2 id="relevant-topics" className="flex shrink-0 items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <Tags className="size-4 shrink-0 text-primary" aria-hidden="true" />
+                Relevant tags
+              </h2>
+              <div className="flex min-w-0 flex-wrap gap-2">
+                {categories.map((category, index) => (
+                  <Badge key={`${category}-${index}`} variant="outline" className="max-w-full rounded-full whitespace-normal px-3 py-1.5 text-sm">
+                    <span className="min-w-0 break-words">{category}</span>
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* About Section */}
         {
