@@ -11,5 +11,5 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const event = await getEventBySlug(slug);
   if (!event) notFound();
   const summary = await getEventSummary(event.names);
-  return createEventOgImage({ title: event.title, total: summary.total, date: summary.date });
+  return createEventOgImage({ title: event.title, date: summary.date });
 }

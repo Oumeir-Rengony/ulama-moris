@@ -23,5 +23,5 @@ export async function GET(request: Request) {
   const event = await getEventBySlug(slug);
   if (!event) return new Response("Event not found", { status: 404 });
   const summary = await getEventSummary(event.names);
-  return createEventOgImage({ title: title || event.title, total: summary.total, date: summary.date });
+  return createEventOgImage({ title: title || event.title, date: summary.date });
 }

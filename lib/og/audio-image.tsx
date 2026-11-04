@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { getOgTitleFontSize } from "./title-font-size";
 
 const assets = Promise.all([
   readFile(join(process.cwd(), "public/og.jpg")),
@@ -49,24 +50,51 @@ function renderText({ title, author }: AudioImageProps, fontSize: number) {
         {title}
       </h1>
       {author?.trim() && (
-        <p
+        <div
           style={{
-            margin: "48px 0 0",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
             width: "100%",
-            flexShrink: 0,
-            fontSize: 32,
-            textAlign: "center",
-            justifyContent: "center",
-            lineHeight: 1.2,
-            wordBreak: "break-word",
-            display: "block",
-            lineClamp: 2,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
           }}
         >
-          By {author}
-        </p>
+          <svg
+            width="480"
+            height="40"
+            viewBox="0 0 600 50"
+            fill="none"
+            style={{ margin: "24px 0", flexShrink: 0 }}
+          >
+            <path d="M10 25H257M343 25H590" stroke="#ad965d" strokeWidth="4" strokeLinecap="round" />
+            <polygon
+              points="300,0 307,8 317,8 317,18 325,25 317,32 317,42 307,42 300,50 293,42 283,42 283,32 275,25 283,18 283,8 293,8"
+              fill="#ad965d"
+            />
+            <polygon
+              points="300,9 305,15 310,15 310,20 316,25 310,30 310,35 305,35 300,41 295,35 290,35 290,30 284,25 290,20 290,15 295,15"
+              stroke="#e9e6d6"
+              strokeWidth="0.8"
+            />
+          </svg>
+          <p
+            style={{
+              margin: 0,
+              width: "100%",
+              flexShrink: 0,
+              fontSize: 32,
+              textAlign: "center",
+              justifyContent: "center",
+              lineHeight: 1.2,
+              wordBreak: "break-word",
+              display: "block",
+              lineClamp: 2,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            By {author}
+          </p>
+        </div>
       )}
     </div>
   );
@@ -75,19 +103,7 @@ function renderText({ title, author }: AudioImageProps, fontSize: number) {
 export async function createAudioOgImage(props: AudioImageProps) {
   const [background, font] = await assets;
   const fonts = [{ name: "El Messiri", data: font, style: "normal" as const, weight: 600 as const }];
-  let titleFontSize = 72;
-  if (props.title.length > 60) {
-    titleFontSize = 60;
-  }
-  if (props.title.length > 100) {
-    titleFontSize = 48;
-  }
-  if (props.title.length > 160) {
-    titleFontSize = 40;
-  }
-  if (props.title.length > 240) {
-    titleFontSize = 36;
-  }
+  const titleFontSize = getOgTitleFontSize(props.title);
 
   return new ImageResponse(
     (

@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { getOgTitleFontSize } from "./title-font-size";
 
 const assets = Promise.all([
   readFile(join(process.cwd(), "public/series og.jpg")),
@@ -8,33 +9,17 @@ const assets = Promise.all([
   readFile(join(process.cwd(), "public/font/Geist-Bold.ttf")),
 ]);
 
-export async function createEventOgImage({ title: eventTitle, total, date: recordingDate }: {
+const titleLineHeight = 1.1;
+const maxTitleHeight = 180;
+
+export async function createEventOgImage({ title, date }: {
   title: string;
-  total: number;
   date: string | null;
 }) {
   const [background, titleFont, detailFont] = await assets;
 
-  const dateMatch = eventTitle.match(
-    /\s+[-–—]\s+((?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)[a-z]*\s+)?\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})$/i,
-  );
-  let title = eventTitle;
-  let date = recordingDate;
-  if (dateMatch) {
-    title = eventTitle.slice(0, dateMatch.index).trim();
-    // A date in the title must not restore a date hidden for a multi-day event.
-    if (recordingDate) {
-      date = dateMatch[1];
-    }
-  }
-
-  let titleFontSize = 56;
-  if (title.length > 65) {
-    titleFontSize = 46;
-  }
-  if (title.length > 110) {
-    titleFontSize = 36;
-  }
+  const titleFontSize = getOgTitleFontSize(title);
+  const maxTitleLines = Math.floor(maxTitleHeight / (titleFontSize * titleLineHeight));
 
   return new ImageResponse(
     (
@@ -88,13 +73,15 @@ export async function createEventOgImage({ title: eventTitle, total, date: recor
           </div>
           <div
             style={{
-              display: "flex",
+              display: "block",
+              width: "100%",
+              flexShrink: 0,
               marginTop: 20,
               fontSize: titleFontSize,
               fontWeight: 700,
-              lineHeight: 1.14,
+              lineHeight: titleLineHeight,
               letterSpacing: -1.2,
-              maxHeight: 180,
+              lineClamp: maxTitleLines,
               overflow: "hidden",
               textOverflow: "ellipsis",
               wordBreak: "break-word",
@@ -118,30 +105,37 @@ export async function createEventOgImage({ title: eventTitle, total, date: recor
           <div
             style={{
               display: "flex",
-              marginTop: 30,
-              padding: "8px 17px",
-              borderRadius: 999,
-              backgroundColor: "#006e16",
-              color: "#ffffff",
-              fontSize: 16,
+              alignItems: "center",
+              gap: 18,
+              width: 620,
+              marginTop: 32,
+              paddingTop: 22,
+              borderTop: "1px solid #b8cdbb",
+              color: "#102e1b",
               fontFamily: "Geist",
-              fontWeight: 400,
-              letterSpacing: 1,
+              fontWeight: 700,
             }}
           >
-            {total} {total === 1 ? "Lecture" : "Lectures"}
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#45634d" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <path d="M3 14v-3a9 9 0 0 1 18 0v3" />
+              <rect x="3" y="12" width="4" height="9" rx="2" />
+              <rect x="17" y="12" width="4" height="9" rx="2" />
+            </svg>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ fontSize: 26, lineHeight: 1.2, letterSpacing: -0.6 }}>
+                More talks on this topic
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 18, color: "#45634d" }}>
+                Explore the audio collection
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#45634d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 12h16m-6-6 6 6-6 6" />
+                </svg>
+              </div>
+              <div style={{ fontSize: 16}}>
+                ulama-moris.org
+              </div>
+            </div>
           </div>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            position: "absolute",
-            bottom: 53,
-            left: 60,
-          }}
-        >
-          <span style={{ color: "#738a78", fontSize: 16 }}>ulama-moris.org</span>
         </div>
       </div>
     ),
