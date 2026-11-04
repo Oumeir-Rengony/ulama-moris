@@ -7,6 +7,7 @@ export function getEventPath(event: string): string {
 }
 
 export type EventRecording = {
+  date?: string | null;
   duration?: string | null;
   masjid?: {
     sys: { id: string };
@@ -48,9 +49,19 @@ function getSharedEventLocation(recordings: EventRecording[]): string | null {
 }
 
 export function summarizeEventRecordings(recordings: EventRecording[]) {
+  let firstDate: Date | null = null;
+  let lastDate: Date | null = null;
   let totalSeconds = 0;
   let hasAllDurations = recordings.length > 0;
   for (const recording of recordings) {
+    if (recording?.date) {
+      const recordedAt = new Date(recording.date);
+      if (!Number.isNaN(recordedAt.getTime())) {
+        if (!firstDate || recordedAt < firstDate) firstDate = recordedAt;
+        if (!lastDate || recordedAt > lastDate) lastDate = recordedAt;
+      }
+    }
+
     const seconds = getDurationSeconds(recording?.duration);
     if (seconds === null) {
       hasAllDurations = false;
@@ -70,7 +81,22 @@ export function summarizeEventRecordings(recordings: EventRecording[]) {
     duration = parts.join(" ");
   }
 
+  let date: string | null = null;
+  if (firstDate && lastDate) {
+    const formatter = new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "Indian/Mauritius",
+    });
+    const start = formatter.format(firstDate);
+    const end = formatter.format(lastDate);
+    date = start;
+    if (start !== end) date = `${start} – ${end}`;
+  }
+
   return {
+    date,
     total: recordings.length,
     duration,
     location: getSharedEventLocation(recordings),

@@ -10,6 +10,7 @@ export default gql`
     ) {
       total
       items {
+        date
         duration
         masjid {
           sys { id }

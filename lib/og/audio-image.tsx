@@ -1,0 +1,127 @@
+import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import satori from "satori";
+
+const assets = Promise.all([
+  readFile(join(process.cwd(), "public/og.jpg")),
+  readFile(join(process.cwd(), "public/font/ElMessiri-SemiBold.ttf")),
+]);
+
+const contentWidth = 740;
+const contentHeight = 420;
+const titleLineHeight = 1.1;
+const maxTitleLines = 6;
+
+type AudioImageProps = { title: string; author?: string | null };
+
+function renderText({ title, author }: AudioImageProps, fontSize: number, clampTitle: boolean) {
+  return (
+    <div
+      id="audio-text"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        width: contentWidth,
+        color: "#102e1b",
+        fontFamily: "El Messiri",
+        fontWeight: 600,
+        textAlign: "center",
+      }}
+    >
+      <h1
+        id="audio-title"
+        style={{
+          margin: 0,
+          width: "100%",
+          flexShrink: 0,
+          fontSize,
+          textAlign: "center",
+          justifyContent: "center",
+          lineHeight: titleLineHeight,
+          wordBreak: "break-word",
+          display: "block",
+          ...(clampTitle ? { lineClamp: maxTitleLines } : {}),
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {title}
+      </h1>
+      {author?.trim() && (
+        <p
+          style={{
+            margin: "48px 0 0",
+            width: "100%",
+            flexShrink: 0,
+            fontSize: 32,
+            textAlign: "center",
+            justifyContent: "center",
+            lineHeight: 1.2,
+            wordBreak: "break-word",
+            display: "block",
+            lineClamp: 2,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          By {author}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export async function createAudioOgImage(props: AudioImageProps) {
+  const [background, font] = await assets;
+  const fonts = [{ name: "El Messiri", data: font, style: "normal" as const, weight: 600 as const }];
+  let titleFontSize = 36;
+
+  // Measure the actual wrapped text with the renderer's font and layout engine.
+  for (let candidateSize = 72; candidateSize >= 36; candidateSize -= 4) {
+    let titleHeight = 0;
+    let groupHeight = 0;
+    await satori(renderText(props, candidateSize, false), {
+      width: contentWidth,
+      fonts,
+      embedFont: false,
+      onNodeDetected(node) {
+        if (node.props.id === "audio-title") titleHeight = node.height;
+        if (node.props.id === "audio-text") groupHeight = node.height;
+      },
+    });
+    const titleFits = titleHeight <= candidateSize * titleLineHeight * maxTitleLines + 1;
+    if (titleFits && groupHeight <= contentHeight) {
+      titleFontSize = candidateSize;
+      break;
+    }
+  }
+
+  return new ImageResponse(
+    (
+      <div style={{ display: "flex", position: "relative", width: 1200, height: 630 }}>
+        <img alt="" src={`data:image/jpeg;base64,${background.toString("base64")}`} width={1200} height={630} />
+        <div
+          style={{
+            display: "flex",
+            position: "absolute",
+            top: 80,
+            left: 224,
+            width: contentWidth,
+            height: contentHeight,
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {renderText(props, titleFontSize, true)}
+        </div>
+        <div style={{ display: "flex", position: "absolute", bottom: 53, right: 60, color: "#738a78", fontFamily: "El Messiri", fontWeight: 600, fontSize: 16 }}>
+          ulama-moris.org
+        </div>
+      </div>
+    ),
+    { width: 1200, height: 630, fonts },
+  );
+}

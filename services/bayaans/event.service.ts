@@ -4,7 +4,7 @@ import { ExecuteQuery } from "@/services/apollo/apollo.service";
 import EventNamesQuery from "./query/eventNames.query";
 import EventSummaryQuery from "./query/eventSummary.query";
 
-const getEventNames = cache(async (): Promise<string[]> => {
+export const getEventNames = cache(async (): Promise<string[]> => {
   const names = new Set<string>();
   const limit = 1000;
   let skip = 0;

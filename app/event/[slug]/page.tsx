@@ -31,6 +31,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
     description,
     alternates: { canonical: path },
     openGraph: { title, description, url: path },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
