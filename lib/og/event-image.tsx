@@ -47,7 +47,7 @@ export async function createEventOgImage({ title, date }: {
           style={{
             display: "flex",
             position: "absolute",
-            top: 100,
+            top: 72,
             left: 100,
             width: 710,
             flexDirection: "column",
@@ -58,14 +58,14 @@ export async function createEventOgImage({ title, date }: {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 12,
+              gap: 14,
               color: "#ad913e",
-              fontSize: 17,
+              fontSize: 30,
               fontWeight: 700,
-              letterSpacing: 3,
+              letterSpacing: 4,
             }}
           >
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ad913e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ad913e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="m12 3 10 5-10 5L2 8l10-5Z" />
               <path d="m2 12 10 5 10-5M2 16l10 5 10-5" />
             </svg>
@@ -94,7 +94,7 @@ export async function createEventOgImage({ title, date }: {
               style={{
                 marginTop: 20,
                 fontFamily: "Geist",
-                fontSize: 18,
+                fontSize: 26,
                 fontWeight: 700,
                 color: "#45634d",
               }}
@@ -106,9 +106,9 @@ export async function createEventOgImage({ title, date }: {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 18,
-              width: 620,
-              marginTop: 32,
+              gap: 22,
+              width: 700,
+              marginTop: 28,
               paddingTop: 22,
               borderTop: "1px solid #b8cdbb",
               color: "#102e1b",
@@ -116,22 +116,22 @@ export async function createEventOgImage({ title, date }: {
               fontWeight: 700,
             }}
           >
-            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#45634d" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#45634d" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
               <path d="M3 14v-3a9 9 0 0 1 18 0v3" />
               <rect x="3" y="12" width="4" height="9" rx="2" />
               <rect x="17" y="12" width="4" height="9" rx="2" />
             </svg>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <div style={{ fontSize: 26, lineHeight: 1.2, letterSpacing: -0.6 }}>
+              <div style={{ fontSize: 40, lineHeight: 1.2, letterSpacing: -0.6 }}>
                 More talks on this topic
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 18, color: "#45634d" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 30, color: "#45634d" }}>
                 Explore the audio collection
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#45634d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#45634d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 12h16m-6-6 6 6-6 6" />
                 </svg>
               </div>
-              <div style={{ fontSize: 16}}>
+              <div style={{ fontSize: 26 }}>
                 ulama-moris.org
               </div>
             </div>

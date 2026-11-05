@@ -81,7 +81,7 @@ function renderText({ title, author }: AudioImageProps, fontSize: number) {
               margin: 0,
               width: "100%",
               flexShrink: 0,
-              fontSize: 32,
+              fontSize: 40,
               textAlign: "center",
               justifyContent: "center",
               lineHeight: 1.2,
@@ -113,7 +113,7 @@ export async function createAudioOgImage(props: AudioImageProps) {
           style={{
             display: "flex",
             position: "absolute",
-            top: "30%",
+            top: "25%",
             left: (1200 - contentWidth) / 2,
             width: contentWidth,
             flexDirection: "column",

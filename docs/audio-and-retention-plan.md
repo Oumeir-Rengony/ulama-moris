@@ -77,21 +77,7 @@ Caveats found during the first implementation:
 - **Placement on mobile:** below the hero, the row is off-screen on first load at 390px width.
 - **Interaction with item 1:** if item 1 is done first, the homepage provider structure changes. The `<Suspense>` hydration timing above still applies to anything in `AudioList`.
 
-### 4. Highlight new content
 
-Status: built (a gold star "New" seal on cards) and then removed on 2026-11-05 at the owner's request. The caveats below still apply if the idea comes back.
-
-Add a "New" badge for lectures published within the last 7 days.
-
-Context and caveats:
-- **Use `sys.firstPublishedAt`:**
-  - The bayaan `date` field is when the lecture was given, not when it was uploaded, so it must not be used.
-  - Contentful's `sys.publishedAt` changes every time the entry is republished (edited), so it must not be used either.
-  - Use `sys.firstPublishedAt`. It is available on the GraphQL `sys` block but isn't selected in `bayaan.fragment.ts` yet.
-  - Checked against Contentful on 2026-11-05: "A Country on Fire: Analysis and Lessons" has `date` 2026-10-16, `firstPublishedAt` 2026-11-03 and `publishedAt` 2026-11-04.
-- **Caching:** list pages are cached for up to 24 hours. A server-side "is new" check freezes until the next revalidation, and differs from a browser-side check made at a different time, which causes a hydration mismatch.
-- **Card header:** `components/audio-card.tsx` only renders its header row (where the category pills are) when the lecture has categories. A badge placed in that row is hidden for lectures with no category. (The stray `0` this row used to render is fixed.)
-- **Where to show it:** cards are rendered in two places, `components/audio-list.tsx` and `app/events/[slug]/page.tsx`. Both need the new prop. The related-lecture cards on `/audio/[slug]` use a separate `RelatedLectureCard` component.
 
 ## Testing notes
 
