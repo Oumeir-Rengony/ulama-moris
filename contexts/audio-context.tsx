@@ -9,7 +9,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react"
-import CONFIG from "@/config/config.json";
+import { getTrackProgress, removeProgress, saveProgress } from "@/lib/listening-progress";
 
 // Types
 export interface AudioTrack {
@@ -40,37 +40,6 @@ interface AudioContextValue {
 
 const AudioContext = createContext<AudioContextValue | null>(null)
 
-
-const STORAGE_KEY = CONFIG.localstorageKey.audioTime;
-
-
-type ProgressMap = Record<string, number>
-
-function getProgressMap(): ProgressMap {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY)
-    return data ? JSON.parse(data) : {}
-  } catch {
-    return {}
-  }
-}
-
-function saveProgress(trackId: string, time: number) {
-  const map = getProgressMap()
-  map[trackId] = time
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(map))
-}
-
-function removeProgress(trackId: string) {
-  const map = getProgressMap()
-  delete map[trackId]
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(map))
-}
-
-function getTrackProgress(trackId: string): number {
-  const map = getProgressMap()
-  return map[trackId] || 0
-}
 
 
 // AudioProvider - Single global audio element

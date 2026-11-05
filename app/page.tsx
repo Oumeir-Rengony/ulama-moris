@@ -4,8 +4,8 @@ import { getBayaansWithPagination, type Local } from "@/services/bayaans/bayaan.
 // import { headers } from "next/headers";
 // import { getSelectorsByUserAgent } from "react-device-detect";
 import { AudioProvider } from '@/contexts/audio-context';
-import dayjs from "dayjs";
 import { Suspense } from "react";
+import { parseDateParam, parsePageParam } from "@/lib/search-params";
 
 // export const dynamic = 'force-static';
 export const revalidate = 86400; // 24 hours in seconds
@@ -20,16 +20,17 @@ export default async function Home({
 
   const queryParams = await searchParams;
 
-  const page = queryParams?.page || 1;
+  // The URL can be edited by hand, so bad values fall back to safe defaults.
+  const page = parsePageParam(queryParams?.page);
+  const startDate = parseDateParam(queryParams?.startDate);
+  const endDate = parseDateParam(queryParams?.endDate);
 
-  const startDate = queryParams?.startDate as string || "";
-  const endDate = queryParams?.endDate as string || "";
-  const search = queryParams?.search as string || "";
+  let search = "";
+  if (typeof queryParams?.search === "string") {
+    search = queryParams.search;
+  }
 
   const region = queryParams?.type as Local || "local"
-  
-  const validStartDate = dayjs(startDate).isValid() ? startDate : "";
-  const validEndDate = dayjs(endDate).isValid() ? endDate : "";
 
   //headers undefine din force-static
   // const userAgent = (await headers()).get('user-agent');
@@ -38,7 +39,7 @@ export default async function Home({
   const isMobile = true; // Assuming mobile for now since headers are not available in force-static mode
 
   const audioListPromise = getBayaansWithPagination({ 
-    page: +page,
+    page: page,
     startDate: startDate,
     endDate: endDate,
     type: region,
@@ -56,7 +57,7 @@ export default async function Home({
         <AudioProvider>
           <AudioList 
             audioListPromise={audioListPromise}
-            currentPage={+page}
+            currentPage={page}
             searchQuery={search}
             region={region}
             isMobile={isMobile}

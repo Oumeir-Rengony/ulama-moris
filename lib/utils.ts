@@ -20,13 +20,21 @@ export const toISODuration = (timeStr: string) => {
   } else if (parts.length === 2) {
     [minutes, seconds] = parts;
   } else {
-    throw new Error("Invalid time format. Use HH:MM:SS or MM:SS.");
+    // A malformed duration from the CMS should drop the field from JSON-LD,
+    // not crash the page that builds it.
+    return;
   }
+
+  const hasInvalidPart = Number.isNaN(hours) || Number.isNaN(minutes) || Number.isNaN(seconds);
+  if (hasInvalidPart) return;
 
   let iso = "PT";
   if (hours) iso += hours + "H";
   if (minutes) iso += minutes + "M";
   if (seconds) iso += seconds + "S";
+
+  // "PT" alone is not a valid duration; a zero-length one is written "PT0S".
+  if (iso === "PT") return "PT0S";
 
   return iso;
 }
@@ -75,10 +83,20 @@ export const getWhatsAppLink = (pathname: string, queryString: string) => {
   return encodeURIComponent(fullUrl);
 }
 
+// One paragraph with nothing visible inside: spaces, &nbsp; or <br>, <br/>, <br />.
+const EMPTY_PARAGRAPH = /<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>/gi;
+
 export const cleanDescription = (html?: string) => {
-  if (!html || html === "<p><br></p>" || html === "<p></p>") {
+  if (!html) {
     return "";
   }
+
+  // The CMS rich-text editor saves an untouched description as empty paragraphs.
+  const visibleContent = html.replace(EMPTY_PARAGRAPH, "").trim();
+  if (visibleContent === "") {
+    return "";
+  }
+
   return html;
 };
 

@@ -225,7 +225,8 @@ const getEventID = (event: string, date: string) => {
     : ""
 }
 
-const selectUniqueBayaan= (data: any[], limit=4) => {
+// Exported for tests.
+export const selectUniqueBayaan= (data: any[], limit=4) => {
   const seen = new Set();
   const final = [];
 

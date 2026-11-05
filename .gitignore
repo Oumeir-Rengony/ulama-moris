@@ -46,3 +46,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# playwright (output is written inside e2e/)
+/e2e/test-results/
+/e2e/playwright-report/
+/playwright/.cache/
+
+# test coverage report (npm run test:coverage)
+/tests/coverage/

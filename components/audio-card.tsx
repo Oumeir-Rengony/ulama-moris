@@ -42,6 +42,10 @@ export function AudioCard({
   whatsAppLink
 }: AudioCardProps) {
 
+  const categories = arrayify(category)
+  // A boolean, so a lecture with no categories renders nothing (not a stray "0").
+  const showHeader = categories.length > 0
+
   const showToast = () => {
     toast(title, {
       description: "Download started. Check your download folder",
@@ -60,11 +64,11 @@ export function AudioCard({
     <article className="group relative overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5">
 
       {/* Category Badge & Play Button Header */}
-      {category?.length &&
+      {showHeader &&
         <div className="flex justify-between border-b border-border bg-secondary/30 px-5 py-2.5 md:py-3">
           <div className="flex items-center gap-2 flex-wrap">
             {
-              arrayify(category).map((cat, idx) => (
+              categories.map((cat, idx) => (
                 <span key={idx} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground border-border`}>
                   {cat}
                 </span>

@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CalendarDays, ChevronRight, Clock3, Layers3, MapPin, Radio } from "lucide-react";
 import CONFIG from "@/config/config.json";
-import type { EventDirectoryEntry } from "@/lib/events";
+import { groupEventsByYear, type EventDirectoryEntry } from "@/lib/events";
 import { toTitleCase } from "@/lib/utils";
+import { parsePageParam } from "@/lib/search-params";
 import { getEventDirectory } from "@/services/bayaans/event.service";
 
 export const revalidate = 86400; // 24 hours in seconds
@@ -33,37 +34,6 @@ export const metadata: Metadata = {
 type EventsPageProps = {
   searchParams: Promise<{ page?: string | string[] }>;
 };
-
-type EventYearGroup = {
-  heading: string;
-  events: EventDirectoryEntry[];
-};
-
-function groupEventsByYear(events: EventDirectoryEntry[]): EventYearGroup[] {
-  const groups: EventYearGroup[] = [];
-  const undatedEvents: EventDirectoryEntry[] = [];
-
-  // Events arrive newest first, so a new year heading starts whenever the year changes.
-  for (const event of events) {
-    if (!event.year) {
-      undatedEvents.push(event);
-      continue;
-    }
-
-    const currentGroup = groups[groups.length - 1];
-    if (currentGroup && currentGroup.heading === event.year) {
-      currentGroup.events.push(event);
-    } else {
-      groups.push({ heading: event.year, events: [event] });
-    }
-  }
-
-  if (undatedEvents.length > 0) {
-    groups.push({ heading: "Other events", events: undatedEvents });
-  }
-
-  return groups;
-}
 
 function EventDateBadge({ event }: { event: EventDirectoryEntry }) {
   if (!event.day || !event.month) {
@@ -137,8 +107,7 @@ function EventRow({ event }: { event: EventDirectoryEntry }) {
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const query = await searchParams;
-  const requestedPage = typeof query.page === "string" ? Number(query.page) : 1;
-  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const page = parsePageParam(query.page);
 
   const events = await getEventDirectory();
   const pageSize = CONFIG.bayaan.pageSize.desktop;

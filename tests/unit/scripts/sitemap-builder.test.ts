@@ -9,7 +9,7 @@ import {
    getEventSitemapEntries,
    getLatestDate,
    groupEventSitemapItems,
-} from "./sitemap-builder";
+} from "@/scripts/sitemap-builder";
 
 vi.mock("node-fetch", () => ({ default: vi.fn() }));
 

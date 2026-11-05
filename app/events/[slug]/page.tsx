@@ -9,6 +9,7 @@ import { getEventPath } from "@/lib/events";
 import { getBayaansWithPagination } from "@/services/bayaans/bayaan.service";
 import { getEventBySlug, getEventSummary } from "@/services/bayaans/event.service";
 import { toTitleCase } from "@/lib/utils";
+import { parsePageParam } from "@/lib/search-params";
 
 export const revalidate = 86400; // 24 hours in seconds
 
@@ -45,8 +46,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
   }
 
   const query = await searchParams;
-  const requestedPage = typeof query.page === "string" ? Number(query.page) : 1;
-  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const page = parsePageParam(query.page);
   const [audioList, summary] = await Promise.all([
     getBayaansWithPagination({ events: event.names, page, isMobile: false }),
     getEventSummary(event.names),

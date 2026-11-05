@@ -8,6 +8,7 @@ import { Local } from "@/services/bayaans/bayaan.service"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { cn, createQueryString } from "@/lib/utils"
 import { useDebouncedCallback } from "@/hooks/use-debounce";
+import { getPageNumbers } from "@/lib/pagination";
 
 export function AudioList({
   audioListPromise,
@@ -47,11 +48,25 @@ export function AudioList({
     trailing: true,
   }),[]);
 
-  const onSearch = (query: string) => {
+  // New filters give a new list, so drop the page number and start at page 1.
+  const pushFilters = (filters: Record<string, string | null>) => {
     const params = createQueryString(searchParams, {
-      search: query
+      ...filters,
+      page: null,
     })
-    router.push(`${pathname}?${params}`, {scroll: false})
+
+    if (params === "") {
+      router.push(pathname, { scroll: false })
+      return
+    }
+
+    router.push(`${pathname}?${params}`, { scroll: false })
+  }
+
+  const onSearch = (query: string) => {
+    // An empty search box means no search filter at all.
+    const searchValue = query === "" ? null : query
+    pushFilters({ search: searchValue })
   }
 
 
@@ -73,10 +88,7 @@ export function AudioList({
   
   const handleRegionChange = (region: Local) => {
     startTransition(() => {
-      const params = createQueryString(searchParams, {
-        type: region
-      })
-      router.push(`${pathname}?${params}`, { scroll: false})
+      pushFilters({ type: region })
     })
   }
 
@@ -104,26 +116,6 @@ export function AudioList({
     // document.getElementById("audio-list")?.scrollIntoView({ behavior: "smooth" })
   }
 
-  const getPageNumbers = () => {
-    const pages: (number | string)[] = []
-    const maxVisible = 5
-
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i)
-      }
-    } else {
-      if (currentPage <= 3) {
-        pages.push(1, 2, 3, 4, "...", totalPages)
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages)
-      } else {
-        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages)
-      }
-    }
-
-    return pages
-  }
 
   return (
     <section id="audio-list" className="py-12">
@@ -230,7 +222,7 @@ export function AudioList({
 
             {/* Page Numbers */}
             <div className="flex items-center gap-1">
-              {getPageNumbers().map((page, index) => (
+              {getPageNumbers(currentPage, totalPages).map((page, index) => (
                 page === "..." ? (
                   <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">
                     ...

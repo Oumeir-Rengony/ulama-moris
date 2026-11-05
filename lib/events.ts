@@ -147,6 +147,37 @@ function formatEventDateRange(firstDate: Date, lastDate: Date): string {
   return `${start} – ${end}`;
 }
 
+export type EventYearGroup = {
+  heading: string;
+  events: EventDirectoryEntry[];
+};
+
+export function groupEventsByYear(events: EventDirectoryEntry[]): EventYearGroup[] {
+  const groups: EventYearGroup[] = [];
+  const undatedEvents: EventDirectoryEntry[] = [];
+
+  // Events arrive newest first, so a new year heading starts whenever the year changes.
+  for (const event of events) {
+    if (!event.year) {
+      undatedEvents.push(event);
+      continue;
+    }
+
+    const currentGroup = groups[groups.length - 1];
+    if (currentGroup && currentGroup.heading === event.year) {
+      currentGroup.events.push(event);
+    } else {
+      groups.push({ heading: event.year, events: [event] });
+    }
+  }
+
+  if (undatedEvents.length > 0) {
+    groups.push({ heading: "Other events", events: undatedEvents });
+  }
+
+  return groups;
+}
+
 export function createEventDirectoryEntry(title: string, recordings: EventRecording[]): EventDirectoryEntry {
   const summary = summarizeEventRecordings(recordings);
   const entry: EventDirectoryEntry = {

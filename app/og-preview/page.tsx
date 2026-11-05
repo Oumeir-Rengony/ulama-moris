@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEventPath, getEventSlug } from "@/lib/events";
+import { parsePageParam } from "@/lib/search-params";
 import { getBayaansBase } from "@/services/bayaans/bayaan.service";
 import { getEventNames } from "@/services/bayaans/event.service";
 import { PreviewImage } from "./preview-image";
@@ -24,8 +25,7 @@ export default async function OgPreviewPage({
   const type = query.type === "audio" ? "audio" : "event";
   const search = query.search?.trim() || "";
   const customTitle = query.title?.trim().slice(0, 2000) || "";
-  const requestedPage = Number(query.page || 1);
-  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const page = parsePageParam(query.page);
   const pageSize = 20;
   let options: PreviewOption[] = [];
   let totalPages = 1;
