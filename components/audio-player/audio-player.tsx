@@ -175,7 +175,6 @@ function Progress({ className, thumbSize = "md", trackHeight = "md" }: ProgressP
 
   // Handle value change during drag - only update UI, don't seek audio yet
   const handleValueChange = useCallback((value: number[]) => {
-    console.log("handleValueChange",  value[0])
       if (isCurrentTrack) { 
         seekImmediate(value[0])
       }

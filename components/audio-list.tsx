@@ -34,7 +34,7 @@ export function AudioList({
   const [isPending, startTransition] = useTransition();
 
   const ITEMS_PER_PAGE = isMobile ? CONFIG.bayaan.pageSize.mobile : CONFIG.bayaan.pageSize.desktop;
-  const totalAudio = audioList?.total || 1;
+  const totalAudio = audioList?.total ?? 0;
 
   const regions: { value: Local; label: string }[] = [
     { value: "local", label: "Local" },
@@ -165,6 +165,7 @@ export function AudioList({
             <input
               type="text"
               placeholder="Search lectures..."
+              defaultValue={searchQuery}
               onChange={handleSearchChange}
               onBlur={handleSearchBlur}
               className="h-10 w-full rounded-full border border-input bg-background pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
@@ -173,10 +174,12 @@ export function AudioList({
 
         </div>
 
-        {/* Results count */}
-        <div className="mb-6 text-sm text-muted-foreground">
-          Showing {startIndex + 1}-{Math.min(endIndex, totalAudio)} of {totalAudio} lectures
-        </div>
+        {/* Results count (the empty state below already explains when nothing matches) */}
+        {totalAudio > 0 && (
+          <div className="mb-6 text-sm text-muted-foreground">
+            Showing {startIndex + 1}-{Math.min(endIndex, totalAudio)} of {totalAudio} lectures
+          </div>
+        )}
 
         {/* Audio Grid */}
         {audioList?.items?.length > 0 ? (
