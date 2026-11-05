@@ -13,9 +13,13 @@ export async function GET(req: NextRequest) {
       return new Response("Missing file URL", { status: 400 });
    }
 
-   const urlObj = new URL(fileUrl);
+   let urlObj: URL;
+   try {
+      urlObj = new URL(fileUrl);
+   } catch {
+      return new Response("Invalid file URL", { status: 400 });
+   }
 
-   
    if ( urlObj.hostname !== "ctfassets.net" && !urlObj.hostname.endsWith(".ctfassets.net")) {
       return new Response("Unauthorized", { status: 403 });
    }

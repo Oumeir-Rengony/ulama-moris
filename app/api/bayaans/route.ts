@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBayaansWithPagination, type Local } from "@/services/bayaans/bayaan.service";
+import { parseDateParam, parsePageParam } from "@/lib/search-params";
 
 export const revalidate = 86400
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
-  const page = parseInt(searchParams.get("page") || "1", 10);
-  const startDate = searchParams.get("startDate") || "";
-  const endDate = searchParams.get("endDate") || "";
+  const page = parsePageParam(searchParams.get("page") ?? undefined);
+  const startDate = parseDateParam(searchParams.get("startDate") ?? undefined);
+  const endDate = parseDateParam(searchParams.get("endDate") ?? undefined);
   const search = searchParams.get("search") || "";
   const type = searchParams.get("type") as Local | undefined;
 

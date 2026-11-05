@@ -4,24 +4,31 @@ import { getCanonicalRequest } from '@/lib/utils';
 import { revalidatePath, revalidateTag } from "next/cache";
 
 
-const SECRET = process.env.CF_WEBHOOK_SECRET!;
-
 export async function POST(req: NextRequest) {
-   const rawBody = await req.text();
+  // Read on each request (not once at import) so a missing secret is caught here.
+  const secret = process.env.CF_WEBHOOK_SECRET;
+  if (!secret) {
+    // Fail closed: without a secret no request can be verified.
+    console.error("CF_WEBHOOK_SECRET is not set; refusing webhook");
+    return NextResponse.json({ error: "Webhook secret is not configured" }, { status: 500 });
+  }
 
-   const canonicalReq = await getCanonicalRequest(req, rawBody);
+  const rawBody = await req.text();
 
-   const isVerifiedRequest = verifyRequest(SECRET, canonicalReq);
-   
-   console.log({isVerifiedRequest});
+  const canonicalReq = await getCanonicalRequest(req, rawBody);
+
+  const isVerifiedRequest = verifyRequest(secret, canonicalReq);
 
   if (!isVerifiedRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
-  
-  const { searchParams } = new URL(req.url);
-    
-  const body = JSON.parse(rawBody);
+
+  let body;
+  try {
+    body = JSON.parse(rawBody);
+  } catch {
+    return NextResponse.json({ error: "Body is not valid JSON" }, { status: 400 });
+  }
 
   try {
    
@@ -38,9 +45,12 @@ export async function POST(req: NextRequest) {
    // so refresh every event page (and its OG image) rather than guess which ones changed.
    revalidatePath("/events/[slug]", "layout");
 
-    const id = body?.fields?.sys?.id;
+    // Contentful puts `sys` at the top level of the payload, next to `fields`.
+    // Audio URLs are tagged with their asset id (`audio:{assetId}`), so this
+    // matches when the webhook fires for an asset.
+    const id = body?.sys?.id;
 
-    if(!id){
+    if (id) {
       revalidateTag(`audio:${id}`, { expire: 0 });
     }
 
