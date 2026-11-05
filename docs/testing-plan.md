@@ -9,8 +9,8 @@ Decisions:
 - All tests live in one top-level `tests/` folder, split by level (see Phase 0).
 
 **Status (2026-11-05): phases 0–4 are implemented.**
-- `npm test`: 152 tests in 17 files (unit, component and integration).
-- `npm run test:e2e`: 12 passing, 1 skipped. The pagination journey skips itself while no event has more than one page of lectures (the largest has 8, exactly one page).
+- `npm test`: 175 tests in 18 files (unit, component and integration).
+- `npm run test:e2e`: 14 passing, 1 skipped. The pagination journey skips itself while no event has more than one page of lectures (the largest has 8, exactly one page).
 - Section 1 describes the state **before** this work; it is kept as the record of the analysis.
 
 ## 1. Where we are today
@@ -133,6 +133,11 @@ All of these are now fixed and covered by Phase 1 tests. The webhook and downloa
 - Clicking a region tab pushes `type=`.
 - Clicking a page number or Next pushes `page=`. Previous is disabled on page 1.
 
+**`components/audio-player/audio-detail-player.tsx`** (the lecture page's player; `useAudio` replaced by a fake)
+- Ready state: Play, `0:00` and the lecture length.
+- Play asks the player to play this lecture; Pause and the position show while it plays; another lecture's position is ignored.
+- Loading state while buffering; the skip buttons skip 15 seconds; Download has the right link and shows the toast.
+
 ### Phase 3: Integration tests (real hooks and state; only the outer boundary mocked)
 
 **Audio playback:** `AudioProvider` with real `AudioCardPlayer` and `AudioPlayer` parts
@@ -141,6 +146,11 @@ All of these are now fixed and covered by Phase 1 tests. The webhook and downloa
 - With two cards, starting the second one leaves the first showing Play.
 - With `localStorage.audioTime` already set for a track, playing it resumes at the saved time once `loadedmetadata` fires.
 - While playing, progress is saved every 3 seconds (fake timers). On `ended` it is removed.
+- Skip ±15s, stopping at the start and the end; a skip button on a lecture that isn't playing starts it instead.
+- The progress slider moves the playing lecture, and starts a lecture that isn't playing.
+- Loading spinner while buffering (only on the buffering lecture); an audio error returns to Play; the end of a lecture resets it to `0:00`.
+- Pressing Play again resumes without reloading; when the browser blocks playback, the button stays on Play.
+- `useAudio` controls no component uses yet (`toggle`, `pause`, `seek`), the length learned from `durationchange`/`canplay`, and the clear errors when `useAudio` or a player part is used outside its provider.
 
 **Contentful service layer** (mock `ExecuteQuery` with `vi.mock("@/services/apollo/apollo.service")`)
 - `getEventDirectory`:
@@ -167,6 +177,7 @@ Contentful content changes, so assertions check structure and behaviour, never s
 | 6 | Download | A card's download link goes through `/api/download`. Requesting it returns 200 with `Content-Disposition: attachment`. |
 | 7 | Not found | `/events/does-not-exist` returns 404. `/audio/does-not-exist` shows "Audio Not Found". |
 | 8 | Mobile navigation | In the Pixel project, the menu button opens the menu and its links go to Events and About. |
+| 9 | About | `/about` shows its heading, the Mission, Values and Get in Touch sections, and a Contact Us email link; the header marks About as the current page. |
 
 ### Unit-test review (2026-11-05)
 
