@@ -31,8 +31,6 @@ export default defineConfig({
         "components/ui/**",
         // Static data that nothing imports.
         "lib/audio-data.ts",
-        // Not served: Next.js ignores folders starting with "_".
-        "app/api/_audio/**",
         "**/*.d.ts",
       ],
     },

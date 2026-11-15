@@ -203,7 +203,6 @@ Following the strategy's advice to go for distinct coverage rather than repeatin
 - **shadcn primitives in `components/ui/*`:** library code that we don't change.
 - **OG image layout:** only a smoke test that the route returns an image (journey 4). Pixel-level layout isn't checked.
 - **`lib/audio-data.ts`:** static data that no code imports.
-- **`app/api/_audio/route.ts`:** the folder name starts with `_`, so Next.js doesn't serve it as a route.
 
 ## 4. Running the tests
 
