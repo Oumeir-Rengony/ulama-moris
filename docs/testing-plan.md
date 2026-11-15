@@ -110,9 +110,6 @@ All of these are now fixed and covered by Phase 1 tests. The webhook and downloa
   - 401 when the signature check fails
   - on success, `revalidatePath` is called for `/`, `/events`, the event layout and `/audio/{slug}`
   - `revalidateTag("audio:{id}")` is called with the real entry id (bug)
-- `app/api/bayaans/route.ts`, with the service mocked:
-  - query parameters are passed to `getBayaansWithPagination`
-  - a 500 JSON error when the service throws
 
 ### Phase 2: Component tests (Vitest + React Testing Library, jsdom, dependencies stubbed)
 
@@ -185,7 +182,7 @@ A review of edge cases after phases 0–4 found more bugs. Each now has a test t
 
 | Area | Problem | Fix |
 |---|---|---|
-| `app/page.tsx`, events pages, OG preview, `/api/bayaans` | `?page=abc` became `NaN` on the home page; the home page computed valid dates and then sent the raw ones to Contentful; the events pages each had their own copy of the page check. | Shared `parsePageParam` and `parseDateParam` in `lib/search-params.ts`. Dates must be a real `YYYY-MM-DD` date (strict: `2026-13-45` is rejected, not rolled over to 2027). |
+| `app/page.tsx`, events pages, OG preview | `?page=abc` became `NaN` on the home page; the home page computed valid dates and then sent the raw ones to Contentful; the events pages each had their own copy of the page check. | Shared `parsePageParam` and `parseDateParam` in `lib/search-params.ts`. Dates must be a real `YYYY-MM-DD` date (strict: `2026-13-45` is rejected, not rolled over to 2027). |
 | `components/audio-list.tsx` | Searching or switching region kept the page number, often landing on an empty page; clearing the search left `search=` in the URL. | New filters reset to page 1, and an empty search removes the parameter. |
 | `lib/utils.ts` | `toISODuration("0:00")` returned the invalid `"PT"`; `cleanDescription` showed `<p> </p>` / `<p><br/></p>` as a description. | Returns `"PT0S"`; any paragraph with only spaces, `&nbsp;` or `<br>` counts as empty. |
 | `app/api/webhook/revalidate/route.ts` | A missing `CF_WEBHOOK_SECRET` was read once at startup and passed on as `undefined`; a signed body that wasn't JSON threw. The test never checked what was passed to the signature check. | Fails closed with 500 when the secret is missing; 400 for invalid JSON; the test now checks the secret and the exact request passed to `verifyRequest`. |
