@@ -1,7 +1,7 @@
 import path from "path";
 import { defineConfig } from "vitest/config";
 
-// `npm test` runs every Vitest test under tests/, split by level (see docs/testing-plan.md):
+// `npm test` runs every Vitest test under tests/, split by level:
 //   tests/unit         pure logic and API route handlers, in Node
 //   tests/component    one React component, dependencies stubbed, in jsdom
 //   tests/integration  real hooks/state/services, only the outer boundary mocked
@@ -27,7 +27,7 @@ export default defineConfig({
       // Our own source code; every file is listed, including ones no test touches.
       include: ["app/**", "components/**", "contexts/**", "hooks/**", "lib/**", "services/**", "scripts/**"],
       exclude: [
-        // Third-party shadcn primitives we do not change (see docs/testing-plan.md).
+        // Third-party shadcn primitives we do not change.
         "components/ui/**",
         // Static data that nothing imports.
         "lib/audio-data.ts",
