@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { appApiError, appApiSuccess } from "@/lib/mobile-app/response";
-import { toAppLecture, toContentfulSeries, type AppLecture } from "@/lib/mobile-app/convert";
+import { isUsableBayaan, toAppLecture, toContentfulSeries, type AppLecture } from "@/lib/mobile-app/convert";
 import { parseLimitParam } from "@/lib/mobile-app/limit-param";
 import { parsePageParam } from "@/lib/search-params";
 import { getBayaansBase, type Local } from "@/services/bayaans/bayaan.service";
@@ -45,11 +45,16 @@ export async function GET(request: NextRequest) {
 
   const items: AppLecture[] = [];
   for (const bayaan of collection.items) {
+    if (!isUsableBayaan(bayaan)) {
+      continue;
+    }
     items.push(toAppLecture(bayaan));
   }
 
   // Contentful reports a total of 0 past the last page, so the app stops on hasMore.
-  const hasMore = skip + items.length < collection.total;
+  // Count what Contentful returned, not what was kept: a skipped lecture on the last page
+  // would otherwise report another page that doesn't exist.
+  const hasMore = skip + collection.items.length < collection.total;
 
   return appApiSuccess(request, { items, total: collection.total, page, hasMore });
 }

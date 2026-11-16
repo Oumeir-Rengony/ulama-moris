@@ -16,6 +16,17 @@ const bayaan = {
   sys: { id: "id-1" },
   slug: "on-patience",
   title: "On patience",
+  audio: { url: "https://assets.ctfassets.net/on-patience.m4a" },
+  local: ["local"],
+  category: null,
+};
+
+// A bayaan with no audio, which the app can't play.
+const bayaanWithoutAudio = {
+  sys: { id: "id-2" },
+  slug: "no-audio",
+  title: "No audio",
+  audio: null,
   local: ["local"],
   category: null,
 };
@@ -72,6 +83,18 @@ describe("GET /api/v1/lectures", () => {
     const response = await requestLectures("?page=99");
 
     expect((await response.json()).hasMore).toBe(false);
+  });
+
+  it("leaves out unusable lectures without reporting an extra page", async () => {
+    // The last page: Contentful returns items 21 and 22 of 22, and one has no audio.
+    mockedGetBayaansBase.mockResolvedValue({ bayaanCollection: { total: 22, items: [bayaan, bayaanWithoutAudio] } });
+
+    const response = await requestLectures("?page=3&limit=10");
+
+    const body = await response.json();
+    expect(body.items).toHaveLength(1);
+    expect(body.items[0].id).toBe("id-1");
+    expect(body.hasMore).toBe(false);
   });
 
   it("rejects an unknown type with a 400", async () => {
@@ -141,6 +164,15 @@ describe("GET /api/v1/lectures/[slug]", () => {
 
     expect(response.status).toBe(404);
     expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(await response.json()).toEqual({ error: "Lecture not found" });
+  });
+
+  it("returns a 404 for a lecture the app can't play", async () => {
+    mockedGetBayaanBySlug.mockResolvedValue({ data: bayaanWithoutAudio, total: undefined });
+
+    const response = await requestLecture("no-audio");
+
+    expect(response.status).toBe(404);
     expect(await response.json()).toEqual({ error: "Lecture not found" });
   });
 });

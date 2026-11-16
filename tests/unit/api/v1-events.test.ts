@@ -37,6 +37,9 @@ const seerahWeek: EventDetails = {
 // A bayaan as Contentful returns it, linked to Seerah Week.
 const seerahWeekBayaan = {
   sys: { id: "id-1" },
+  slug: "seerah-day-one",
+  title: "Seerah day one",
+  audio: { url: "https://assets.ctfassets.net/seerah-day-one.m4a" },
   local: ["local"],
   linkedFrom: {
     eventCollection: {
@@ -122,6 +125,23 @@ describe("GET /api/v1/events/[slug]", () => {
     expect(body.event).not.toHaveProperty("path");
     expect(body.lectures).toHaveLength(1);
     expect(body.lectures[0]).toMatchObject({ id: "id-1", event: "Seerah Week", eventSlug: "seerah-week" });
+  });
+
+  it("leaves out lectures the app can't use but keeps the summary", async () => {
+    mockedGetEventBySlug.mockResolvedValue({
+      ...seerahWeek,
+      bayaanIds: ["id-1", "id-2"],
+      recordings: [...seerahWeek.recordings, { sys: { id: "id-2" }, date: "2026-11-04T10:00:00Z", duration: "30:00" }],
+    });
+    const bayaanWithoutTitle = { ...seerahWeekBayaan, sys: { id: "id-2" }, title: null };
+    mockedGetBayaansBase.mockResolvedValue({ bayaanCollection: { total: 2, items: [seerahWeekBayaan, bayaanWithoutTitle] } });
+
+    const response = await requestEvent("seerah-week");
+
+    const body = await response.json();
+    expect(body.event.total).toBe(2);
+    expect(body.lectures).toHaveLength(1);
+    expect(body.lectures[0].id).toBe("id-1");
   });
 
   it("returns an event with no bayaans without asking Contentful for lectures", async () => {

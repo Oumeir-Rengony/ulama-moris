@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { createEventDirectoryEntry } from "@/lib/events";
-import { toAppEvent, toAppLecture, type AppLecture } from "@/lib/mobile-app/convert";
+import { isUsableBayaan, toAppEvent, toAppLecture, type AppLecture } from "@/lib/mobile-app/convert";
 import { appApiError, appApiSuccess } from "@/lib/mobile-app/response";
 import { getBayaansBase } from "@/services/bayaans/bayaan.service";
 import { getEventBySlug, type EventDetails } from "@/services/bayaans/event.service";
@@ -51,8 +51,12 @@ export async function GET(request: NextRequest, { params }: EventRouteContext) {
     return appApiError(request, 500, "Failed to fetch event");
   }
 
+  // The summary above still counts every recording, like the website's event page.
   const lectures: AppLecture[] = [];
   for (const bayaan of collection.items) {
+    if (!isUsableBayaan(bayaan)) {
+      continue;
+    }
     lectures.push(toAppLecture(bayaan));
   }
 

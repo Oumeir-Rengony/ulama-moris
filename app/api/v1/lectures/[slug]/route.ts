@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { appApiError, appApiSuccess } from "@/lib/mobile-app/response";
-import { toAppLecture } from "@/lib/mobile-app/convert";
+import { isUsableBayaan, toAppLecture } from "@/lib/mobile-app/convert";
 import { getBayaanBySlug } from "@/services/bayaans/bayaan.service";
 
 type LectureRouteContext = {
@@ -24,6 +24,11 @@ export async function GET(request: NextRequest, { params }: LectureRouteContext)
   // getBayaanBySlug can't tell "no such lecture" from a Contentful error, so a brief
   // Contentful failure also shows up as this 404.
   if (!bayaan) {
+    return appApiError(request, 404, "Lecture not found");
+  }
+
+  // The app can't open, play or show a lecture without a slug, title and audio URL.
+  if (!isUsableBayaan(bayaan)) {
     return appApiError(request, 404, "Lecture not found");
   }
 

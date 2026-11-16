@@ -9,13 +9,13 @@ export type AppSeries = "local" | "guest" | "islahi-majlis";
 
 export type AppLecture = {
   id: string;
-  slug: string | null;
-  title: string | null;
+  slug: string;
+  title: string;
   author: string | null;
   date: string | null;
   duration: string | null;
   masjid: string | null;
-  url: string | null;
+  url: string;
   series: AppSeries | null;
   event: string | null;
   eventSlug: string | null;
@@ -69,6 +69,19 @@ function textOrNull(value: unknown): string | null {
   return trimmed;
 }
 
+// The mobile app can't open, play or show a lecture without these fields.
+export function isUsableBayaan(bayaan: any): boolean {
+  const requiredFields = [bayaan?.slug, bayaan?.title, bayaan?.audio?.url];
+
+  for (const field of requiredFields) {
+    if (textOrNull(field) === null) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 // A bayaan as Contentful returns it (see BayaanFragment), turned into the app's Lecture.
 // `any` because the bayaan service is untyped.
 export function toAppLecture(bayaan: any): AppLecture {
@@ -88,13 +101,14 @@ export function toAppLecture(bayaan: any): AppLecture {
 
   return {
     id: bayaan.sys.id,
-    slug: bayaan.slug ?? null,
-    title: bayaan.title ?? null,
-    author: bayaan.author ?? null,
+    // Callers check isUsableBayaan first, so slug, title and url are set.
+    slug: bayaan.slug.trim(),
+    title: bayaan.title.trim(),
+    author: textOrNull(bayaan.author),
     date: bayaan.date ?? null,
     duration: textOrNull(bayaan.duration),
     masjid: textOrNull(bayaan.masjid?.title),
-    url: bayaan.audio?.url ?? null,
+    url: bayaan.audio.url.trim(),
     series: toAppSeries(bayaan.local),
     event,
     eventSlug,
