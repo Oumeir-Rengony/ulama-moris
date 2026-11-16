@@ -6,6 +6,7 @@ import { getBayaansWithPagination, type Local } from "@/services/bayaans/bayaan.
 import { AudioProvider } from '@/contexts/audio-context';
 import { Suspense } from "react";
 import { parseDateParam, parsePageParam } from "@/lib/search-params";
+import { BayaanListSkeleton } from "@/components/skeletons/bayaan-list-skeleton";
 
 // export const dynamic = 'force-static';
 export const revalidate = 86400; // 24 hours in seconds
@@ -53,7 +54,7 @@ export default async function Home({
     <div className="min-h-screen bg-background">
       <main>
         <Hero />
-        <Suspense>
+        <Suspense fallback={<BayaanListSkeleton />}>
         <AudioProvider>
           <AudioList 
             audioListPromise={audioListPromise}

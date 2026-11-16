@@ -22,6 +22,7 @@ import { AudioProvider } from "@/contexts/audio-context"
 import { getBayaanEvent, getEventPath } from "@/lib/events"
 import { createAudioJsonLd, createBreadcrumbJsonLd, getAudioBreadcrumbSteps } from "@/lib/json-ld"
 import { JsonLdScript } from "@/components/json-ld-script"
+import { RelatedLectureListSkeleton } from "@/components/skeletons/related-lecture-skeleton"
 
 export const dynamic = 'force-static';
 
@@ -266,14 +267,14 @@ export default async function AudioDetailPage({
         }
 
         {/* More Lectures Section */}
-        <Suspense>
-          <section className="mb-10">
-            <h2 className="mb-6 text-xl font-semibold text-foreground">More Lectures</h2>
-            <div className="grid gap-4 sm:grid-cols-2 auto-rows-fr">
+        <section className="mb-10">
+          <h2 className="mb-6 text-xl font-semibold text-foreground">More Lectures</h2>
+          <div className="grid gap-4 sm:grid-cols-2 auto-rows-fr">
+            <Suspense fallback={<RelatedLectureListSkeleton />}>
               <RelatedLectureSection relatedLecturesPromise={relatedLecturesPromise} />
-            </div>
-          </section>
-        </Suspense>
+            </Suspense>
+          </div>
+        </section>
 
         {/* Related Fatwas Section */}
         {/* <section className="rounded-xl border border-border bg-secondary/30 p-6">
