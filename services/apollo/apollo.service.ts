@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "http";
+import { appendFile } from "node:fs/promises";
 import {
    ApolloClient,
    InMemoryCache,
@@ -111,11 +112,36 @@ export const CreateApolloClient = (): ApolloClient => {
    });
 };
 
+// --- Query log (production e2e cache test only) ---
+// When CONTENTFUL_QUERY_LOG is set, every query that really goes to Contentful
+// appends one line to that file. The cache test (e2e-production/cache.spec.ts)
+// counts the lines to tell a cache hit from a real request. Nothing sets this
+// variable outside that test, so normally this does nothing.
+async function logQueryForCacheTest(query: DocumentNode) {
+   const queryLogPath = process.env.CONTENTFUL_QUERY_LOG;
+   if (!queryLogPath) {
+      return;
+   }
+
+   // The fragments come first in our query documents, so look for the query itself.
+   let operationName = "unnamed query";
+   for (const definition of query.definitions) {
+      if (definition.kind === "OperationDefinition" && definition.name) {
+         operationName = definition.name.value;
+         break;
+      }
+   }
+
+   await appendFile(queryLogPath, `${operationName}\n`);
+}
+
 // --- Execute Query ---
 export const ExecuteQuery = async (
    query: DocumentNode,
    { variables = {}, preview = false }: { variables?: any; preview: boolean }
 ): Promise<any> => {
+   await logQueryForCacheTest(query);
+
    const client = CreateApolloClient();
 
    const result = await client.query({

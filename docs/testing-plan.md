@@ -158,7 +158,7 @@ All of these are now fixed and covered by Phase 1 tests. The webhook and downloa
 - `getEventBySlug`: finds the matching names, and returns `undefined` when none match.
 - `getEventSummary`: pages through all recordings, and throws on an empty page before the total is reached.
 - `getRelatedBayaans`: puts same-event lectures first, then same-category, then random; removes duplicates; returns at most 4.
-- These functions are wrapped in React's `cache()`. Reset modules between tests (`vi.resetModules()` and a fresh import) so a cached result doesn't leak into the next test.
+- These functions use `"use cache"`. It only caches inside a Next.js server, and `tests/vitest.setup.ts` turns `cacheLife()`/`cacheTag()` into no-ops, so Vitest runs them as plain functions. Whether the cache really works is checked by the production end-to-end test (Phase 5).
 
 ### Phase 4: End-to-end tests (Playwright, live Contentful, critical journeys only)
 
@@ -175,6 +175,26 @@ Contentful content changes, so assertions check structure and behaviour, never s
 | 7 | Not found | `/events/does-not-exist` returns 404. `/audio/does-not-exist` shows "Audio Not Found". |
 | 8 | Mobile navigation | In the Pixel project, the menu button opens the menu and its links go to Events and About. |
 | 9 | About | `/about` shows its heading, the Mission, Values and Get in Touch sections, and a Contact Us email link; the header marks About as the current page. |
+
+### Phase 5: Production cache test (Playwright, production build)
+
+`e2e-production/cache.spec.ts` checks the `"use cache"` setup end to end, against a real production server:
+
+1. The first visit to a page queries Contentful.
+2. A second visit is served from the cache, with no query.
+3. After a signed Contentful webhook (`/api/webhook/revalidate`), the next visit queries Contentful again.
+
+**How it counts queries.** The server is started with `CONTENTFUL_QUERY_LOG` set, so `ExecuteQuery` appends one line per real Contentful query to `e2e-production/contentful-queries.log`. The test counts the lines added during each page load. Counting is used instead of timing, which is too noisy to tell a cache hit from a fast response. Nothing sets `CONTENTFUL_QUERY_LOG` outside this test, so the log is off everywhere else.
+
+**Why it has its own config and folder** (`playwright.production.config.ts`, `e2e-production/`):
+
+- **It needs a production build.** The dev server ignores the cache for any request sent with `Cache-Control: no-cache` (DevTools "Disable cache", or a hard reload), clears the cache whenever a file is saved, and the dev e2e config reuses a dev server you may already have running. Any of these makes a cache test pass or fail for the wrong reason.
+- **It is slow to start.** The config runs `next build` before the test, which takes a minute or two. Keeping it out of `npm run test:e2e` keeps the everyday e2e run fast.
+- **It needs its own server settings.** The server runs on port 3200 (no clash with `npm run dev` or the dev e2e server on 3100), always starts fresh with an empty cache (`reuseExistingServer: false`), and gets a test webhook secret so the test can sign webhook requests.
+
+**It does not touch the live site.** The webhook goes to the local test server only, signed with a test secret only that server knows. Contentful is only read, never written. The live site's cache is unaffected.
+
+**When to run it:** after changing caching (`"use cache"`, `cacheLife`, `cacheTag`, `next.config.mjs`), the webhook route, or `ExecuteQuery`. Like the other e2e tests it needs `.env.local` with the Contentful variables. It runs `next build`, which writes to `.next/`; a running `npm run dev` keeps working, because the dev server uses its own folder (`.next/dev`).
 
 ### Unit-test review (2026-11-05)
 
@@ -209,5 +229,6 @@ Following the strategy's advice to go for distinct coverage rather than repeatin
 | `npm run test:watch` | The same, re-running on change |
 | `npm run test:coverage` | The same, plus a coverage report in the terminal and in `tests/coverage/index.html`. Pages under `app/` show 0% because only end-to-end tests reach them. |
 | `npm run test:e2e` | End-to-end tests (Playwright). Needs `.env.local` with the Contentful variables. If a dev server is already running, add `E2E_BASE_URL=http://localhost:<port>` in front. |
+| `npm run test:e2e:production` | The production cache test (Phase 5). Builds the app, starts it on port 3200 and checks that the cache and the webhook work. Takes a minute or two because of the build. |
 | `npx playwright show-report e2e/playwright-report` | Open the HTML report of the last end-to-end run. |
 | `npx playwright show-trace e2e/test-results/<test>/trace.zip` | Step through a failed end-to-end test (traces are kept for failures only). |

@@ -2,6 +2,10 @@ import { defineConfig, devices } from "@playwright/test";
 
 // End-to-end tests run against the real Next.js app and live Contentful data,
 // so `.env.local` must contain CF_API_URL and CF_AUTH.
+//
+// These run on the dev server. The cache test needs a production build, so it
+// lives in e2e-production/ with its own config: see playwright.production.config.ts
+// and run it with `npm run test:e2e:production`.
 const DEFAULT_PORT = 3100;
 const baseURL = process.env.E2E_BASE_URL || `http://localhost:${DEFAULT_PORT}`;
 
