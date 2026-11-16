@@ -2,7 +2,8 @@ import { cache } from 'react';
 import { gql } from '@apollo/client';
 import { ExecuteQuery } from '@/services/apollo/apollo.service';
 import Config from "@/config/config.json";
-import { WithContext, Article as SchemaArticle, ItemList, Person } from 'schema-dts';
+import { WithContext, Article as SchemaArticle, ItemList } from 'schema-dts';
+import { getAuthorPerson } from '@/lib/json-ld';
 
 import {
   ArticleQuery,
@@ -223,6 +224,8 @@ export const getRelatedArticles = cache(async ({
 });
 
 const getArticleJsonLd = (item: any): SchemaArticle => {
+  const author = getAuthorPerson(item?.author);
+
   return {
     "@type": "Article",
     headline: item?.metaTitle || item?.title,
@@ -230,10 +233,7 @@ const getArticleJsonLd = (item: any): SchemaArticle => {
     image: item?.coverImage?.url,
     datePublished: item?.date,
     dateModified: item?.sys?.publishedAt,
-    author: {
-      "@type": "Person",
-      name: item?.author,
-    } as Person,
+    ...(author && { author }),
     publisher: {
       "@type": "Organization",
       name: "Ulama Moris",
@@ -262,6 +262,10 @@ export const createArticleListJsonLd = (data: any) => {
   return JsonLd;
 };
 
-export const createArticleJsonLd = (data: any) => {
-  return getArticleJsonLd(data);
+export const createArticleJsonLd = (data: any): WithContext<SchemaArticle> => {
+  // A JSON-LD block on its own needs @context, or search engines cannot read it.
+  return {
+    "@context": "https://schema.org",
+    ...getArticleJsonLd(data),
+  } as WithContext<SchemaArticle>;
 };

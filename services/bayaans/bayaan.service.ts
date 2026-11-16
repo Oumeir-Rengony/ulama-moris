@@ -4,9 +4,6 @@ import { ExecuteQuery } from '@/services/apollo/apollo.service';
 
 import dayjs from 'dayjs';
 import Config from "@/config/config.json";
-import { WithContext,  AudioObject, Event, ItemList, Person, Place, PostalAddress } from 'schema-dts';
-import { toISODuration } from '@/lib/utils';
-import { getBayaanEvent } from '@/lib/events';
 
 import {
   BayaanFragment,
@@ -220,12 +217,6 @@ const getTotalBayaan = cache(async (isPreview?: boolean):Promise<number> => {
 })
 
 
-const getEventID = (eventSlug: string, date: string) => {
-  return (eventSlug && date)
-    ? "https://ulama-moris.org/event/" + eventSlug + '-' + dayjs(date).format('YYYY-MM-DD')
-    : ""
-}
-
 // Exported for tests.
 export const selectUniqueBayaan= (data: any[], limit=4) => {
   const seen = new Set();
@@ -304,71 +295,3 @@ export const getRelatedBayaans = cache(async ({
   return sortedResult;
   
 });
-
-const getEventJsonLd = (item: any, masjid?: string, address?: string): Event | null => {
-  const event = getBayaanEvent(item);
-  if (!event) return null;
-
-  return {
-    "@type": "Event",
-    "@id": getEventID(event.slug, item.date),
-    name: event.title,
-    startDate: item.date,
-    eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
-    location: {
-      "@type": "Place",
-      name: masjid,
-      url: item?.masjid?.geoLink,
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: address,
-        addressCountry: "MU",
-      } as PostalAddress,
-    } as Place,
-  } as Event;
-
-};
-
-const getAudioBookJsonLd = (item: any) => {
-
-  const [masjid, address] = item?.masjid?.title ? item?.masjid?.title?.split(",") : ["", ""];
-
-  const event = getEventJsonLd(item, masjid, address)
-
-  return {
-    "@type": "AudioObject",
-    name: item?.metaTitle,
-    description: item?.metaDescription,
-    contentUrl: item?.audio?.url,
-    encodingFormat: "audio/mpeg",
-    duration: toISODuration(item?.duration),
-    inLanguage: "mfe",
-    author: {
-      "@type": "Person",
-      "name": item?.author?.replace(/(mufti|mawlana)/gi, ""),
-    } as Person,
-    ...(event && { subjectOf: event }), // only include if present
-  } as AudioObject
-
-}
-
-export const createAudioListJsonLd = (data: any) => {
-
-  const JsonLd: WithContext<ItemList> = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: "Latest Islamic lectures",
-    itemListElement: data?.map((item: any, index: number) => {
-    return {
-      "@type": "ListItem",
-      position: index,
-      "item": getAudioBookJsonLd(item)
-    }})
-  }
-
-  return JsonLd;
-}
-
-export const createAudioJsonLd = (data: any) => {
-  return getAudioBookJsonLd(data);
-}

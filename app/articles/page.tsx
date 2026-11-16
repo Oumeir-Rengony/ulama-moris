@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import { headers } from "next/headers"
 import type { Metadata } from "next"
 import { ArticleList } from "@/components/article-list"
+import { JsonLdScript } from "@/components/json-ld-script"
 import { getArticlesWithPagination, createArticleListJsonLd } from "@/services/articles/article.service"
 
 export const dynamic = 'force-static';
@@ -49,10 +50,7 @@ export default async function ArticlesPage({
   return (
     <div className="min-h-screen bg-background">
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLdScript data={jsonLd} />
 
       <main>
         <Suspense fallback={

@@ -9,6 +9,8 @@ import { getEventPath, summarizeEventRecordings } from "@/lib/events";
 import { getBayaansWithPagination } from "@/services/bayaans/bayaan.service";
 import { getEventBySlug } from "@/services/bayaans/event.service";
 import { toTitleCase } from "@/lib/utils";
+import { createBreadcrumbJsonLd, createEventJsonLd, getEventBreadcrumbSteps } from "@/lib/json-ld";
+import { JsonLdScript } from "@/components/json-ld-script";
 import { parsePageParam } from "@/lib/search-params";
 
 export const revalidate = 86400; // 24 hours in seconds
@@ -64,6 +66,9 @@ export default async function EventPage({ params, searchParams }: EventPageProps
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 sm:px-6">
+      <JsonLdScript data={createEventJsonLd({ title: event.title, slug: event.slug, lectures: event.recordings })} />
+      <JsonLdScript data={createBreadcrumbJsonLd(getEventBreadcrumbSteps(event))} />
+
       <Link href="/events" prefetch={false} className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
         <ArrowLeft className="size-4" aria-hidden="true" />
         All events
@@ -101,22 +106,25 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         <AudioProvider>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {audioList.items.map((item: any) => (
-              <AudioCard
-                key={item.sys.id}
-                id={item.sys.id}
-                title={item.title}
-                slug={item.slug}
-                description={item.description}
-                author={item.author}
-                masjid={item.masjid?.title}
-                masjidLocation={item.masjid?.geoLink}
-                duration={item.duration}
-                date={item.date}
-                audioSrc={`${item.audio?.url}?t=${item.audio?.sys?.publishedAt}&tag=audio:${item.audio?.sys?.id}`}
-                downloadSrc={`/api/download?url=${item.audio?.url}?t=${item.audio?.sys?.publishedAt}&tag=audio:${item.audio?.sys?.id}`}
-                category={item.category}
-                whatsAppLink={`whatsapp://send?text=${siteUrl}/audio/${item.slug}`}
-              />
+              // Wrapping the card stops the grid from stretching it to the row height,
+              // which would leave an empty strip below the footer.
+              <div key={item.sys.id}>
+                <AudioCard
+                  id={item.sys.id}
+                  title={item.title}
+                  slug={item.slug}
+                  description={item.description}
+                  author={item.author}
+                  masjid={item.masjid?.title}
+                  masjidLocation={item.masjid?.geoLink}
+                  duration={item.duration}
+                  date={item.date}
+                  audioSrc={`${item.audio?.url}?t=${item.audio?.sys?.publishedAt}&tag=audio:${item.audio?.sys?.id}`}
+                  downloadSrc={`/api/download?url=${item.audio?.url}?t=${item.audio?.sys?.publishedAt}&tag=audio:${item.audio?.sys?.id}`}
+                  category={item.category}
+                  whatsAppLink={`whatsapp://send?text=${siteUrl}/audio/${item.slug}`}
+                />
+              </div>
             ))}
           </div>
         </AudioProvider>

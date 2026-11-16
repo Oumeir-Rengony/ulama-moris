@@ -2,21 +2,17 @@ import { cache } from "react";
 import {
   createEventDirectoryEntry,
   type EventDirectoryEntry,
-  type EventRecording,
+  type EventLecture,
 } from "@/lib/events";
 import { ExecuteQuery } from "@/services/apollo/apollo.service";
 import EventBySlugQuery from "./query/eventBySlug.query";
 import EventDirectoryQuery from "./query/eventDirectory.query";
 
-type ContentfulEventRecording = EventRecording & {
-  sys?: { id: string } | null;
-};
-
 type ContentfulEvent = {
   title?: string | null;
   slug?: string | null;
   bayaansCollection?: {
-    items?: ContentfulEventRecording[];
+    items?: EventLecture[];
   } | null;
 } | null;
 
@@ -24,10 +20,10 @@ export type EventDetails = {
   title: string;
   slug: string;
   bayaanIds: string[];
-  recordings: EventRecording[];
+  recordings: EventLecture[];
 };
 
-function getEventRecordings(event: ContentfulEvent): ContentfulEventRecording[] {
+function getEventRecordings(event: ContentfulEvent): EventLecture[] {
   return event?.bayaansCollection?.items ?? [];
 }
 

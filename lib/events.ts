@@ -52,6 +52,18 @@ export type EventRecording = {
   } | null;
 } | null;
 
+// A lecture as an event page loads it. The extra fields feed the event's JSON-LD.
+export type EventLecture = EventRecording & {
+  sys?: { id: string } | null;
+  slug?: string | null;
+  title?: string | null;
+  masjid?: {
+    sys: { id: string };
+    title?: string | null;
+    geoLink?: string | null;
+  } | null;
+};
+
 function getDurationSeconds(duration?: string | null): number | null {
   if (!duration || !/^\d+:\d{2}(:\d{2})?$/.test(duration.trim())) {
     return null;

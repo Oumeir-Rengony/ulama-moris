@@ -20,6 +20,8 @@ import { Suspense } from "react"
 import type { Metadata, ResolvingMetadata } from "next"
 import { AudioProvider } from "@/contexts/audio-context"
 import { getBayaanEvent, getEventPath } from "@/lib/events"
+import { createAudioJsonLd, createBreadcrumbJsonLd, getAudioBreadcrumbSteps } from "@/lib/json-ld"
+import { JsonLdScript } from "@/components/json-ld-script"
 
 export const dynamic = 'force-static';
 
@@ -171,6 +173,9 @@ export default async function AudioDetailPage({
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLdScript data={createAudioJsonLd(data)} />
+      <JsonLdScript data={createBreadcrumbJsonLd(getAudioBreadcrumbSteps(data))} />
+
       <main className="mx-auto max-w-4xl px-4 py-8">
         {/* Back Button */}
         <Link

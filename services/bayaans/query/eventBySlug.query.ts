@@ -10,11 +10,14 @@ export default gql`
         bayaansCollection(limit: 10) {
           items {
             sys { id }
+            slug
+            title
             date
             duration
             masjid {
               sys { id }
               title
+              geoLink
             }
           }
         }

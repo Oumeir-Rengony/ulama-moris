@@ -1,6 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { RichTextRenderer } from "@/components/rich-text-renderer"
+import { JsonLdScript } from "@/components/json-ld-script"
 import {
   User,
   Calendar,
@@ -157,10 +158,7 @@ export default async function ArticleDetailPage({
   return (
     <div className="min-h-screen bg-background">
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLdScript data={jsonLd} />
 
       <main className="mx-auto max-w-4xl px-4 py-8">
         {/* Back Button */}
