@@ -52,12 +52,12 @@ describe("getBayaansWithPagination", () => {
   it("passes the filters that are set and leaves out the empty ones", async () => {
     const { getBayaansWithPagination } = await loadBayaanService();
 
-    await getBayaansWithPagination({ page: 1, search: "sabr", type: "international", events: ["Seerah Week"] });
+    await getBayaansWithPagination({ page: 1, search: "sabr", type: "international", bayaanIds: ["b1", "b2"] });
 
     expect(sentVariables()).toEqual({
       limit: 6,
       search: "sabr",
-      events: ["Seerah Week"],
+      bayaanIds: ["b1", "b2"],
       local: "international",
     });
   });

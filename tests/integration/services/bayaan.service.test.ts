@@ -39,6 +39,24 @@ describe("selectUniqueBayaan", () => {
 });
 
 describe("getRelatedBayaans", () => {
+  it("leaves out the event filter for a bayaan that is not part of an event", async () => {
+    mockedExecuteQuery.mockResolvedValue({
+      event: { items: [] },
+      category: { items: [] },
+      random: { items: [] },
+    });
+
+    await getRelatedBayaans({
+      currentSlug: "this-lecture",
+      date: "2026-11-03T10:00:00Z",
+      category: ["Seerah"],
+      totalBayaans: 100,
+    });
+
+    const options = mockedExecuteQuery.mock.calls[0][1] as { variables: Record<string, unknown> };
+    expect(options.variables.eventBayaanIds).toBeUndefined();
+  });
+
   it("returns up to 4 lectures, same event first, then same category, then random", async () => {
     mockedExecuteQuery.mockResolvedValue({
       event: { items: [lecture("event-1")] },
@@ -48,7 +66,7 @@ describe("getRelatedBayaans", () => {
 
     const related = await getRelatedBayaans({
       currentSlug: "this-lecture",
-      event: "Seerah Week",
+      eventBayaanIds: ["event-1", "event-2"],
       date: "2026-11-03T10:00:00Z",
       category: ["Seerah"],
       totalBayaans: 100,
@@ -67,7 +85,7 @@ describe("getRelatedBayaans", () => {
 
     await getRelatedBayaans({
       currentSlug: "this-lecture",
-      event: "Seerah Week",
+      eventBayaanIds: ["event-1", "event-2"],
       date: "2026-11-03T10:00:00Z",
       category: ["Seerah"],
       totalBayaans: 100,
@@ -75,7 +93,7 @@ describe("getRelatedBayaans", () => {
 
     const options = mockedExecuteQuery.mock.calls[0][1] as { variables: Record<string, unknown> };
     expect(options.variables).toMatchObject({
-      event: "Seerah Week",
+      eventBayaanIds: ["event-1", "event-2"],
       category: ["Seerah"],
       currentSlug: "this-lecture",
       limit: 4,

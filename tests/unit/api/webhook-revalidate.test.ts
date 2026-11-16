@@ -35,8 +35,13 @@ beforeEach(() => {
 
 // The shape Contentful sends: `sys` at the top level, next to `fields`.
 const publishedBayaan = {
-  sys: { id: "5DbwIghILaPkCEI5GaYhmK", type: "Entry" },
+  sys: { id: "5DbwIghILaPkCEI5GaYhmK", type: "Entry", contentType: { sys: { id: "bayaan" } } },
   fields: { slug: { "en-US": "mauritius-islamic-finance-hub" } },
+};
+
+const publishedEvent = {
+  sys: { id: "3kQxEventId", type: "Entry", contentType: { sys: { id: "event" } } },
+  fields: { slug: { "en-US": "seerah-week" } },
 };
 
 afterEach(() => {
@@ -105,6 +110,18 @@ describe("POST /api/webhook/revalidate", () => {
     expect(mockedRevalidatePath).toHaveBeenCalledWith("/events");
     expect(mockedRevalidatePath).toHaveBeenCalledWith("/events/[slug]", "layout");
     expect(mockedRevalidatePath).toHaveBeenCalledWith("/audio/mauritius-islamic-finance-hub");
+  });
+
+  it("refreshes every lecture page, not one named after the event, when an event is published", async () => {
+    mockedVerifyRequest.mockReturnValue(true);
+
+    const response = await sendWebhook(publishedEvent);
+
+    expect(response.status).toBe(200);
+    expect(mockedRevalidatePath).toHaveBeenCalledWith("/events");
+    expect(mockedRevalidatePath).toHaveBeenCalledWith("/events/[slug]", "layout");
+    expect(mockedRevalidatePath).toHaveBeenCalledWith("/audio/[slug]", "layout");
+    expect(mockedRevalidatePath).not.toHaveBeenCalledWith("/audio/seerah-week");
   });
 
   it("refreshes the cached audio for the id in the payload's top-level sys", async () => {

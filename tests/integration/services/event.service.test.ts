@@ -17,7 +17,7 @@ async function loadEventService() {
 // Queues one Contentful response per call, in order.
 function respondWithPages(pages: Array<{ total: number; items: unknown[] } | null>) {
   for (const page of pages) {
-    mockedExecuteQuery.mockResolvedValueOnce({ bayaanCollection: page });
+    mockedExecuteQuery.mockResolvedValueOnce({ eventCollection: page });
   }
 }
 
@@ -30,6 +30,10 @@ function requestedSkips(): number[] {
   return skips;
 }
 
+function contentfulEvent(title: string, slug: string, bayaans: unknown[]) {
+  return { title, slug, bayaansCollection: { items: bayaans } };
+}
+
 beforeEach(() => {
   mockedExecuteQuery.mockReset();
 });
@@ -39,27 +43,54 @@ afterEach(() => {
 });
 
 describe("getEventDirectory", () => {
-  it("reads every page of results, 1000 at a time", async () => {
+  it("reads every page of events, 100 at a time", async () => {
     respondWithPages([
-      { total: 1500, items: [{ event: "Seerah Week", date: "2026-11-03T10:00:00Z" }] },
-      { total: 1500, items: [{ event: "Ramadan Talks", date: "2026-03-01T10:00:00Z" }] },
+      { total: 150, items: [contentfulEvent("Seerah Week", "seerah-week", [{ date: "2026-11-03T10:00:00Z" }])] },
+      { total: 150, items: [contentfulEvent("Ramadan Talks", "ramadan-talks", [{ date: "2026-03-01T10:00:00Z" }])] },
     ]);
     const { getEventDirectory } = await loadEventService();
 
     const events = await getEventDirectory();
 
-    expect(requestedSkips()).toEqual([0, 1000]);
+    expect(requestedSkips()).toEqual([0, 100]);
     expect(events.map((event) => event.title)).toEqual(["Seerah Week", "Ramadan Talks"]);
   });
 
-  it("lists names that share a slug as one event, using the first name seen", async () => {
+  it("uses the event's own slug and summarises its bayaans", async () => {
+    respondWithPages([
+      {
+        total: 1,
+        items: [
+          contentfulEvent("Hilaal & Moon Sighting", "hilaal-and-moon-sighting", [
+            { date: "2026-11-03T10:00:00Z", duration: "30:00", masjid: { sys: { id: "m1" }, title: "Masjid Noor" } },
+            { date: "2026-11-05T10:00:00Z", duration: "45:00", masjid: { sys: { id: "m1" }, title: "Masjid Noor" } },
+          ]),
+        ],
+      },
+    ]);
+    const { getEventDirectory } = await loadEventService();
+
+    const [event] = await getEventDirectory();
+
+    expect(event).toMatchObject({
+      slug: "hilaal-and-moon-sighting",
+      path: "/events/hilaal-and-moon-sighting",
+      title: "Hilaal & Moon Sighting",
+      total: 2,
+      duration: "1h 15m",
+      location: "Masjid Noor",
+      dateRange: "3 Nov – 5 Nov 2026",
+    });
+  });
+
+  it("skips events without a title or slug", async () => {
     respondWithPages([
       {
         total: 3,
         items: [
-          { event: "Seerah Week", date: "2026-11-03T10:00:00Z" },
-          { event: "seerah  week", date: "2026-11-04T10:00:00Z" },
-          { event: "   ", date: "2026-11-04T10:00:00Z" },
+          contentfulEvent("Seerah Week", "seerah-week", []),
+          contentfulEvent("   ", "blank-title", []),
+          contentfulEvent("No Slug", "", []),
         ],
       },
     ]);
@@ -67,9 +98,7 @@ describe("getEventDirectory", () => {
 
     const events = await getEventDirectory();
 
-    expect(events).toHaveLength(1);
-    expect(events[0].title).toBe("Seerah Week");
-    expect(events[0].total).toBe(2);
+    expect(events.map((event) => event.slug)).toEqual(["seerah-week"]);
   });
 
   it("puts the most recent events first and undated events last", async () => {
@@ -77,9 +106,9 @@ describe("getEventDirectory", () => {
       {
         total: 3,
         items: [
-          { event: "Undated Talks" },
-          { event: "Older Event", date: "2025-05-01T10:00:00Z" },
-          { event: "Newer Event", date: "2026-05-01T10:00:00Z" },
+          contentfulEvent("Undated Talks", "undated-talks", [{}]),
+          contentfulEvent("Older Event", "older-event", [{ date: "2025-05-01T10:00:00Z" }]),
+          contentfulEvent("Newer Event", "newer-event", [{ date: "2026-05-01T10:00:00Z" }]),
         ],
       },
     ]);
@@ -99,44 +128,54 @@ describe("getEventDirectory", () => {
 });
 
 describe("getEventBySlug", () => {
-  it("returns the event with every stored name that matches the slug", async () => {
-    respondWithPages([
-      { total: 3, items: [{ event: "Seerah Week" }, { event: "seerah week" }, { event: "Ramadan Talks" }] },
-    ]);
+  it("asks Contentful for the event with that slug", async () => {
+    respondWithPages([{ total: 0, items: [] }]);
+    const { getEventBySlug } = await loadEventService();
+
+    await getEventBySlug("seerah-week");
+
+    const options = mockedExecuteQuery.mock.calls[0][1] as { variables: Record<string, unknown> };
+    expect(options.variables).toEqual({ slug: "seerah-week" });
+  });
+
+  it("returns the event with its bayaan ids and recordings", async () => {
+    const bayaans = [
+      { sys: { id: "b1" }, date: "2026-11-03T10:00:00Z", duration: "30:00" },
+      { sys: { id: "b2" }, date: "2026-11-04T10:00:00Z", duration: "45:00" },
+    ];
+    respondWithPages([{ total: 1, items: [contentfulEvent("Seerah Week", "seerah-week", bayaans)] }]);
     const { getEventBySlug } = await loadEventService();
 
     const event = await getEventBySlug("seerah-week");
 
-    expect(event).toEqual({ title: "Seerah Week", names: ["Seerah Week", "seerah week"] });
+    expect(event).toEqual({
+      title: "Seerah Week",
+      slug: "seerah-week",
+      bayaanIds: ["b1", "b2"],
+      recordings: bayaans,
+    });
+  });
+
+  it("returns an event with no bayaans yet", async () => {
+    respondWithPages([{ total: 1, items: [{ title: "Coming Soon", slug: "coming-soon", bayaansCollection: null }] }]);
+    const { getEventBySlug } = await loadEventService();
+
+    const event = await getEventBySlug("coming-soon");
+
+    expect(event).toEqual({ title: "Coming Soon", slug: "coming-soon", bayaanIds: [], recordings: [] });
   });
 
   it("returns undefined when no event matches", async () => {
-    respondWithPages([{ total: 1, items: [{ event: "Seerah Week" }] }]);
+    respondWithPages([{ total: 0, items: [] }]);
     const { getEventBySlug } = await loadEventService();
 
     expect(await getEventBySlug("does-not-exist")).toBeUndefined();
   });
-});
 
-describe("getEventSummary", () => {
-  it("summarises recordings from every page", async () => {
-    respondWithPages([
-      { total: 1001, items: [{ duration: "30:00" }] },
-      { total: 1001, items: [{ duration: "45:00" }] },
-    ]);
-    const { getEventSummary } = await loadEventService();
+  it("throws when Contentful returns no collection", async () => {
+    respondWithPages([null]);
+    const { getEventBySlug } = await loadEventService();
 
-    const summary = await getEventSummary(["Seerah Week"]);
-
-    expect(requestedSkips()).toEqual([0, 1000]);
-    expect(summary.total).toBe(2);
-    expect(summary.duration).toBe("1h 15m");
-  });
-
-  it("throws when a page comes back empty before the total is reached", async () => {
-    respondWithPages([{ total: 5, items: [] }]);
-    const { getEventSummary } = await loadEventService();
-
-    await expect(getEventSummary(["Seerah Week"])).rejects.toThrow("Unable to load event summary");
+    await expect(getEventBySlug("seerah-week")).rejects.toThrow("Unable to load event");
   });
 });

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   createEventDirectoryEntry,
+  getBayaanEvent,
   getEventPath,
-  getEventSlug,
   groupEventsByYear,
   summarizeEventRecordings,
   type EventDirectoryEntry,
@@ -28,32 +28,52 @@ function recording(fields: {
   };
 }
 
-describe("getEventSlug", () => {
-  it("lowercases and joins words with single hyphens", () => {
-    expect(getEventSlug("  Seerah Conference 2026 ")).toBe("seerah-conference-2026");
+describe("getEventPath", () => {
+  it("builds the event page path from the event's slug", () => {
+    expect(getEventPath("seerah-week")).toBe("/events/seerah-week");
   });
 
-  it("collapses existing hyphens and spaces into one hyphen", () => {
-    expect(getEventSlug("Islahi - Majlis")).toBe("islahi-majlis");
-  });
-
-  it("returns an empty slug for an empty or blank name", () => {
-    expect(getEventSlug("")).toBe("");
-    expect(getEventSlug("   ")).toBe("");
-  });
-
-  it("keeps hyphens at the ends, so existing event URLs do not change", () => {
-    expect(getEventSlug("- Seerah -")).toBe("-seerah-");
+  it("URL-encodes characters that are not safe in a path", () => {
+    expect(getEventPath("q&a-night")).toBe("/events/q%26a-night");
   });
 });
 
-describe("getEventPath", () => {
-  it("URL-encodes characters that are not safe in a path", () => {
-    expect(getEventPath("Q&A Night")).toBe("/events/q%26a-night");
+describe("getBayaanEvent", () => {
+  function bayaanInEvent(event: { title?: string | null; slug?: string | null; bayaanIds?: string[] } | null) {
+    if (!event) {
+      return { linkedFrom: { eventCollection: { items: [] } } };
+    }
+
+    const items = [];
+    for (const id of event.bayaanIds ?? []) {
+      items.push({ sys: { id } });
+    }
+
+    return {
+      linkedFrom: {
+        eventCollection: {
+          items: [{ title: event.title, slug: event.slug, bayaansCollection: { items } }],
+        },
+      },
+    };
+  }
+
+  it("returns the event the bayaan belongs to, with the event's bayaan ids", () => {
+    const bayaan = bayaanInEvent({ title: " Seerah Week ", slug: "seerah-week", bayaanIds: ["b1", "b2"] });
+
+    expect(getBayaanEvent(bayaan)).toEqual({ title: "Seerah Week", slug: "seerah-week", bayaanIds: ["b1", "b2"] });
   });
 
-  it("keeps accented letters, URL-encoded", () => {
-    expect(getEventPath("Şahābā Day")).toBe("/events/%C5%9Fah%C4%81b%C4%81-day");
+  it("returns null when the bayaan is not part of an event", () => {
+    expect(getBayaanEvent(bayaanInEvent(null))).toBeNull();
+    expect(getBayaanEvent({})).toBeNull();
+    expect(getBayaanEvent(null)).toBeNull();
+    expect(getBayaanEvent(undefined)).toBeNull();
+  });
+
+  it("returns null when the event has no title or slug", () => {
+    expect(getBayaanEvent(bayaanInEvent({ title: "  ", slug: "seerah-week" }))).toBeNull();
+    expect(getBayaanEvent(bayaanInEvent({ title: "Seerah Week", slug: null }))).toBeNull();
   });
 });
 
@@ -171,13 +191,14 @@ describe("summarizeEventRecordings", () => {
 
 describe("createEventDirectoryEntry", () => {
   it("shows a short range for an event within one year, badged with its start date", () => {
-    const entry = createEventDirectoryEntry("Seerah Week", [
+    const entry = createEventDirectoryEntry({ title: "Seerah Week", slug: "seerah-week" }, [
       recording({ date: "2026-11-03T10:00:00Z" }),
       recording({ date: "2026-11-05T10:00:00Z" }),
     ]);
 
     expect(entry.slug).toBe("seerah-week");
     expect(entry.path).toBe("/events/seerah-week");
+    expect(entry.title).toBe("Seerah Week");
     expect(entry.dateRange).toBe("3 Nov – 5 Nov 2026");
     expect(entry.year).toBe("2026");
     expect(entry.day).toBe("3");
@@ -186,7 +207,7 @@ describe("createEventDirectoryEntry", () => {
   });
 
   it("badges an event that crosses years with its latest date, to match its year heading", () => {
-    const entry = createEventDirectoryEntry("New Year Programme", [
+    const entry = createEventDirectoryEntry({ title: "New Year Programme", slug: "new-year-programme" }, [
       recording({ date: "2025-12-30T10:00:00Z" }),
       recording({ date: "2026-01-02T10:00:00Z" }),
     ]);
@@ -198,7 +219,7 @@ describe("createEventDirectoryEntry", () => {
   });
 
   it("shows a single date for an event recorded on one Mauritius day", () => {
-    const entry = createEventDirectoryEntry("One Evening", [
+    const entry = createEventDirectoryEntry({ title: "One Evening", slug: "one-evening" }, [
       recording({ date: "2026-11-03T08:00:00Z" }),
       recording({ date: "2026-11-03T12:00:00Z" }),
     ]);
@@ -207,7 +228,7 @@ describe("createEventDirectoryEntry", () => {
   });
 
   it("leaves the date fields empty when no recording has a date", () => {
-    const entry = createEventDirectoryEntry("Undated Talks", [recording({ duration: "30:00" })]);
+    const entry = createEventDirectoryEntry({ title: "Undated Talks", slug: "undated-talks" }, [recording({ duration: "30:00" })]);
 
     expect(entry.dateRange).toBeNull();
     expect(entry.year).toBeNull();

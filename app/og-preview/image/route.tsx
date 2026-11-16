@@ -1,5 +1,6 @@
 import { getBayaanBySlug } from "@/services/bayaans/bayaan.service";
-import { getEventBySlug, getEventSummary } from "@/services/bayaans/event.service";
+import { getEventBySlug } from "@/services/bayaans/event.service";
+import { summarizeEventRecordings } from "@/lib/events";
 import { createAudioOgImage } from "@/lib/og/audio-image";
 import { createEventOgImage } from "@/lib/og/event-image";
 
@@ -22,6 +23,6 @@ export async function GET(request: Request) {
 
   const event = await getEventBySlug(slug);
   if (!event) return new Response("Event not found", { status: 404 });
-  const summary = await getEventSummary(event.names);
+  const summary = summarizeEventRecordings(event.recordings);
   return createEventOgImage({ title: title || event.title, date: summary.date });
 }

@@ -41,8 +41,9 @@ export async function POST(req: NextRequest) {
 
    revalidatePath("/");
    revalidatePath("/events");
-   // The webhook only sends a bayaan's current event, not the one it was moved from,
-   // so refresh every event page (and its OG image) rather than guess which ones changed.
+   // A bayaan's payload does not say which event it belongs to, and an event's payload
+   // only lists its current bayaans, so refresh every event page (and its OG image)
+   // rather than guess which ones changed.
    revalidatePath("/events/[slug]", "layout");
 
     // Contentful puts `sys` at the top level of the payload, next to `fields`.
@@ -54,10 +55,15 @@ export async function POST(req: NextRequest) {
       revalidateTag(`audio:${id}`, { expire: 0 });
     }
 
-    // Extract slug safely
+    const contentType = body?.sys?.contentType?.sys?.id;
     const slug = body?.fields?.slug?.["en-US"];
 
-    if (slug) {
+    if (contentType === "event") {
+      // Every lecture page shows the event it belongs to. The payload only has the
+      // bayaans' ids, not their slugs, and lectures may have just been removed from
+      // the event, so refresh every lecture page.
+      revalidatePath("/audio/[slug]", "layout");
+    } else if (slug) {
       revalidatePath(`/audio/${slug}`);
     }
 

@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import Config from "@/config/config.json";
 import { WithContext,  AudioObject, Event, ItemList, Person, Place, PostalAddress } from 'schema-dts';
 import { toISODuration } from '@/lib/utils';
+import { getBayaanEvent } from '@/lib/events';
 
 import {
   BayaanFragment,
@@ -25,7 +26,7 @@ export const getBayaansBase = cache(async ({
     startDate = "", 
     endDate = "",  
     search = "", 
-    events,
+    bayaanIds,
     limit = 0,
     skip = 0,
     type,
@@ -36,7 +37,7 @@ export const getBayaansBase = cache(async ({
     startDate?: string; 
     endDate?: string; 
     search?: string;
-    events?: string[];
+    bayaanIds?: string[];
     type?: Local,
     isPreview?: boolean; 
 }): Promise<{bayaanCollection: any}> => {
@@ -60,7 +61,7 @@ export const getBayaansBase = cache(async ({
     ...(startDate && { startDate }),
     ...(endDate && { endDate }),
     ...(search && { search }),
-    ...(events && { events }),
+    ...(bayaanIds && { bayaanIds }),
     local: type
   };
 
@@ -78,7 +79,7 @@ export const getBayaansWithPagination = cache(async ({
   startDate = "",
   endDate = "",
   search = "",
-  events,
+  bayaanIds,
   type,
   isMobile = true,
   isPreview = false,
@@ -87,7 +88,7 @@ export const getBayaansWithPagination = cache(async ({
   startDate?: string;
   endDate?: string;
   search?: string;
-  events?: string[];
+  bayaanIds?: string[];
   type?: Local;
   isMobile?: boolean;
   isPreview?: boolean;
@@ -107,7 +108,7 @@ export const getBayaansWithPagination = cache(async ({
     endDate,
     type,
     search,
-    events,
+    bayaanIds,
     isPreview,
   });
 
@@ -219,9 +220,9 @@ const getTotalBayaan = cache(async (isPreview?: boolean):Promise<number> => {
 })
 
 
-const getEventID = (event: string, date: string) => {
-  return (event && date)
-    ? "https://ulama-moris.org/event/" + event?.replace(/\s+/g, '-').toLowerCase() + '-' + dayjs(date).format('YYYY-MM-DD')
+const getEventID = (eventSlug: string, date: string) => {
+  return (eventSlug && date)
+    ? "https://ulama-moris.org/event/" + eventSlug + '-' + dayjs(date).format('YYYY-MM-DD')
     : ""
 }
 
@@ -247,14 +248,15 @@ export const selectUniqueBayaan= (data: any[], limit=4) => {
 
 export const getRelatedBayaans = cache(async ({ 
   currentSlug,
-  event, 
+  eventBayaanIds,
   date,
   category,
   totalBayaans,
   limit=4
 }: { 
   currentSlug: string
-  event: string, 
+  // Undefined when the bayaan is not part of an event: the same-day lectures are used instead.
+  eventBayaanIds?: string[],
   date: string,
   category: string[] | string,
   totalBayaans: number,
@@ -286,7 +288,7 @@ export const getRelatedBayaans = cache(async ({
 
   const result =  await ExecuteQuery(RELATED_QUERY, {
     variables: {
-      event: event,
+      eventBayaanIds: eventBayaanIds,
       date_gte: date_gte,
       date_lt: date_lt,
       category: category,
@@ -304,12 +306,13 @@ export const getRelatedBayaans = cache(async ({
 });
 
 const getEventJsonLd = (item: any, masjid?: string, address?: string): Event | null => {
-  if (!item?.event) return null;
+  const event = getBayaanEvent(item);
+  if (!event) return null;
 
   return {
     "@type": "Event",
-    "@id": getEventID(item.event, item.date),
-    name: item.event,
+    "@id": getEventID(event.slug, item.date),
+    name: event.title,
     startDate: item.date,
     eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
     location: {

@@ -19,7 +19,7 @@ import CONFIG from "@/config/config.json";
 import { Suspense } from "react"
 import type { Metadata, ResolvingMetadata } from "next"
 import { AudioProvider } from "@/contexts/audio-context"
-import { getEventPath } from "@/lib/events"
+import { getBayaanEvent, getEventPath } from "@/lib/events"
 
 export const dynamic = 'force-static';
 
@@ -134,9 +134,11 @@ export default async function AudioDetailPage({
     slug: slug
   });
 
+  const event = getBayaanEvent(data)
+
   const relatedLecturesPromise = getRelatedBayaans({
     currentSlug: slug,
-    event: data?.event,
+    eventBayaanIds: event?.bayaanIds,
     date: data?.date,
     category: data?.category,
     totalBayaans: total
@@ -182,15 +184,15 @@ export default async function AudioDetailPage({
 
         {/* Header Section */}
         <header className="mb-8">
-          {data.event?.trim() && (
+          {event && (
             <Link
-              href={getEventPath(data.event)}
+              href={getEventPath(event.slug)}
               prefetch={false}
               className="group/event mb-5 inline-flex max-w-full items-center gap-2 rounded-full border border-primary/25 bg-secondary/60 px-3 py-2 text-sm font-medium text-primary transition-colors hover:border-primary/50 hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring sm:gap-2.5 sm:px-4"
             >
               <CalendarDays className="size-4 shrink-0" aria-hidden="true" />
               <span className="min-w-0 break-words">
-                Part of event: <span className="font-semibold">{data.event}</span>
+                Part of event: <span className="font-semibold">{event.title}</span>
               </span>
               <ArrowRight className="size-4 shrink-0 motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out motion-safe:group-hover/event:translate-x-1 motion-safe:group-focus-visible/event:translate-x-1" aria-hidden="true" />
             </Link>

@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import { bayaanSlugQuery } from "@/services/bayaans/query";
 import EventSitemapQuery from "@/services/bayaans/query/eventSitemap.query";
-import { getEventPath, getEventSlug } from "@/lib/events";
+import { getEventPath } from "@/lib/events";
 
 // Kept free of side effects (no env loading, no file writes) so it can be unit tested.
 
@@ -22,15 +22,21 @@ export type EventSitemapEntry = {
    lastModified: string;
 };
 
-type EventSitemapItem = {
-   event?: string | null;
+export type EventSitemapItem = {
+   slug?: string | null;
    sys?: { publishedAt?: string | null } | null;
+   bayaansCollection?: {
+      items?: Array<{ sys?: { publishedAt?: string | null } | null } | null>;
+   } | null;
 } | null;
 
 // Contentful returns at most 100 entries per request unless asked for more, so fetch in batches.
-const CONTENTFUL_BATCH_SIZE = 1000;
+const AUDIO_BATCH_SIZE = 1000;
+// Each event also asks for up to 10 bayaans, so fewer events per request keeps the
+// query inside Contentful's query complexity limit.
+const EVENT_BATCH_SIZE = 100;
 
-async function fetchContentfulCollection(query: string | undefined, limit: number, skip: number) {
+async function fetchContentfulData(query: string | undefined, limit: number, skip: number) {
    const response = await fetch(process.env.CF_API_URL!, {
       method: "POST",
       headers: {
@@ -44,7 +50,7 @@ async function fetchContentfulCollection(query: string | undefined, limit: numbe
    });
 
    const result = await response.json() as any;
-   return result?.data?.bayaanCollection;
+   return result?.data;
 }
 
 export async function getAudioSitemapItems(): Promise<AudioSitemapItem[]> {
@@ -53,42 +59,49 @@ export async function getAudioSitemapItems(): Promise<AudioSitemapItem[]> {
    let total = 0;
 
    do {
-      const collection = await fetchContentfulCollection(bayaanSlugQuery.loc?.source.body, CONTENTFUL_BATCH_SIZE, skip);
+      const data = await fetchContentfulData(bayaanSlugQuery.loc?.source.body, AUDIO_BATCH_SIZE, skip);
+      const collection = data?.bayaanCollection;
       if (!collection) {
          throw new Error("Unable to load audio slugs for the sitemap");
       }
 
       items.push(...collection.items);
       total = collection.total;
-      skip += CONTENTFUL_BATCH_SIZE;
+      skip += AUDIO_BATCH_SIZE;
    } while (skip < total);
 
    return items;
 }
 
-export function groupEventSitemapItems(items: EventSitemapItem[], now: string): EventSitemapEntry[] {
-   const entriesBySlug = new Map<string, EventSitemapEntry>();
+// An event page changes when the event itself or any of its lectures is published,
+// so it is dated by whichever of those was published last.
+function getEventLastModified(item: NonNullable<EventSitemapItem>, now: string): string {
+   let lastModified = item.sys?.publishedAt || "";
 
-   // Names that share a slug open the same event page, so they get one sitemap entry,
-   // dated by the most recently published lecture in that event.
-   for (const item of items) {
-      const name = item?.event;
-      if (!name?.trim()) {
-         continue;
-      }
-
-      const publishedAt = item?.sys?.publishedAt || now;
-      const slug = getEventSlug(name);
-      const existingEntry = entriesBySlug.get(slug);
-
-      if (!existingEntry) {
-         entriesBySlug.set(slug, { path: getEventPath(name), lastModified: publishedAt });
-      } else if (publishedAt > existingEntry.lastModified) {
-         existingEntry.lastModified = publishedAt;
+   const bayaans = item.bayaansCollection?.items ?? [];
+   for (const bayaan of bayaans) {
+      const publishedAt = bayaan?.sys?.publishedAt || "";
+      if (publishedAt > lastModified) {
+         lastModified = publishedAt;
       }
    }
 
-   return Array.from(entriesBySlug.values());
+   return lastModified || now;
+}
+
+export function createEventSitemapEntries(items: EventSitemapItem[], now: string): EventSitemapEntry[] {
+   const entries: EventSitemapEntry[] = [];
+
+   for (const item of items) {
+      const slug = item?.slug?.trim();
+      if (!item || !slug) {
+         continue;
+      }
+
+      entries.push({ path: getEventPath(slug), lastModified: getEventLastModified(item, now) });
+   }
+
+   return entries;
 }
 
 export async function getEventSitemapEntries(now: string): Promise<EventSitemapEntry[]> {
@@ -97,17 +110,18 @@ export async function getEventSitemapEntries(now: string): Promise<EventSitemapE
    let total = 0;
 
    do {
-      const collection = await fetchContentfulCollection(EventSitemapQuery.loc?.source.body, CONTENTFUL_BATCH_SIZE, skip);
+      const data = await fetchContentfulData(EventSitemapQuery.loc?.source.body, EVENT_BATCH_SIZE, skip);
+      const collection = data?.eventCollection;
       if (!collection) {
          throw new Error("Unable to load events for the sitemap");
       }
 
       items.push(...collection.items);
       total = collection.total;
-      skip += CONTENTFUL_BATCH_SIZE;
+      skip += EVENT_BATCH_SIZE;
    } while (skip < total);
 
-   return groupEventSitemapItems(items, now);
+   return createEventSitemapEntries(items, now);
 }
 
 export function getLatestDate(entries: EventSitemapEntry[], now: string): string {

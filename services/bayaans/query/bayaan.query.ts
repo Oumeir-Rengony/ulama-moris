@@ -4,7 +4,7 @@ export default gql`query GetBayaan (
   $startDate: DateTime, 
   $endDate: DateTime, 
   $search: String, 
-  $events: [String],
+  $bayaanIds: [String],
   $local: [String]
   # $categories: [String],
   $limit: Int, 
@@ -15,7 +15,7 @@ export default gql`query GetBayaan (
       date_gte: $startDate,
       date_lte: $endDate,
       title_contains: $search,
-      event_in: $events,
+      sys: { id_in: $bayaanIds },
       local_contains_all: $local
       # category_in: $categories,
     },

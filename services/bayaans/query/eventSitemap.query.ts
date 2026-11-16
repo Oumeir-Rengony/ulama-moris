@@ -1,18 +1,21 @@
 import { gql } from "@apollo/client";
 
+// An event holds at most 10 bayaans, so one page of 10 covers every bayaan in it.
 export default gql`
   query GetEventSitemap($limit: Int!, $skip: Int!) {
-    bayaanCollection(
-      where: { event_exists: true }
-      limit: $limit
-      skip: $skip
-      order: sys_id_ASC
-    ) {
+    eventCollection(limit: $limit, skip: $skip, order: sys_id_ASC) {
       total
       items {
-        event
+        slug
         sys {
           publishedAt
+        }
+        bayaansCollection(limit: 10) {
+          items {
+            sys {
+              publishedAt
+            }
+          }
         }
       }
     }

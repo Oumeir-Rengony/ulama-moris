@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client"
 
-export default gql`query relatedBayaan($currentSlug: String, $event: String, $date_gte: DateTime, $date_lt: DateTime,  $category: [String], $limit: Int, $skip: Int) {
-   event: bayaanCollection(where: { slug_not: $currentSlug, event_contains: $event, date_gte: $date_gte, date_lt: $date_lt }, limit: $limit){
+export default gql`query relatedBayaan($currentSlug: String, $eventBayaanIds: [String], $date_gte: DateTime, $date_lt: DateTime,  $category: [String], $limit: Int, $skip: Int) {
+   event: bayaanCollection(where: { slug_not: $currentSlug, sys: { id_in: $eventBayaanIds }, date_gte: $date_gte, date_lt: $date_lt }, limit: $limit){
       total
       items {
          ...BayaanFields

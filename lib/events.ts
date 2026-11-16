@@ -1,9 +1,46 @@
-export function getEventSlug(event: string): string {
-  return event.trim().toLowerCase().replace(/[\s-]+/g, "-");
+export function getEventPath(slug: string): string {
+  return `/events/${encodeURIComponent(slug)}`;
 }
 
-export function getEventPath(event: string): string {
-  return `/events/${encodeURIComponent(getEventSlug(event))}`;
+export type LinkedEvent = {
+  title: string;
+  slug: string;
+  bayaanIds: string[];
+};
+
+// The part of a Contentful bayaan that says which event it belongs to.
+export type BayaanEventLink = {
+  linkedFrom?: {
+    eventCollection?: {
+      items?: Array<{
+        title?: string | null;
+        slug?: string | null;
+        bayaansCollection?: {
+          items?: Array<{ sys: { id: string } } | null>;
+        } | null;
+      } | null>;
+    } | null;
+  } | null;
+} | null | undefined;
+
+// A bayaan belongs to at most one event, so only the first linking event is used.
+export function getBayaanEvent(bayaan: BayaanEventLink): LinkedEvent | null {
+  const event = bayaan?.linkedFrom?.eventCollection?.items?.[0];
+  const title = event?.title?.trim();
+  const slug = event?.slug?.trim();
+  if (!title || !slug) {
+    return null;
+  }
+
+  const bayaanIds: string[] = [];
+  const eventBayaans = event?.bayaansCollection?.items ?? [];
+  for (const eventBayaan of eventBayaans) {
+    if (eventBayaan?.sys.id) {
+      bayaanIds.push(eventBayaan.sys.id);
+    }
+  }
+
+  return { title, slug, bayaanIds };
 }
 
 export type EventRecording = {
@@ -178,12 +215,15 @@ export function groupEventsByYear(events: EventDirectoryEntry[]): EventYearGroup
   return groups;
 }
 
-export function createEventDirectoryEntry(title: string, recordings: EventRecording[]): EventDirectoryEntry {
+export function createEventDirectoryEntry(
+  event: { title: string; slug: string },
+  recordings: EventRecording[],
+): EventDirectoryEntry {
   const summary = summarizeEventRecordings(recordings);
   const entry: EventDirectoryEntry = {
-    slug: getEventSlug(title),
-    path: getEventPath(title),
-    title,
+    slug: event.slug,
+    path: getEventPath(event.slug),
+    title: event.title,
     total: summary.total,
     duration: summary.duration,
     location: summary.location,

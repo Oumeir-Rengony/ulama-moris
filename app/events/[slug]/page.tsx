@@ -5,9 +5,9 @@ import { ArrowLeft, Radio, Layers3, Clock3, MapPin } from "lucide-react";
 import { AudioCard } from "@/components/audio-card";
 import CONFIG from "@/config/config.json";
 import { AudioProvider } from "@/contexts/audio-context";
-import { getEventPath } from "@/lib/events";
+import { getEventPath, summarizeEventRecordings } from "@/lib/events";
 import { getBayaansWithPagination } from "@/services/bayaans/bayaan.service";
-import { getEventBySlug, getEventSummary } from "@/services/bayaans/event.service";
+import { getEventBySlug } from "@/services/bayaans/event.service";
 import { toTitleCase } from "@/lib/utils";
 import { parsePageParam } from "@/lib/search-params";
 
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
 
   const title = `${event.title} | Ulama Moris`;
   const description = `Listen to all bayaans from ${event.title}.`;
-  const path = getEventPath(event.title);
+  const path = getEventPath(event.slug);
 
   return {
     title,
@@ -47,10 +47,8 @@ export default async function EventPage({ params, searchParams }: EventPageProps
 
   const query = await searchParams;
   const page = parsePageParam(query.page);
-  const [audioList, summary] = await Promise.all([
-    getBayaansWithPagination({ events: event.names, page, isMobile: false }),
-    getEventSummary(event.names),
-  ]);
+  const summary = summarizeEventRecordings(event.recordings);
+  const audioList = await getBayaansWithPagination({ bayaanIds: event.bayaanIds, page, isMobile: false });
   if (!audioList) {
     throw new Error("Unable to load event lectures");
   }
@@ -60,7 +58,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     notFound();
   }
 
-  const path = getEventPath(event.title);
+  const path = getEventPath(event.slug);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ulama-moris.org";
   const navigationClassName = "rounded-sm text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring";
 

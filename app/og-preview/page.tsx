@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getEventPath, getEventSlug } from "@/lib/events";
+import { getEventPath } from "@/lib/events";
 import { parsePageParam } from "@/lib/search-params";
 import { getBayaansBase } from "@/services/bayaans/bayaan.service";
-import { getEventNames } from "@/services/bayaans/event.service";
+import { getEventDirectory } from "@/services/bayaans/event.service";
 import { PreviewImage } from "./preview-image";
 
 export const metadata: Metadata = {
@@ -31,14 +31,10 @@ export default async function OgPreviewPage({
   let totalPages = 1;
 
   if (type === "event") {
-    const events = await getEventNames();
-    events.sort((first, second) => first.localeCompare(second));
-    const seenSlugs = new Set<string>();
+    const events = await getEventDirectory();
+    events.sort((first, second) => first.title.localeCompare(second.title));
     for (const event of events) {
-      const slug = getEventSlug(event);
-      if (seenSlugs.has(slug)) continue;
-      seenSlugs.add(slug);
-      options.push({ slug, title: event });
+      options.push({ slug: event.slug, title: event.title });
     }
   } else {
     const result = await getBayaansBase({ search, limit: pageSize, skip: (page - 1) * pageSize });
@@ -56,7 +52,7 @@ export default async function OgPreviewPage({
   let pageUrl = "";
   let imageUrl = "";
   if (selected) {
-    pageUrl = type === "audio" ? `/audio/${encodeURIComponent(selected.slug)}` : getEventPath(selected.title);
+    pageUrl = type === "audio" ? `/audio/${encodeURIComponent(selected.slug)}` : getEventPath(selected.slug);
     const imageQuery = new URLSearchParams({ type, slug: selected.slug, preview: String(Date.now()) });
     if (customTitle) imageQuery.set("title", customTitle);
     imageUrl = `/og-preview/image?${imageQuery}`;

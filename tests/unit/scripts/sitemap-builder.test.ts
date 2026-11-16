@@ -8,7 +8,7 @@ import {
    getAudioSitemapItems,
    getEventSitemapEntries,
    getLatestDate,
-   groupEventSitemapItems,
+   createEventSitemapEntries,
 } from "@/scripts/sitemap-builder";
 
 vi.mock("node-fetch", () => ({ default: vi.fn() }));
@@ -19,9 +19,12 @@ const NOW = "2026-11-05T00:00:00.000Z";
 const DOMAIN = "https://www.ulama-moris.org";
 
 // Makes the mocked fetch answer like Contentful's GraphQL API, one response per call.
-function mockContentfulResponses(collections: Array<{ total: number; items: unknown[] } | null>) {
+function mockContentfulResponses(
+   collections: Array<{ total: number; items: unknown[] } | null>,
+   collectionName: "bayaanCollection" | "eventCollection" = "bayaanCollection",
+) {
    for (const collection of collections) {
-      const body = { data: { bayaanCollection: collection } };
+      const body = { data: { [collectionName]: collection } };
       mockedFetch.mockResolvedValueOnce({ json: async () => body } as any);
    }
 }
@@ -77,11 +80,15 @@ describe("getAudioSitemapItems", () => {
    });
 });
 
-describe("groupEventSitemapItems", () => {
-   it("creates one entry per event page using the /events path", () => {
-      const entries = groupEventSitemapItems([
-         { event: "Jummah", sys: { publishedAt: "2026-01-01T00:00:00.000Z" } },
-         { event: "Strong Youth Strong Ummah", sys: { publishedAt: "2026-02-01T00:00:00.000Z" } },
+describe("createEventSitemapEntries", () => {
+   function bayaanPublishedAt(publishedAt: string) {
+      return { sys: { publishedAt } };
+   }
+
+   it("creates one entry per event using its slug and the /events path", () => {
+      const entries = createEventSitemapEntries([
+         { slug: "jummah", sys: { publishedAt: "2026-01-01T00:00:00.000Z" } },
+         { slug: "strong-youth-strong-ummah", sys: { publishedAt: "2026-02-01T00:00:00.000Z" } },
       ], NOW);
 
       expect(entries).toEqual([
@@ -90,50 +97,63 @@ describe("groupEventSitemapItems", () => {
       ]);
    });
 
-   it("merges event names that open the same page and keeps the newest publish date", () => {
-      const entries = groupEventSitemapItems([
-         { event: "Jummah", sys: { publishedAt: "2026-03-01T00:00:00.000Z" } },
-         { event: "jummah ", sys: { publishedAt: "2026-08-21T00:00:00.000Z" } },
-         { event: "JUMMAH", sys: { publishedAt: "2026-05-01T00:00:00.000Z" } },
+   it("dates an event by its newest publish, whether of the event or one of its bayaans", () => {
+      const entries = createEventSitemapEntries([
+         {
+            slug: "bayaan-newer",
+            sys: { publishedAt: "2026-03-01T00:00:00.000Z" },
+            bayaansCollection: {
+               items: [bayaanPublishedAt("2026-08-21T00:00:00.000Z"), bayaanPublishedAt("2026-05-01T00:00:00.000Z"), null],
+            },
+         },
+         {
+            slug: "event-newer",
+            sys: { publishedAt: "2026-09-01T00:00:00.000Z" },
+            bayaansCollection: { items: [bayaanPublishedAt("2026-05-01T00:00:00.000Z")] },
+         },
       ], NOW);
 
       expect(entries).toEqual([
-         { path: "/events/jummah", lastModified: "2026-08-21T00:00:00.000Z" },
+         { path: "/events/bayaan-newer", lastModified: "2026-08-21T00:00:00.000Z" },
+         { path: "/events/event-newer", lastModified: "2026-09-01T00:00:00.000Z" },
       ]);
    });
 
-   it("skips lectures without an event name", () => {
-      const entries = groupEventSitemapItems([
-         { event: null, sys: { publishedAt: "2026-01-01T00:00:00.000Z" } },
-         { event: "   ", sys: { publishedAt: "2026-01-01T00:00:00.000Z" } },
+   it("skips events without a slug", () => {
+      const entries = createEventSitemapEntries([
+         { slug: null, sys: { publishedAt: "2026-01-01T00:00:00.000Z" } },
+         { slug: "   ", sys: { publishedAt: "2026-01-01T00:00:00.000Z" } },
          null,
       ], NOW);
 
       expect(entries).toEqual([]);
    });
 
-   it("uses the current time when a lecture has no publish date", () => {
-      const entries = groupEventSitemapItems([{ event: "Jummah", sys: null }], NOW);
+   it("uses the current time when nothing in the event has a publish date", () => {
+      const entries = createEventSitemapEntries([{ slug: "jummah", sys: null }], NOW);
 
       expect(entries).toEqual([{ path: "/events/jummah", lastModified: NOW }]);
    });
 });
 
 describe("getEventSitemapEntries", () => {
-   it("groups events across every fetched batch", async () => {
+   it("reads events across every fetched batch, 100 at a time", async () => {
       mockContentfulResponses([
-         { total: 1500, items: [{ event: "Jummah", sys: { publishedAt: "2026-01-01T00:00:00.000Z" } }] },
-         { total: 1500, items: [{ event: "Jummah", sys: { publishedAt: "2026-06-01T00:00:00.000Z" } }] },
-      ]);
+         { total: 150, items: [{ slug: "jummah", sys: { publishedAt: "2026-01-01T00:00:00.000Z" } }] },
+         { total: 150, items: [{ slug: "seerah", sys: { publishedAt: "2026-06-01T00:00:00.000Z" } }] },
+      ], "eventCollection");
 
       const entries = await getEventSitemapEntries(NOW);
 
-      expect(entries).toEqual([{ path: "/events/jummah", lastModified: "2026-06-01T00:00:00.000Z" }]);
-      expect(getRequestedSkips()).toEqual([0, 1000]);
+      expect(entries).toEqual([
+         { path: "/events/jummah", lastModified: "2026-01-01T00:00:00.000Z" },
+         { path: "/events/seerah", lastModified: "2026-06-01T00:00:00.000Z" },
+      ]);
+      expect(getRequestedSkips()).toEqual([0, 100]);
    });
 
    it("throws when Contentful returns no data", async () => {
-      mockContentfulResponses([null]);
+      mockContentfulResponses([null], "eventCollection");
 
       await expect(getEventSitemapEntries(NOW)).rejects.toThrow("Unable to load events for the sitemap");
    });
