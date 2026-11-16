@@ -200,6 +200,7 @@ describe("createEventDirectoryEntry", () => {
     expect(entry.path).toBe("/events/seerah-week");
     expect(entry.title).toBe("Seerah Week");
     expect(entry.dateRange).toBe("3 Nov – 5 Nov 2026");
+    expect(entry.dateRangeLong).toBe("3 – 5 November 2026");
     expect(entry.year).toBe("2026");
     expect(entry.day).toBe("3");
     expect(entry.month).toBe("Nov");
@@ -213,6 +214,7 @@ describe("createEventDirectoryEntry", () => {
     ]);
 
     expect(entry.dateRange).toBe("30 Dec 2025 – 2 Jan 2026");
+    expect(entry.dateRangeLong).toBe("30 December 2025 – 2 January 2026");
     expect(entry.year).toBe("2026");
     expect(entry.day).toBe("2");
     expect(entry.month).toBe("Jan");
@@ -225,12 +227,23 @@ describe("createEventDirectoryEntry", () => {
     ]);
 
     expect(entry.dateRange).toBe("3 Nov 2026");
+    expect(entry.dateRangeLong).toBe("3 November 2026");
+  });
+
+  it("names both months in the long range for an event that crosses a month", () => {
+    const entry = createEventDirectoryEntry({ title: "Month End Programme", slug: "month-end-programme" }, [
+      recording({ date: "2026-10-30T10:00:00Z" }),
+      recording({ date: "2026-11-02T10:00:00Z" }),
+    ]);
+
+    expect(entry.dateRangeLong).toBe("30 October – 2 November 2026");
   });
 
   it("leaves the date fields empty when no recording has a date", () => {
     const entry = createEventDirectoryEntry({ title: "Undated Talks", slug: "undated-talks" }, [recording({ duration: "30:00" })]);
 
     expect(entry.dateRange).toBeNull();
+    expect(entry.dateRangeLong).toBeNull();
     expect(entry.year).toBeNull();
     expect(entry.day).toBeNull();
     expect(entry.latestTime).toBe(0);
@@ -248,6 +261,7 @@ describe("groupEventsByYear", () => {
       duration: null,
       location: null,
       dateRange: null,
+      dateRangeLong: null,
       year,
       day: null,
       month: null,

@@ -166,6 +166,7 @@ export type EventDirectoryEntry = {
   duration: string | null;
   location: string | null;
   dateRange: string | null;
+  dateRangeLong: string | null;
   year: string | null;
   day: string | null;
   month: string | null;
@@ -190,6 +191,35 @@ function formatEventDateRange(firstDate: Date, lastDate: Date): string {
   const startYear = formatInMauritius(firstDate, { year: "numeric" });
   const endYear = formatInMauritius(lastDate, { year: "numeric" });
   if (startYear === endYear) {
+    return `${formatInMauritius(firstDate, dayAndMonth)} – ${end}`;
+  }
+
+  return `${start} – ${end}`;
+}
+
+// The long form for an event's own page: "3 November 2026", "24 – 31 October 2026",
+// "30 October – 2 November 2026" or "30 December 2025 – 2 January 2026". Each end of the
+// range only repeats the month and year when they differ.
+function formatEventDateRangeLong(firstDate: Date, lastDate: Date): string {
+  const fullDate: Intl.DateTimeFormatOptions = { day: "numeric", month: "long", year: "numeric" };
+  const dayAndMonth: Intl.DateTimeFormatOptions = { day: "numeric", month: "long" };
+  const dayOnly: Intl.DateTimeFormatOptions = { day: "numeric" };
+  const monthAndYear: Intl.DateTimeFormatOptions = { month: "long", year: "numeric" };
+  const yearOnly: Intl.DateTimeFormatOptions = { year: "numeric" };
+
+  const start = formatInMauritius(firstDate, fullDate);
+  const end = formatInMauritius(lastDate, fullDate);
+  if (start === end) {
+    return start;
+  }
+
+  const isSameMonth = formatInMauritius(firstDate, monthAndYear) === formatInMauritius(lastDate, monthAndYear);
+  if (isSameMonth) {
+    return `${formatInMauritius(firstDate, dayOnly)} – ${end}`;
+  }
+
+  const isSameYear = formatInMauritius(firstDate, yearOnly) === formatInMauritius(lastDate, yearOnly);
+  if (isSameYear) {
     return `${formatInMauritius(firstDate, dayAndMonth)} – ${end}`;
   }
 
@@ -240,6 +270,7 @@ export function createEventDirectoryEntry(
     duration: summary.duration,
     location: summary.location,
     dateRange: null,
+    dateRangeLong: null,
     year: null,
     day: null,
     month: null,
@@ -252,6 +283,7 @@ export function createEventDirectoryEntry(
 
   // The directory is ordered and grouped by when an event last had a recording.
   entry.dateRange = formatEventDateRange(summary.firstDate, summary.lastDate);
+  entry.dateRangeLong = formatEventDateRangeLong(summary.firstDate, summary.lastDate);
   entry.year = formatInMauritius(summary.lastDate, { year: "numeric" });
   // The badge shows when an event started, unless it ran across years: then the start
   // date would contradict the year heading it is listed under, so show the latest date.
