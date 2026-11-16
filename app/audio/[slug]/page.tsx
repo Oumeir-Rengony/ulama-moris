@@ -24,11 +24,6 @@ import { createAudioJsonLd, createBreadcrumbJsonLd, getAudioBreadcrumbSteps } fr
 import { JsonLdScript } from "@/components/json-ld-script"
 import { RelatedLectureListSkeleton } from "@/components/skeletons/related-lecture-skeleton"
 
-export const dynamic = 'force-static';
-
-
-export const dynamicParams = true;
-
 // Return a list of `params` to populate the [slug] dynamic segment
 // export async function generateStaticParams() {
 //   const audioList = await getBayaanSlug();

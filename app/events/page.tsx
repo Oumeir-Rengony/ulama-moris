@@ -8,8 +8,6 @@ import { toTitleCase } from "@/lib/utils";
 import { parsePageParam } from "@/lib/search-params";
 import { getEventDirectory } from "@/services/bayaans/event.service";
 
-export const revalidate = 86400; // 24 hours in seconds
-
 const title = "Events | Ulama Moris";
 const description = "Browse every event recorded by Ulama Moris and open one to listen to its lectures.";
 

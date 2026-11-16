@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyRequest } from "@contentful/node-apps-toolkit";
 import { getCanonicalRequest } from '@/lib/utils';
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
+import { CONTENTFUL_CACHE_TAG } from "@/lib/cache";
 
 
 export async function POST(req: NextRequest) {
@@ -39,12 +40,12 @@ export async function POST(req: NextRequest) {
    //    return NextResponse.json({ skipped: true });
    //  }
 
-   revalidatePath("/");
-   revalidatePath("/events");
-   // A bayaan's payload does not say which event it belongs to, and an event's payload
-   // only lists its current bayaans, so refresh every event page (and its OG image)
-   // rather than guess which ones changed.
-   revalidatePath("/events/[slug]", "layout");
+    // A payload does not say every page its entry appears on (a bayaan does not
+    // list its event, an event only lists its current bayaans), so clear every
+    // cached Contentful query rather than guess which ones changed.
+    // `expire: 0` makes the next visitor get fresh content straight away, so an
+    // editor sees their change as soon as they publish.
+    revalidateTag(CONTENTFUL_CACHE_TAG, { expire: 0 });
 
     // Contentful puts `sys` at the top level of the payload, next to `fields`.
     // Audio URLs are tagged with their asset id (`audio:{assetId}`), so this
@@ -53,18 +54,6 @@ export async function POST(req: NextRequest) {
 
     if (id) {
       revalidateTag(`audio:${id}`, { expire: 0 });
-    }
-
-    const contentType = body?.sys?.contentType?.sys?.id;
-    const slug = body?.fields?.slug?.["en-US"];
-
-    if (contentType === "event") {
-      // Every lecture page shows the event it belongs to. The payload only has the
-      // bayaans' ids, not their slugs, and lectures may have just been removed from
-      // the event, so refresh every lecture page.
-      revalidatePath("/audio/[slug]", "layout");
-    } else if (slug) {
-      revalidatePath(`/audio/${slug}`);
     }
 
     return NextResponse.json({ revalidated: true });

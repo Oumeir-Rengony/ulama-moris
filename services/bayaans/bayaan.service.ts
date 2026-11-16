@@ -1,4 +1,5 @@
-import { cache } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
+import { CONTENTFUL_CACHE_TAG } from '@/lib/cache';
 import { gql } from '@apollo/client'; 
 import { ExecuteQuery } from '@/services/apollo/apollo.service';
 
@@ -19,7 +20,7 @@ import { AssetsFragment } from '@/services/query';
 
 export type Local = "local" | "international" | "islahi majlis";
 
-export const getBayaansBase = cache(async ({
+export const getBayaansBase = async ({
     startDate = "", 
     endDate = "",  
     search = "", 
@@ -38,6 +39,9 @@ export const getBayaansBase = cache(async ({
     type?: Local,
     isPreview?: boolean; 
 }): Promise<{bayaanCollection: any}> => {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
 
   const QUERY = gql`
     ${AssetsFragment}
@@ -69,9 +73,9 @@ export const getBayaansBase = cache(async ({
   });
 
   return result;
-});
+};
 
-export const getBayaansWithPagination = cache(async ({
+export const getBayaansWithPagination = async ({
   page = 1,
   startDate = "",
   endDate = "",
@@ -110,9 +114,9 @@ export const getBayaansWithPagination = cache(async ({
   });
 
   return result?.bayaanCollection;
-});
+};
 
-export const getAllBayaans = cache(async ({
+export const getAllBayaans = async ({
   startDate = "",
   endDate = "",
   type,
@@ -135,9 +139,12 @@ export const getAllBayaans = cache(async ({
   });
 
   return result?.bayaanCollection;
-});
+};
 
-export const getBayaanSlug = cache(async (isPreview: boolean = false, type?: Local): Promise<any> => {
+export const getBayaanSlug = async (isPreview: boolean = false, type?: Local): Promise<any> => {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
 
   const QUERY = gql`
     ${bayaanSlugQuery}
@@ -151,15 +158,18 @@ export const getBayaanSlug = cache(async (isPreview: boolean = false, type?: Loc
   });
 
   return result?.bayaanCollection;
-})
+};
 
-export const getBayaanBySlug = cache(async ({
+export const getBayaanBySlug = async ({
   slug="", 
   isPreview = false
 }: {
   slug: String,
   isPreview?: boolean
 }): Promise<any> => {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
 
   const QUERY = gql`
     ${AssetsFragment}
@@ -177,13 +187,15 @@ export const getBayaanBySlug = cache(async ({
     data: result?.bayaanCollection?.items?.[0],
     total: result?.bayaanCollection?.total
   }
-})
+};
 
-export const GetBayaanById = cache(async (
+export const GetBayaanById = async (
   id: String,
   isPreview:boolean = false 
 ): Promise<any> => {
-
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
 
   const QUERY = gql`
     ${AssetsFragment}
@@ -201,9 +213,12 @@ export const GetBayaanById = cache(async (
 
 
   return result?.bayaan;
-});
+};
 
-const getTotalBayaan = cache(async (isPreview?: boolean):Promise<number> => {
+const getTotalBayaan = async (isPreview?: boolean):Promise<number> => {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
 
   const QUERY = gql`
     ${BayaanTotalQuery}
@@ -214,7 +229,7 @@ const getTotalBayaan = cache(async (isPreview?: boolean):Promise<number> => {
   })
 
   return result?.bayaanCollection?.total;
-})
+};
 
 
 // Exported for tests.
@@ -237,7 +252,7 @@ export const selectUniqueBayaan= (data: any[], limit=4) => {
 }
 
 
-export const getRelatedBayaans = cache(async ({ 
+export const getRelatedBayaans = async ({ 
   currentSlug,
   eventBayaanIds,
   date,
@@ -253,6 +268,9 @@ export const getRelatedBayaans = cache(async ({
   totalBayaans: number,
   limit?: number;
 }, isPreview: boolean = false): Promise<any> =>  {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
 
   const RELATED_QUERY = gql`
     ${AssetsFragment}
@@ -275,6 +293,8 @@ export const getRelatedBayaans = cache(async ({
     total = await getTotalBayaan(false);
   }
 
+  // This runs inside "use cache", so the random pick is kept for the whole cache
+  // lifetime: a lecture shows the same "More Lectures" until the cache refreshes.
   const randomSkip = Math.max(0, Math.floor(Math.random() * (total - 4)));
 
   const result =  await ExecuteQuery(RELATED_QUERY, {
@@ -294,4 +314,4 @@ export const getRelatedBayaans = cache(async ({
   const sortedResult = selectUniqueBayaan([result?.event?.items, result?.category?.items, result?.random?.items]) 
   return sortedResult;
   
-});
+};

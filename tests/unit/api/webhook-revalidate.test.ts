@@ -1,14 +1,13 @@
 import { NextRequest } from "next/server";
 import { verifyRequest } from "@contentful/node-apps-toolkit";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "@/app/api/webhook/revalidate/route";
 
 vi.mock("@contentful/node-apps-toolkit", () => ({ verifyRequest: vi.fn() }));
-vi.mock("next/cache", () => ({ revalidatePath: vi.fn(), revalidateTag: vi.fn() }));
+vi.mock("next/cache", () => ({ revalidateTag: vi.fn() }));
 
 const mockedVerifyRequest = vi.mocked(verifyRequest);
-const mockedRevalidatePath = vi.mocked(revalidatePath);
 const mockedRevalidateTag = vi.mocked(revalidateTag);
 
 const WEBHOOK_SECRET = "test-webhook-secret";
@@ -77,7 +76,7 @@ describe("POST /api/webhook/revalidate", () => {
     expect(consoleError).toHaveBeenCalledWith("CF_WEBHOOK_SECRET is not set; refusing webhook");
     consoleError.mockRestore();
     expect(mockedVerifyRequest).not.toHaveBeenCalled();
-    expect(mockedRevalidatePath).not.toHaveBeenCalled();
+    expect(mockedRevalidateTag).not.toHaveBeenCalled();
   });
 
   it("returns 400 for a signed body that is not valid JSON", async () => {
@@ -86,7 +85,7 @@ describe("POST /api/webhook/revalidate", () => {
     const response = await sendRawWebhook("{not json");
 
     expect(response.status).toBe(400);
-    expect(mockedRevalidatePath).not.toHaveBeenCalled();
+    expect(mockedRevalidateTag).not.toHaveBeenCalled();
   });
 
   it("rejects a request whose signature does not verify", async () => {
@@ -95,33 +94,26 @@ describe("POST /api/webhook/revalidate", () => {
     const response = await sendWebhook(publishedBayaan);
 
     expect(response.status).toBe(401);
-    expect(mockedRevalidatePath).not.toHaveBeenCalled();
     expect(mockedRevalidateTag).not.toHaveBeenCalled();
   });
 
-  it("refreshes the listing pages, every event page and the lecture's own page", async () => {
+  it("clears every cached Contentful query straight away when a bayaan is published", async () => {
     mockedVerifyRequest.mockReturnValue(true);
 
     const response = await sendWebhook(publishedBayaan);
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ revalidated: true });
-    expect(mockedRevalidatePath).toHaveBeenCalledWith("/");
-    expect(mockedRevalidatePath).toHaveBeenCalledWith("/events");
-    expect(mockedRevalidatePath).toHaveBeenCalledWith("/events/[slug]", "layout");
-    expect(mockedRevalidatePath).toHaveBeenCalledWith("/audio/mauritius-islamic-finance-hub");
+    expect(mockedRevalidateTag).toHaveBeenCalledWith("contentful", { expire: 0 });
   });
 
-  it("refreshes every lecture page, not one named after the event, when an event is published", async () => {
+  it("clears every cached Contentful query when an event is published", async () => {
     mockedVerifyRequest.mockReturnValue(true);
 
     const response = await sendWebhook(publishedEvent);
 
     expect(response.status).toBe(200);
-    expect(mockedRevalidatePath).toHaveBeenCalledWith("/events");
-    expect(mockedRevalidatePath).toHaveBeenCalledWith("/events/[slug]", "layout");
-    expect(mockedRevalidatePath).toHaveBeenCalledWith("/audio/[slug]", "layout");
-    expect(mockedRevalidatePath).not.toHaveBeenCalledWith("/audio/seerah-week");
+    expect(mockedRevalidateTag).toHaveBeenCalledWith("contentful", { expire: 0 });
   });
 
   it("refreshes the cached audio for the id in the payload's top-level sys", async () => {
@@ -129,22 +121,22 @@ describe("POST /api/webhook/revalidate", () => {
 
     await sendWebhook(publishedBayaan);
 
-    expect(mockedRevalidateTag).toHaveBeenCalledTimes(1);
+    expect(mockedRevalidateTag).toHaveBeenCalledTimes(2);
     expect(mockedRevalidateTag).toHaveBeenCalledWith("audio:5DbwIghILaPkCEI5GaYhmK", { expire: 0 });
   });
 
-  it("skips the audio and lecture refresh when the payload has no id or slug", async () => {
+  it("still clears the Contentful cache when the payload has no id", async () => {
     mockedVerifyRequest.mockReturnValue(true);
 
     await sendWebhook({ fields: {} });
 
-    expect(mockedRevalidateTag).not.toHaveBeenCalled();
-    expect(mockedRevalidatePath).toHaveBeenCalledTimes(3);
+    expect(mockedRevalidateTag).toHaveBeenCalledTimes(1);
+    expect(mockedRevalidateTag).toHaveBeenCalledWith("contentful", { expire: 0 });
   });
 
   it("returns 500 when revalidation throws", async () => {
     mockedVerifyRequest.mockReturnValue(true);
-    mockedRevalidatePath.mockImplementationOnce(() => {
+    mockedRevalidateTag.mockImplementationOnce(() => {
       throw new Error("cache unavailable");
     });
 

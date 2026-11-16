@@ -5,9 +5,6 @@ import { ArticleList } from "@/components/article-list"
 import { JsonLdScript } from "@/components/json-ld-script"
 import { getArticlesWithPagination, createArticleListJsonLd } from "@/services/articles/article.service"
 
-export const dynamic = 'force-static';
-
-
 export const metadata: Metadata = {
   title: "Islamic Articles | Ulama Moris",
   description: "Read Islamic articles on various topics including Qur'an, Hadith, Fiqh, and Islamic spirituality from respected scholars.",
@@ -21,10 +18,30 @@ export const metadata: Metadata = {
   }
 }
 
-export default async function ArticlesPage({
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+
+// The fallback is prerendered into the static shell. The list depends on the URL
+// query and the user agent, so it streams in per request.
+export default function ArticlesPage({
   searchParams
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams: SearchParams
+}) {
+  return (
+    <div className="min-h-screen bg-background">
+      <main>
+        <Suspense fallback={<ArticleListFallback />}>
+          <ArticleListSection searchParams={searchParams} />
+        </Suspense>
+      </main>
+    </div>
+  )
+}
+
+async function ArticleListSection({
+  searchParams
+}: {
+  searchParams: SearchParams
 }) {
   const params = await searchParams
 
@@ -36,51 +53,47 @@ export default async function ArticlesPage({
   const userAgent = headersList.get("user-agent") || ""
   const isMobile = /mobile/i.test(userAgent)
 
-  const articleListPromise = getArticlesWithPagination({
+  // JSON-LD needs the articles, so the list is awaited here instead of streamed.
+  const articleList = await getArticlesWithPagination({
     page,
     search,
     category,
     isMobile
   })
-
-  // For JSON-LD, we need to await the promise
-  const articleList = await articleListPromise
   const jsonLd = createArticleListJsonLd(articleList?.items || [])
 
   return (
-    <div className="min-h-screen bg-background">
-
+    <>
       <JsonLdScript data={jsonLd} />
+      <ArticleList
+        articleListPromise={Promise.resolve(articleList)}
+        currentPage={page}
+        searchQuery={search}
+        category={category}
+        isMobile={isMobile}
+      />
+    </>
+  )
+}
 
-      <main>
-        <Suspense fallback={
-          <div className="mx-auto max-w-6xl px-4 py-12">
-            <div className="animate-pulse">
-              <div className="mb-8">
-                <div className="h-8 w-48 bg-muted rounded mb-2" />
-                <div className="h-4 w-64 bg-muted rounded" />
-              </div>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="rounded-xl border border-border bg-card p-5">
-                    <div className="h-40 bg-muted rounded mb-4" />
-                    <div className="h-5 bg-muted rounded mb-2" />
-                    <div className="h-4 bg-muted rounded w-3/4" />
-                  </div>
-                ))}
-              </div>
+function ArticleListFallback() {
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-12">
+      <div className="animate-pulse">
+        <div className="mb-8">
+          <div className="h-8 w-48 bg-muted rounded mb-2" />
+          <div className="h-4 w-64 bg-muted rounded" />
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="rounded-xl border border-border bg-card p-5">
+              <div className="h-40 bg-muted rounded mb-4" />
+              <div className="h-5 bg-muted rounded mb-2" />
+              <div className="h-4 bg-muted rounded w-3/4" />
             </div>
-          </div>
-        }>
-          <ArticleList
-            articleListPromise={Promise.resolve(articleList)}
-            currentPage={page}
-            searchQuery={search}
-            category={category}
-            isMobile={isMobile}
-          />
-        </Suspense>
-      </main>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

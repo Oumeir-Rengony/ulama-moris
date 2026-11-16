@@ -1,4 +1,5 @@
-import { cache } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
+import { CONTENTFUL_CACHE_TAG } from '@/lib/cache';
 import { gql } from '@apollo/client';
 import { ExecuteQuery } from '@/services/apollo/apollo.service';
 import Config from "@/config/config.json";
@@ -18,7 +19,7 @@ import {
 
 import { AssetsFragment } from '@/services/query';
 
-export const getArticlesBase = cache(async ({
+export const getArticlesBase = async ({
   search = "",
   category = "",
   limit = 0,
@@ -31,6 +32,9 @@ export const getArticlesBase = cache(async ({
   category?: string;
   isPreview?: boolean;
 }): Promise<{ articleCollection: any }> => {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
 
   const QUERY = gql`
     ${AssetsFragment}
@@ -51,9 +55,9 @@ export const getArticlesBase = cache(async ({
   });
 
   return result;
-});
+};
 
-export const getArticlesWithPagination = cache(async ({
+export const getArticlesWithPagination = async ({
   page = 1,
   search = "",
   category = "",
@@ -83,9 +87,9 @@ export const getArticlesWithPagination = cache(async ({
   });
 
   return result?.articleCollection;
-});
+};
 
-export const getAllArticles = cache(async ({
+export const getAllArticles = async ({
   search = "",
   category = "",
   isPreview = false,
@@ -102,9 +106,12 @@ export const getAllArticles = cache(async ({
   });
 
   return result?.articleCollection;
-});
+};
 
-export const getArticleSlugs = cache(async (isPreview: boolean = false): Promise<any> => {
+export const getArticleSlugs = async (isPreview: boolean = false): Promise<any> => {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
 
   const QUERY = gql`
     ${ArticleSlugQuery}
@@ -115,15 +122,18 @@ export const getArticleSlugs = cache(async (isPreview: boolean = false): Promise
   });
 
   return result?.articleCollection;
-});
+};
 
-export const getArticleBySlug = cache(async ({
+export const getArticleBySlug = async ({
   slug = "",
   isPreview = false
 }: {
   slug: string;
   isPreview?: boolean;
 }): Promise<any> => {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
 
   const QUERY = gql`
     ${AssetsFragment}
@@ -145,9 +155,12 @@ export const getArticleBySlug = cache(async ({
     data: result?.articleCollection?.items?.[0],
     total: total
   };
-});
+};
 
-const getTotalArticles = cache(async (isPreview?: boolean): Promise<number> => {
+const getTotalArticles = async (isPreview?: boolean): Promise<number> => {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
 
   const QUERY = gql`
     ${ArticleTotalQuery}
@@ -158,7 +171,7 @@ const getTotalArticles = cache(async (isPreview?: boolean): Promise<number> => {
   });
 
   return result?.articleCollection?.total;
-});
+};
 
 const selectUniqueArticles = (data: any[], limit = 4) => {
   const seen = new Set();
@@ -178,7 +191,7 @@ const selectUniqueArticles = (data: any[], limit = 4) => {
   return final;
 };
 
-export const getRelatedArticles = cache(async ({
+export const getRelatedArticles = async ({
   currentSlug,
   category,
   totalArticles,
@@ -189,6 +202,9 @@ export const getRelatedArticles = cache(async ({
   totalArticles: number;
   limit?: number;
 }, isPreview: boolean = false): Promise<any> => {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
 
   const RELATED_QUERY = gql`
     ${AssetsFragment}
@@ -202,6 +218,8 @@ export const getRelatedArticles = cache(async ({
     total = await getTotalArticles(false);
   }
 
+  // This runs inside "use cache", so the random pick is kept for the whole cache
+  // lifetime: an article shows the same "More Articles" until the cache refreshes.
   const randomSkip = Math.max(0, Math.floor(Math.random() * (total - 4)));
 
   const result = await ExecuteQuery(RELATED_QUERY, {
@@ -221,7 +239,7 @@ export const getRelatedArticles = cache(async ({
   ]);
 
   return sortedResult;
-});
+};
 
 const getArticleJsonLd = (item: any): SchemaArticle => {
   const author = getAuthorPerson(item?.author);

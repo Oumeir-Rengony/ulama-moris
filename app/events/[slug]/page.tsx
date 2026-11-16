@@ -13,8 +13,6 @@ import { createBreadcrumbJsonLd, createEventJsonLd, getEventBreadcrumbSteps } fr
 import { JsonLdScript } from "@/components/json-ld-script";
 import { parsePageParam } from "@/lib/search-params";
 
-export const revalidate = 86400; // 24 hours in seconds
-
 type EventPageProps = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ page?: string | string[] }>;

@@ -1,24 +1,37 @@
 import { Hero } from "@/components/hero"
 import { AudioList } from "@/components/audio-list"
 import { getBayaansWithPagination, type Local } from "@/services/bayaans/bayaan.service";
-// import { headers } from "next/headers";
-// import { getSelectorsByUserAgent } from "react-device-detect";
 import { AudioProvider } from '@/contexts/audio-context';
 import { Suspense } from "react";
 import { parseDateParam, parsePageParam } from "@/lib/search-params";
 import { BayaanListSkeleton } from "@/components/skeletons/bayaan-list-skeleton";
 
-// export const dynamic = 'force-static';
-export const revalidate = 86400; // 24 hours in seconds
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
-export const dynamicParams = true;
-
-export default async function Home({
+// The hero and the skeleton need no request data, so they are prerendered into the
+// static shell. The lecture list depends on the URL query, so it streams in per request.
+export default function Home({
   searchParams
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams: SearchParams
 }) {
+  return (
+    <div className="min-h-screen bg-background">
+      <main>
+        <Hero />
+        <Suspense fallback={<BayaanListSkeleton />}>
+          <LectureListSection searchParams={searchParams} />
+        </Suspense>
+      </main>
+    </div>
+  )
+}
 
+async function LectureListSection({
+  searchParams
+}: {
+  searchParams: SearchParams
+}) {
   const queryParams = await searchParams;
 
   // The URL can be edited by hand, so bad values fall back to safe defaults.
@@ -33,39 +46,29 @@ export default async function Home({
 
   const region = queryParams?.type as Local || "local"
 
-  //headers undefine din force-static
-  // const userAgent = (await headers()).get('user-agent');
-  // const { isMobile } =  getSelectorsByUserAgent(userAgent || "");
+  // The page size is fixed to mobile for now, so every visitor shares the same cache entries.
+  const isMobile = true;
 
-  const isMobile = true; // Assuming mobile for now since headers are not available in force-static mode
-
-  const audioListPromise = getBayaansWithPagination({ 
+  // getBayaansWithPagination is cached ("use cache"), so each filter combination
+  // only reaches Contentful once per cache lifetime.
+  const audioListPromise = getBayaansWithPagination({
     page: page,
     startDate: startDate,
     endDate: endDate,
     type: region,
     search: search,
-    isMobile: true
-    // isMobile: isMobile
+    isMobile: isMobile
   });
 
-  
   return (
-    <div className="min-h-screen bg-background">
-      <main>
-        <Hero />
-        <Suspense fallback={<BayaanListSkeleton />}>
-        <AudioProvider>
-          <AudioList 
-            audioListPromise={audioListPromise}
-            currentPage={page}
-            searchQuery={search}
-            region={region}
-            isMobile={isMobile}
-          />
-        </AudioProvider>
-        </Suspense>
-      </main>
-    </div>
+    <AudioProvider>
+      <AudioList
+        audioListPromise={audioListPromise}
+        currentPage={page}
+        searchQuery={search}
+        region={region}
+        isMobile={isMobile}
+      />
+    </AudioProvider>
   )
 }

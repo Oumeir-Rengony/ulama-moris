@@ -1,6 +1,14 @@
 // Adds DOM matchers such as toBeInTheDocument() to expect().
 import "@testing-library/jest-dom/vitest";
-import { afterEach } from "vitest";
+import { afterEach, vi } from "vitest";
+
+// cacheLife() and cacheTag() throw unless they run inside a Next.js server with
+// cacheComponents on. Vitest calls the services as plain functions, so the cache
+// calls do nothing here. A test file can still mock "next/cache" itself.
+vi.mock("next/cache", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("next/cache")>();
+  return { ...actual, cacheLife: vi.fn(), cacheTag: vi.fn() };
+});
 
 const isDomTest = typeof window !== "undefined";
 

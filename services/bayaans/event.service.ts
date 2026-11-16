@@ -1,4 +1,5 @@
-import { cache } from "react";
+import { cacheLife, cacheTag } from 'next/cache';
+import { CONTENTFUL_CACHE_TAG } from '@/lib/cache';
 import {
   createEventDirectoryEntry,
   type EventDirectoryEntry,
@@ -27,7 +28,11 @@ function getEventRecordings(event: ContentfulEvent): EventLecture[] {
   return event?.bayaansCollection?.items ?? [];
 }
 
-export const getEventBySlug = cache(async (slug: string): Promise<EventDetails | undefined> => {
+export const getEventBySlug = async (slug: string): Promise<EventDetails | undefined> => {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
+
   const result = await ExecuteQuery(EventBySlugQuery, {
     variables: { slug },
     preview: false,
@@ -53,9 +58,13 @@ export const getEventBySlug = cache(async (slug: string): Promise<EventDetails |
   }
 
   return { title, slug: eventSlug, bayaanIds, recordings };
-});
+};
 
 export async function getEventDirectory(): Promise<EventDirectoryEntry[]> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CONTENTFUL_CACHE_TAG)
+
   const events: EventDirectoryEntry[] = [];
   // Each event asks for up to 10 bayaans, so 100 events per request keeps the
   // query well inside Contentful's query complexity limit.

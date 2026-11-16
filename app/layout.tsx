@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
-import { Header } from '@/components/header';
+import { Suspense } from 'react';
+import { Header, HeaderView } from '@/components/header';
 import Footer from '@/components/footer';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -51,7 +52,9 @@ export default function RootLayout({
     <html lang="en">
       <body className="font-sans antialiased">
         <Toaster />
-        <Header />
+        <Suspense fallback={<HeaderView currentPath={null} />}>
+          <Header />
+        </Suspense>
         {children}
         <Footer />
         {process.env.NODE_ENV === 'production' && <Analytics />}

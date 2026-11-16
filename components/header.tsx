@@ -12,13 +12,25 @@ const mobileLinkClassName = "rounded-lg px-3 py-2 text-sm font-medium transition
 const mobileActiveClassName = "text-foreground"
 const mobileInactiveClassName = "text-muted-foreground hover:text-foreground"
 
+// On routes like "/audio/[slug]" the path is only known at request time, so the
+// root layout wraps this in <Suspense> and shows <HeaderView currentPath={null} />
+// (no link highlighted) in the static shell until the path is known.
 export function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
+  return <HeaderView currentPath={pathname} />
+}
 
-  const isHomeActive = pathname === "/" || pathname.startsWith("/audio")
-  const isEventsActive = pathname.startsWith("/events")
-  const isAboutActive = pathname.startsWith("/about")
+export function HeaderView({ currentPath }: { currentPath: string | null }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  let isHomeActive = false
+  let isEventsActive = false
+  let isAboutActive = false
+  if (currentPath !== null) {
+    isHomeActive = currentPath === "/" || currentPath.startsWith("/audio")
+    isEventsActive = currentPath.startsWith("/events")
+    isAboutActive = currentPath.startsWith("/about")
+  }
 
   function getDesktopLinkClassName(isActive: boolean) {
     if (isActive) {

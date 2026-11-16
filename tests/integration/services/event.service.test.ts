@@ -7,8 +7,9 @@ vi.mock("@/services/apollo/apollo.service", () => ({ ExecuteQuery: vi.fn() }));
 
 const mockedExecuteQuery = vi.mocked(ExecuteQuery);
 
-// The service functions are wrapped in React's cache(). Importing a fresh copy
-// for each test keeps one test's cached result out of the next.
+// The service functions use "use cache", which only caches inside a Next.js
+// server, not in Vitest. Importing a fresh copy for each test still keeps any
+// module state from one test out of the next.
 async function loadEventService() {
   vi.resetModules();
   return import("@/services/bayaans/event.service");

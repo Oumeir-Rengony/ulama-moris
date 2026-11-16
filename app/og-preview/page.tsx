@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEventPath } from "@/lib/events";
@@ -14,13 +15,20 @@ export const metadata: Metadata = {
 
 type PreviewOption = { slug: string; title: string };
 
-export default async function OgPreviewPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ type?: string; event?: string; audio?: string; search?: string; page?: string; title?: string }>;
-}) {
+type PreviewSearchParams = Promise<{ type?: string; event?: string; audio?: string; search?: string; page?: string; title?: string }>;
+
+export default function OgPreviewPage({ searchParams }: { searchParams: PreviewSearchParams }) {
   if (process.env.NODE_ENV !== "development") notFound();
 
+  // The tool reads the URL query, which Cache Components only allows inside Suspense.
+  return (
+    <Suspense fallback={<p className="mx-auto max-w-7xl px-4 py-8 text-muted-foreground sm:px-6">Loading preview tool…</p>}>
+      <OgPreviewTool searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function OgPreviewTool({ searchParams }: { searchParams: PreviewSearchParams }) {
   const query = await searchParams;
   const type = query.type === "audio" ? "audio" : "event";
   const search = query.search?.trim() || "";
